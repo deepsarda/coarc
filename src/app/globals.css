@@ -1,26 +1,287 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
+/* ── Theme Tokens (TailwindCSS v4) ── */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+	/* Background layers - slightly lighter to show black shadows */
+	--color-void: #020205;
+	--color-base: #0c0c12;
+	--color-surface: #14141e;
+	--color-elevated: #1c1c2b;
+
+	/* Borders */
+	--color-border-hard: #2a2a3a;
+	--color-border-accent: #ffffff;
+
+	/* Neon accents */
+	--color-neon-cyan: #00f0ff;
+	--color-neon-magenta: #ff00aa;
+	--color-neon-green: #39ff14;
+	--color-neon-orange: #ff6b00;
+	--color-neon-red: #ff0040;
+	--color-neon-purple: #b44aff;
+	--color-neon-yellow: #ffe600;
+
+	/* Text */
+	--color-text-primary: #e8e8f0;
+	--color-text-secondary: #8888a0;
+	--color-text-muted: #55556a;
+
+	/* Fonts */
+	--font-heading: "Space Grotesk", sans-serif;
+	--font-body: "Space Grotesk", sans-serif;
+	--font-mono: "JetBrains Mono", monospace;
+
+	/* Neo-brutal Shadows (Removed for cleaner UI) */
+	--shadow-brutal: none;
+	--shadow-brutal-cyan: none;
+
+	/* Subtle technical shadows */
+	--shadow-tech: none;
+
+	/* Scifi Glows (Kept subtle) */
+	--shadow-glow-cyan: 0 0 15px rgba(0, 240, 255, 0.15);
+
+	/* Epic Page Master Shadow */
+	--shadow-master: none;
+
+	/* Border width - thinner for scifi precision */
+	--border-3: 1px;
+
+	/* Border radius - Scifi style: sharper */
+	--radius-brutal: 2px;
+	--radius-brutal-sm: 1px;
+	--radius-brutal-lg: 4px;
+
+	/* Animations */
+	--animate-slide-up: slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+	--animate-float: float 3s ease-in-out infinite;
+	--animate-pulse-neon: pulse-neon 2s ease-in-out infinite;
+	--animate-grid-scroll: grid-scroll 20s linear infinite;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── Keyframes ── */
+@keyframes slide-up {
+	from {
+		opacity: 0;
+		transform: translateY(16px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 
+@keyframes float {
+	0%,
+	100% {
+		transform: translateY(0px);
+	}
+	50% {
+		transform: translateY(-8px);
+	}
+}
+
+@keyframes pulse-neon {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.6;
+	}
+}
+
+@keyframes grid-scroll {
+	0% {
+		transform: translateY(0);
+	}
+	100% {
+		transform: translateY(50px);
+	}
+}
+
+@keyframes scanline {
+	0% {
+		transform: translateY(-100%);
+	}
+	100% {
+		transform: translateY(100%);
+	}
+}
+
+@keyframes glitch {
+	0% {
+		clip-path: inset(80% 0 0 0);
+	}
+	10% {
+		clip-path: inset(10% 0 85% 0);
+	}
+	100% {
+		clip-path: inset(80% 0 0 0);
+	}
+}
+
+@keyframes counter-glow {
+	0%,
+	100% {
+		text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+	}
+	50% {
+		text-shadow:
+			0 0 20px rgba(0, 240, 255, 0.6),
+			0 0 40px rgba(0, 240, 255, 0.2);
+	}
+}
+
+/* ── Base Styles ── */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+	background: var(--color-base);
+	color: var(--color-text-primary);
+	font-family: var(--font-body);
+	-webkit-font-smoothing: antialiased;
+	overflow-x: hidden;
+}
+
+/* ── Component Classes ── */
+@layer components {
+	.card-brutal {
+		background: var(--color-surface);
+		border: 1px solid var(--color-border-hard);
+		border-radius: var(--radius-brutal);
+		box-shadow: none;
+		transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
+		position: relative;
+	}
+
+	.card-brutal:hover {
+		transform: none;
+		box-shadow: 0 0 30px rgba(0, 240, 255, 0.05);
+		border-color: var(--color-text-muted);
+	}
+
+	.card-brutal-accent {
+		background: var(--color-surface);
+		border: 2px solid var(--color-neon-cyan);
+		border-radius: var(--radius-brutal);
+		box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
+		transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
+		position: relative;
+	}
+
+	.card-brutal-accent:hover {
+		transform: none;
+		box-shadow: 0 0 30px rgba(0, 240, 255, 0.2);
+	}
+
+	.scifi-window {
+		position: relative;
+	}
+
+	.scifi-window::before {
+		content: "";
+		position: absolute;
+		top: -1px;
+		left: 20px;
+		right: 20px;
+		height: 1px;
+		background: linear-gradient(
+			90deg,
+			transparent,
+			var(--color-neon-cyan),
+			transparent
+		);
+		z-index: 10;
+		opacity: 0.5;
+	}
+
+	.scifi-window::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(
+			to bottom,
+			transparent 50%,
+			rgba(0, 240, 255, 0.02) 50%
+		);
+		background-size: 100% 4px;
+		pointer-events: none;
+		z-index: 1;
+		opacity: 0.3;
+	}
+
+	.btn-brutal {
+		font-family: var(--font-mono);
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		font-size: 0.75rem;
+		font-weight: 800;
+		border: 1px solid var(--color-border-hard);
+		border-radius: var(--radius-brutal);
+		box-shadow: none;
+		transition: all 150ms ease;
+		background: var(--color-surface);
+		color: var(--color-text-primary);
+		padding: 0.5rem 1rem;
+	}
+
+	.btn-brutal:hover {
+		transform: none;
+		background: var(--color-elevated);
+	}
+
+	.btn-neon {
+		background: var(--color-neon-cyan);
+		color: #000;
+		font-family: var(--font-mono);
+		font-weight: 900;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		border: 2px solid #000;
+		box-shadow: none;
+		transition: all 150ms ease;
+	}
+
+	.btn-neon:hover {
+		transform: scale(1.02);
+		box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+	}
+
+	/* Backgrounds */
+	.bg-grid {
+		position: relative;
+		&::before {
+			content: "";
+			position: absolute;
+			inset: 0;
+			background-image:
+				linear-gradient(rgba(0, 240, 255, 0.04) 1px, transparent 1px),
+				linear-gradient(90deg, rgba(0, 240, 255, 0.04) 1px, transparent 1px);
+			background-size: 50px 50px;
+			animation: grid-scroll 25s linear infinite;
+			pointer-events: none;
+			mask-image: linear-gradient(
+				to bottom,
+				black 0%,
+				black 20%,
+				transparent 80%
+			);
+		}
+	}
+
+	.bg-grid-full {
+		background: var(--color-void);
+		position: relative;
+		&::before {
+			content: "";
+			position: fixed;
+			inset: 0;
+			background-image:
+				linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+				linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+			background-size: 60px 60px;
+			pointer-events: none;
+			z-index: 0;
+			mask-image: radial-gradient(circle at 50% 30%, black 10%, transparent 90%);
+		}
+	}
 }
