@@ -64,11 +64,11 @@ function LoginForm() {
 				animate={{ opacity: 1, scale: 1 }}
 				className="w-full max-w-md relative z-10"
 			>
-				<div className="text-center mb-10">
-					<h1 className="font-heading text-5xl font-black text-text-primary tracking-tighter uppercase">
+				<div className="text-center mb-6 md:mb-10">
+					<h1 className="font-heading text-4xl md:text-5xl font-black text-text-primary tracking-tighter uppercase">
 						co<span className="text-neon-cyan">.</span>arc
 					</h1>
-					<p className="text-text-muted mt-3 font-mono text-[10px] uppercase tracking-[0.4em] font-bold">
+					<p className="text-text-muted mt-3 font-mono text-small uppercase tracking-epic font-bold">
 						SEASON 01 :: ACCESS PROTOCOL
 					</p>
 				</div>
@@ -88,7 +88,7 @@ function LoginForm() {
 								<div className="w-2 h-2 rounded-full bg-neon-yellow shadow-[0_0_8px_#ffe600]" />
 								<div className="w-2 h-2 rounded-full bg-neon-green shadow-[0_0_8px_#39ff14]" />
 							</div>
-							<h3 className="font-mono text-[10px] text-neon-cyan uppercase tracking-[0.2em] font-black">
+							<h3 className="font-mono text-small text-neon-cyan uppercase tracking-mega font-black">
 								:: AUTHENTICATION
 							</h3>
 						</div>
@@ -104,7 +104,7 @@ function LoginForm() {
 								<div>
 									<label
 										htmlFor="roll-input"
-										className="block text-neon-cyan font-mono mb-4 text-[10px] uppercase tracking-[0.3em] font-black"
+										className="block text-neon-cyan font-mono mb-4 text-small uppercase tracking-mega font-black"
 									>
 										:: ENTER YOUR ROLL NUMBER
 									</label>
@@ -121,7 +121,7 @@ function LoginForm() {
 												setError("");
 											}}
 											onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-											className="flex-1 bg-zinc-950 border-2 border-border-hard p-4 text-center text-3xl font-mono tracking-[0.4em] focus:border-neon-cyan focus:outline-none transition-colors text-white font-black"
+											className="flex-1 bg-zinc-950 border-2 border-border-hard p-3 md:p-4 text-center text-2xl md:text-3xl font-mono tracking-[0.3em] md:tracking-[0.4em] focus:border-neon-cyan focus:outline-none transition-colors text-white font-black"
 										/>
 									</div>
 								</div>
@@ -137,7 +137,7 @@ function LoginForm() {
 								{error && (
 									<div className="bg-neon-red/10 border border-neon-red/30 p-3 flex items-center gap-3">
 										<div className="w-2 h-2 bg-neon-red rounded-full animate-pulse shadow-[0_0_8px_#ff0040]" />
-										<p className="text-neon-red text-[10px] font-mono font-black uppercase tracking-widest">
+										<p className="text-neon-red text-small font-mono font-black uppercase tracking-widest">
 											{error}
 										</p>
 									</div>
@@ -152,21 +152,21 @@ function LoginForm() {
 								className="text-center space-y-8 py-4"
 							>
 								<div className="space-y-2">
-									<p className="text-text-muted font-mono text-[10px] uppercase tracking-widest font-bold">
+									<p className="text-text-muted font-mono text-small uppercase tracking-widest font-bold">
 										EMAIL DETECTED
 									</p>
 									<p className="text-white font-mono text-xl break-all font-black tracking-tight">
 										{email}
 									</p>
 								</div>
-								<p className="text-text-secondary text-xs font-mono uppercase tracking-widest bg-zinc-950 p-3 border border-border-hard/50">
+								<p className="text-text-secondary text-sm font-mono uppercase tracking-widest bg-zinc-950 p-4 border border-border-hard/50">
 									Confirm identity to proceed
 								</p>
 								<div className="flex gap-4">
 									<button
 										type="button"
 										onClick={() => setStep("input")}
-										className="bg-zinc-900 border border-border-hard text-text-primary px-6 py-4 flex-1 font-mono text-[10px] uppercase tracking-widest font-black hover:bg-zinc-800 transition-colors"
+										className="bg-zinc-900 border border-border-hard text-text-primary px-6 py-4 flex-1 font-mono text-small uppercase tracking-widest font-black hover:bg-zinc-800 transition-colors"
 									>
 										Back
 									</button>
@@ -174,7 +174,7 @@ function LoginForm() {
 										type="button"
 										onClick={handleSendLink}
 										disabled={loading}
-										className="btn-neon px-6 py-4 flex-1 disabled:opacity-50 text-[10px] tracking-widest"
+										className="btn-neon px-6 py-4 flex-1 disabled:opacity-50 text-small tracking-widest"
 									>
 										{loading ? "SENDING..." : "SEND MAGIC LINK"}
 									</button>
@@ -198,13 +198,13 @@ function LoginForm() {
 									<h2 className="font-mono text-lg font-black text-white uppercase tracking-widest">
 										LINK SENT
 									</h2>
-									<p className="text-text-secondary font-mono text-xs leading-relaxed uppercase tracking-widest px-4">
+									<p className="text-text-secondary font-mono text-sm leading-relaxed uppercase tracking-widest px-4">
 										Magic link sent to{" "}
 										<span className="text-neon-cyan font-black">{email}</span>
 									</p>
 								</div>
 								<div className="bg-zinc-950 p-4 border border-border-hard/50 space-y-2">
-									<p className="text-text-muted text-[10px] font-mono leading-relaxed uppercase tracking-widest">
+									<p className="text-text-muted text-small font-mono leading-relaxed uppercase tracking-widest">
 										Link expires in 60m
 									</p>
 								</div>
@@ -214,7 +214,7 @@ function LoginForm() {
 										setStep("input");
 										setRollNumber("");
 									}}
-									className="text-text-secondary hover:text-white font-mono text-[9px] uppercase tracking-[0.3em] font-black transition-colors"
+									className="text-text-secondary hover:text-white font-mono text-small uppercase tracking-mega font-black transition-colors"
 								>
 									[ Use different email ]
 								</button>
@@ -225,7 +225,7 @@ function LoginForm() {
 
 				<div className="mt-8 flex items-center justify-center gap-4 opacity-50">
 					<div className="h-[1px] w-12 bg-border-hard" />
-					<p className="text-text-muted text-[9px] font-mono uppercase tracking-[0.4em] font-black">
+					<p className="text-text-muted text-small font-mono uppercase tracking-epic font-black">
 						SVNIT EXCLUSIVE
 					</p>
 					<div className="h-[1px] w-12 bg-border-hard" />

@@ -5,7 +5,7 @@ import Card from "@/components/ui/Card";
 
 export default function DashboardPage() {
 	return (
-		<div className="p-8 space-y-10 relative">
+		<div className="p-4 sm:p-8 pb-24 sm:pb-8 space-y-6 md:space-y-10 relative">
 			{/* Ambient background accent */}
 			<div className="absolute top-0 right-0 w-[400px] h-[400px] bg-neon-cyan/2 rounded-full blur-[120px] pointer-events-none" />
 
@@ -16,16 +16,16 @@ export default function DashboardPage() {
 				className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-l-4 border-neon-cyan pl-6"
 			>
 				<div>
-					<h1 className="font-heading text-4xl font-black text-text-primary uppercase tracking-tighter">
+					<h1 className="font-heading text-2xl md:text-4xl font-black text-text-primary uppercase tracking-tighter">
 						CONTROL_DASHBOARD
 					</h1>
-					<p className="text-text-muted text-[10px] font-mono mt-2 uppercase tracking-[0.4em] font-bold">
+					<p className="text-text-muted text-small font-mono mt-2 uppercase tracking-epic font-bold">
 						SYSTEM_STATUS :: CONNECTED
 					</p>
 				</div>
 				<div className="flex items-center gap-3">
 					<div className="w-2.5 h-2.5 bg-neon-green rounded-none animate-pulse" />
-					<span className="font-mono text-[9px] text-text-muted uppercase tracking-widest font-black">
+					<span className="font-mono text-tiny text-text-muted uppercase tracking-widest font-black">
 						Stable
 					</span>
 				</div>
@@ -68,11 +68,11 @@ export default function DashboardPage() {
 						<Card className="h-full">
 							<div className="flex items-center justify-between">
 								<div className="space-y-1">
-									<p className="text-text-muted text-[9px] font-mono uppercase tracking-widest font-black">
+									<p className="text-text-muted text-tiny md:text-small font-mono uppercase tracking-widest font-black">
 										{stat.label}
 									</p>
 									<p
-										className={`text-4xl font-mono font-black tracking-tighter ${stat.color}`}
+										className={`text-2xl md:text-4xl font-mono font-black tracking-tighter ${stat.color}`}
 									>
 										{stat.value}
 									</p>
@@ -100,23 +100,23 @@ export default function DashboardPage() {
 					<div className="flex flex-col md:flex-row items-center justify-between gap-8 py-4">
 						<div className="flex-1 space-y-3">
 							<div className="flex items-center gap-3">
-								<div className="px-2 py-0.5 bg-neon-cyan/10 border border-neon-cyan/30 text-neon-cyan font-mono text-[9px] font-black uppercase tracking-widest">
+								<div className="px-2 py-1 bg-neon-cyan/10 border border-neon-cyan/30 text-neon-cyan font-mono text-tiny font-black uppercase tracking-widest">
 									Pending
 								</div>
-								<span className="text-text-muted font-mono text-[10px] uppercase font-bold tracking-tighter">
+								<span className="text-text-muted font-mono text-small uppercase font-bold tracking-tighter">
 									Status: Queued
 								</span>
 							</div>
-							<h4 className="text-white font-mono text-xl font-black uppercase tracking-tight">
+							<h4 className="text-white font-mono text-lg md:text-xl font-black uppercase tracking-tight">
 								Daily problem has not been set yet.
 							</h4>
-							<p className="text-text-secondary text-xs font-mono leading-relaxed">
+							<p className="text-text-secondary text-sm font-mono leading-relaxed">
 								Check back later for today's challenge. The reset occurs every day at 08:00 IST.
 							</p>
 						</div>
 						<div className="w-full md:w-auto">
 							<div className="p-6 bg-zinc-950 border border-border-hard flex flex-col items-center justify-center gap-2 min-w-[200px]">
-								<p className="text-text-muted font-mono text-[9px] uppercase tracking-widest font-black">
+								<p className="text-text-muted font-mono text-tiny uppercase tracking-widest font-black">
 									Reset_In
 								</p>
 								<p className="text-text-primary font-mono text-2xl font-black tabular-nums tracking-tighter">
@@ -143,10 +143,10 @@ export default function DashboardPage() {
 								📡
 							</div>
 							<div className="space-y-1">
-								<p className="text-text-muted font-mono text-[10px] uppercase tracking-widest font-black">
+								<p className="text-text-muted font-mono text-small uppercase tracking-widest font-black">
 									LOG_DATA_EMPTY
 								</p>
-								<p className="text-text-secondary text-xs font-mono max-w-sm">
+								<p className="text-text-secondary text-sm font-mono max-w-sm text-center">
 									No recent activity has been recorded.
 								</p>
 							</div>
@@ -164,14 +164,14 @@ export default function DashboardPage() {
 					<Card title="Rankings">
 						<div className="space-y-4">
 							<div className="flex items-center justify-between p-3 bg-zinc-950 border border-border-hard/50">
-								<span className="text-text-muted font-mono text-[10px] uppercase font-black">
+								<span className="text-text-muted font-mono text-small uppercase font-black">
 									ELO Rating
 								</span>
-								<span className="text-text-primary font-mono text-xs font-black">
+								<span className="text-text-primary font-mono text-sm font-black">
 									1200
 								</span>
 							</div>
-							<p className="text-text-muted text-[10px] font-mono leading-relaxed px-1">
+							<p className="text-text-muted text-small font-mono leading-relaxed px-1">
 								Participate in battles to establish your rank.
 							</p>
 						</div>
@@ -180,7 +180,7 @@ export default function DashboardPage() {
 					<Card title="Weekly Quests">
 						<div className="space-y-6">
 							<div className="space-y-2">
-								<div className="flex justify-between text-[9px] font-mono text-text-muted uppercase font-black">
+								<div className="flex justify-between text-tiny font-mono text-text-muted uppercase font-black">
 									<span>Progress</span>
 									<span>0%</span>
 								</div>
@@ -188,7 +188,7 @@ export default function DashboardPage() {
 									<div className="h-full w-0 bg-neon-cyan shadow-[0_0_8px_#00f0ff]" />
 								</div>
 							</div>
-							<p className="text-text-muted text-[10px] font-mono leading-relaxed italic">
+							<p className="text-text-muted text-small font-mono leading-relaxed italic">
 								{/* Complete weekly challenges to earn more XP. */}
 								Complete weekly challenges to earn more XP.
 							</p>

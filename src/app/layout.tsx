@@ -25,6 +25,12 @@ export const metadata: Metadata = {
 	icons: { icon: '/favicon.ico' },
 };
 
+export const viewport = {
+	width: 'device-width',
+	initialScale: 1,
+	maximumScale: 5,
+};
+
 export default function RootLayout({
 	children,
 }: Readonly<{
@@ -39,7 +45,9 @@ export default function RootLayout({
 					<Navbar />
 					<div className="flex">
 						<Sidebar />
-						<main className="flex-1 min-h-[calc(100vh-3.5rem)] pb-20 lg:pb-0">{children}</main>
+						<main className="flex-1 min-h-[calc(100vh-3.5rem)] pb-20 lg:pb-0 w-full max-w-full overflow-x-hidden">
+							{children}
+						</main>
 					</div>
 					<MobileNav />
 				</ToastProvider>

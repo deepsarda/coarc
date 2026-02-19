@@ -64,19 +64,19 @@ export default function JoinCounter({
 						<div className="w-1.5 h-1.5 rounded-full bg-neon-green/40" />
 						<div className="w-1.5 h-1.5 rounded-full bg-neon-green/20" />
 					</div>
-					<h3 className="font-mono font-black text-text-primary text-[10px] uppercase tracking-[0.2em] flex items-center gap-2">
+					<h3 className="font-mono font-black text-text-primary text-tiny uppercase tracking-mega flex items-center gap-2">
 						<span className="text-neon-green">::</span> Roster_Sync
 					</h3>
 				</div>
 				<div className="flex items-center gap-4 relative z-10">
-					<span className="font-mono text-neon-green text-[10px] tracking-widest font-black uppercase">
+					<span className="font-mono text-neon-green text-tiny tracking-widest font-black uppercase">
 						{percent}%_Joined
 					</span>
 				</div>
 			</div>
 
 			{/* Body */}
-			<div className="p-8 relative flex-1 flex flex-col justify-center z-10">
+			<div className="p-6 md:p-8 relative flex-1 flex flex-col justify-center z-10">
 				{/* Background scanline effect placeholder (handled by scifi-window-scan) */}
 				
 				<div className="flex items-baseline justify-center gap-3 mb-8 relative z-10">
@@ -85,7 +85,7 @@ export default function JoinCounter({
 					</span>
 					<span className="font-mono text-2xl text-text-muted opacity-40">/{total}</span>
 				</div>
-				<p className="text-text-secondary font-mono text-[10px] text-center mb-10 uppercase tracking-[0.2em] opacity-60 font-bold">
+				<p className="text-text-secondary font-mono text-tiny text-center mb-10 uppercase tracking-mega opacity-60 font-bold">
 					Classmates indexed in the arc
 				</p>
 
@@ -111,7 +111,7 @@ export default function JoinCounter({
 							<div key={key} className={`w-${4-i} h-[2px] bg-neon-green/30`} />
 						))}
 					</div>
-					<span className="font-mono text-[8px] text-text-muted tracking-[0.2em] uppercase font-bold">
+					<span className="font-mono text-micro text-text-muted tracking-mega uppercase font-bold">
 						System_Active :: Roster_Sync_Enabled
 					</span>
 				</div>

@@ -52,6 +52,22 @@
 	--radius-brutal-sm: 1px;
 	--radius-brutal-lg: 4px;
 
+	/* Spacing extensions */
+	--spacing-128: 32rem;
+	--spacing-160: 40rem;
+	--spacing-192: 48rem;
+
+	/* Extra small text sizes for technical readout */
+	--font-size-tiny: 0.625rem; /* 10px */
+	--font-size-small: 0.6875rem; /* 11px */
+	--font-size-micro: 0.5rem; /* 8px */
+
+	/* Letter spacing extensions for scifi feel */
+	--letter-spacing-widest: 0.1em;
+	--letter-spacing-mega: 0.25em;
+	--letter-spacing-epic: 0.4em;
+	--letter-spacing-ultra: 0.5em;
+
 	/* Animations */
 	--animate-slide-up: slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 	--animate-float: float 3s ease-in-out infinite;

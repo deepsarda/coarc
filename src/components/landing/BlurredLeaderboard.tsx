@@ -46,22 +46,23 @@ export default function BlurredLeaderboard() {
 						<div className="w-2 h-2 rounded-full bg-neon-yellow/70 shadow-[0_0_8px_#ffe600]" />
 						<div className="w-2 h-2 rounded-full bg-neon-green/70 shadow-[0_0_8px_#39ff14]" />
 					</div>
-					<h3 className="font-mono font-black text-text-primary text-[10px] uppercase tracking-[0.2em] flex items-center gap-2">
+					<h3 className="font-mono font-black text-text-primary text-tiny uppercase tracking-mega flex items-center gap-2">
 						<span className="text-neon-cyan">::</span> Global_Leaderboard
 					</h3>
 				</div>
 				<div className="flex items-center gap-4 relative z-10">
-					<span className="px-2 py-0.5 bg-neon-cyan/10 border border-neon-cyan/30 rounded-none font-mono text-neon-cyan text-[9px] uppercase tracking-widest font-black">
+					<span className="px-2 py-0.5 bg-neon-cyan/10 border border-neon-cyan/30 rounded-none font-mono text-neon-cyan text-tiny uppercase tracking-widest font-black">
 						Live_Data
 					</span>
 				</div>
 			</div>
 
 			{/* Table Content */}
-			<div className="relative z-10">
-				<table className="w-full text-sm">
+			<div className="relative z-10 w-full overflow-hidden">
+				<div className="overflow-x-auto scrollbar-hide">
+					<table className="w-full text-sm min-w-[480px] md:min-w-0">
 					<thead>
-						<tr className="text-text-primary font-mono text-[11px] uppercase tracking-widest border-b border-border-hard bg-zinc-900/50">
+						<tr className="text-text-primary font-mono text-small uppercase tracking-widest border-b border-border-hard bg-zinc-900/50">
 							<th className="text-left px-6 py-4 w-12 font-black">#</th>
 							<th className="text-left px-6 py-4 font-black text-neon-cyan">Ranked_Node</th>
 							<th className="text-right px-6 py-4 font-black">Score</th>
@@ -75,25 +76,26 @@ export default function BlurredLeaderboard() {
 								key={row.rank}
 								className="transition-colors hover:bg-neon-cyan/[0.03]"
 							>
-								<td className="px-6 py-5 font-mono text-neon-cyan text-xs font-black">
+								<td className="px-3 md:px-6 py-4 md:py-5 font-mono text-neon-cyan text-xs font-black">
 									{RANK_MEDAL[row.rank] ?? `0${row.rank}`}
 								</td>
-								<td className="px-6 py-5 font-mono text-xs text-text-primary uppercase tracking-widest font-bold">
+								<td className="px-3 md:px-6 py-4 md:py-5 font-mono text-xs text-text-primary uppercase tracking-widest font-bold">
 									<EncryptedText text={row.name} scrambling={isHovered} />
 								</td>
-								<td className="px-6 py-5 font-mono text-right text-xs text-text-secondary uppercase tracking-widest">
+								<td className="px-3 md:px-6 py-4 md:py-5 font-mono text-right text-xs text-text-secondary uppercase tracking-widest">
 									<EncryptedText text={row.xp} scrambling={isHovered} />
 								</td>
-								<td className="px-6 py-5 font-mono text-right text-xs text-text-secondary uppercase tracking-widest">
+								<td className="px-3 md:px-6 py-4 md:py-5 font-mono text-right text-xs text-text-secondary uppercase tracking-widest">
 									<EncryptedText text={row.rating} scrambling={isHovered} />
 								</td>
-								<td className="px-6 py-5 font-mono text-right text-xs text-text-secondary uppercase tracking-widest">
+								<td className="px-3 md:px-6 py-4 md:py-5 font-mono text-right text-xs text-text-secondary uppercase tracking-widest">
 									<EncryptedText text={row.streak} scrambling={isHovered} />
 								</td>
 							</tr>
 						))}
 					</tbody>
 				</table>
+				</div>
 
 				{/* Overlay */}
 				<div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950/40 backdrop-blur-[2px] z-20">
@@ -102,12 +104,12 @@ export default function BlurredLeaderboard() {
 						whileInView={{ opacity: 1, scale: 1 }}
 						className="text-center p-8 relative"
 					>
-						<p className="text-white font-mono text-sm mb-8 uppercase tracking-[0.4em] font-black drop-shadow-[0_0_10px_rgba(255,b255,b255,0.3)]">
+						<p className="text-white font-mono text-sm mb-8 uppercase tracking-epic font-black drop-shadow-[0_0_10px_rgba(255,b255,b255,0.3)]">
 							Sign in to view your rank
 						</p>
 						<Link
 							href="/login"
-							className="btn-neon px-12 py-4 text-xs tracking-[0.3em]"
+							className="btn-neon px-12 py-4 text-xs tracking-mega"
 						>
 							Login to the Arc →
 						</Link>

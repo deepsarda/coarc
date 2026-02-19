@@ -130,11 +130,11 @@ export default function SetupPage() {
 				animate={{ opacity: 1, scale: 1 }}
 				className="w-full max-w-xl relative z-10"
 			>
-				<div className="text-center mb-10">
-					<h1 className="font-heading text-4xl font-black text-text-primary uppercase tracking-tighter">
+				<div className="text-center mb-6 md:mb-10">
+					<h1 className="font-heading text-3xl md:text-4xl font-black text-text-primary uppercase tracking-tighter text-center">
 						PROFILE SETUP
 					</h1>
-					<p className="text-text-muted mt-3 font-mono text-[10px] uppercase tracking-[0.4em] font-bold">
+					<p className="text-text-muted mt-3 font-mono text-small uppercase tracking-epic font-bold">
 						CONFIGURING YOUR NODE
 					</p>
 				</div>
@@ -150,22 +150,22 @@ export default function SetupPage() {
 					<div className="px-6 py-4 border-b border-border-hard bg-zinc-950/80 backdrop-blur-md relative z-10">
 						<div className="flex items-center gap-3">
 							<div className="w-2.5 h-2.5 bg-neon-cyan rounded-none animate-pulse" />
-							<p className="font-mono text-[10px] text-neon-cyan uppercase tracking-widest font-black">
+							<p className="font-mono text-small text-neon-cyan uppercase tracking-widest font-black">
 								SET UP YOUR PROFILE
 							</p>
 						</div>
 					</div>
 
-					<div className="p-10 space-y-8 relative z-10">
+					<div className="p-6 md:p-10 space-y-6 md:space-y-8 relative z-10">
 						<div className="space-y-4">
 							<div className="flex justify-between items-baseline">
 								<label
 									htmlFor={displayNameId}
-									className="text-text-muted font-mono text-[10px] uppercase tracking-widest font-black"
+									className="text-text-muted font-mono text-small uppercase tracking-widest font-black"
 								>
 									DISPLAY_NAME
 								</label>
-								<span className="text-[9px] font-mono text-neon-red/50 uppercase tracking-widest font-bold">
+								<span className="text-small font-mono text-neon-red/50 uppercase tracking-widest font-bold">
 									* REQUIRED
 								</span>
 							</div>
@@ -180,7 +180,7 @@ export default function SetupPage() {
 									autoFocus
 								/>
 								{errors.name && (
-									<p className="text-neon-red text-[9px] mt-2 font-mono uppercase font-black">
+									<p className="text-neon-red text-small mt-2 font-mono uppercase font-black">
 										{errors.name}
 									</p>
 								)}
@@ -192,12 +192,12 @@ export default function SetupPage() {
 								<div className="flex justify-between items-baseline">
 									<label
 										htmlFor={cfHandleId}
-										className="text-text-muted font-mono text-[10px] uppercase tracking-widest font-black"
+										className="text-text-muted font-mono text-small uppercase tracking-widest font-black"
 									>
 										CF_HANDLE
 									</label>
 									{validating.cf && (
-										<span className="text-[8px] font-mono text-neon-cyan animate-pulse uppercase">
+										<span className="text-tiny font-mono text-neon-cyan animate-pulse uppercase">
 											Verifying...
 										</span>
 									)}
@@ -212,7 +212,7 @@ export default function SetupPage() {
 										className="w-full bg-zinc-950 border border-border-hard p-4 font-mono text-sm focus:border-neon-cyan focus:outline-none transition-colors"
 									/>
 									{errors.cf && (
-										<p className="text-neon-red text-[9px] mt-2 font-mono uppercase font-black">
+										<p className="text-neon-red text-small mt-2 font-mono uppercase font-black">
 											{errors.cf}
 										</p>
 									)}
@@ -223,12 +223,12 @@ export default function SetupPage() {
 								<div className="flex justify-between items-baseline">
 									<label
 										htmlFor={lcHandleId}
-										className="text-text-muted font-mono text-[10px] uppercase tracking-widest font-black"
+										className="text-text-muted font-mono text-small uppercase tracking-widest font-black"
 									>
 										LC_HANDLE
 									</label>
 									{validating.lc && (
-										<span className="text-[8px] font-mono text-neon-cyan animate-pulse uppercase">
+										<span className="text-tiny font-mono text-neon-cyan animate-pulse uppercase">
 											Verifying...
 										</span>
 									)}
@@ -243,7 +243,7 @@ export default function SetupPage() {
 										className="w-full bg-zinc-950 border border-border-hard p-4 font-mono text-sm focus:border-neon-cyan focus:outline-none transition-colors"
 									/>
 									{errors.lc && (
-										<p className="text-neon-red text-[9px] mt-2 font-mono uppercase font-black">
+										<p className="text-neon-red text-small mt-2 font-mono uppercase font-black">
 											{errors.lc}
 										</p>
 									)}
@@ -263,7 +263,7 @@ export default function SetupPage() {
 						</div>
 
 						<div className="bg-zinc-950/50 p-4 border border-border-hard/30">
-							<p className="text-text-muted text-[9px] font-mono text-center uppercase tracking-widest leading-relaxed">
+							<p className="text-text-muted text-small font-mono text-center uppercase tracking-widest leading-relaxed">
 								Handles can be updated later in your dashboard.
 							</p>
 						</div>
