@@ -1,10 +1,10 @@
-// ── LeetCode GraphQL Response Types ──
+// LeetCode GraphQL Response Types
 
 export interface LCUserProfile {
 	username: string;
 	submitStats: {
 		acSubmissionNum: {
-			difficulty: 'All' | 'Easy' | 'Medium' | 'Hard';
+			difficulty: "All" | "Easy" | "Medium" | "Hard";
 			count: number;
 			submissions: number;
 		}[];
@@ -30,7 +30,7 @@ export interface LCProblem {
 	questionId: string;
 	title: string;
 	titleSlug: string;
-	difficulty: 'Easy' | 'Medium' | 'Hard';
+	difficulty: "Easy" | "Medium" | "Hard";
 	topicTags: { name: string; slug: string }[];
 	acRate: number;
 	isPaidOnly: boolean;
@@ -45,7 +45,7 @@ export interface LCContestInfo {
 
 // GraphQL query names
 export type LCQueryType =
-	| 'userProfile'
-	| 'recentSubmissions'
-	| 'contestRanking'
-	| 'submissionCalendar';
+	| "userProfile"
+	| "recentSubmissions"
+	| "contestRanking"
+	| "submissionCalendar";

@@ -1,4 +1,4 @@
-// ── Codeforces API Response Types ──
+// Codeforces API Response Types
 
 export interface CFUser {
 	handle: string;
@@ -49,8 +49,13 @@ export interface CFRatingChange {
 export interface CFContest {
 	id: number;
 	name: string;
-	type: 'CF' | 'IOI' | 'ICPC';
-	phase: 'BEFORE' | 'CODING' | 'PENDING_SYSTEM_TEST' | 'SYSTEM_TEST' | 'FINISHED';
+	type: "CF" | "IOI" | "ICPC";
+	phase:
+		| "BEFORE"
+		| "CODING"
+		| "PENDING_SYSTEM_TEST"
+		| "SYSTEM_TEST"
+		| "FINISHED";
 	frozen: boolean;
 	durationSeconds: number;
 	startTimeSeconds?: number;
@@ -59,7 +64,7 @@ export interface CFContest {
 
 // API response wrapper
 export interface CFApiResponse<T> {
-	status: 'OK' | 'FAILED';
+	status: "OK" | "FAILED";
 	result?: T;
 	comment?: string;
 }

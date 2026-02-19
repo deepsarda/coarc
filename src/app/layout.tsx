@@ -1,32 +1,33 @@
-import type { Metadata } from 'next';
-import { JetBrains_Mono, Space_Grotesk } from 'next/font/google';
-import './globals.css';
-import MobileNav from '@/components/layout/MobileNav';
-import Navbar from '@/components/layout/Navbar';
-import Sidebar from '@/components/layout/Sidebar';
-import { ToastProvider } from '@/components/ui/Toast';
-import { SITE } from '@/lib/config';
+import type { Metadata } from "next";
+import { JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import "./globals.css";
+import AppShell from "@/components/layout/AppShell";
+import MobileNav from "@/components/layout/MobileNav";
+import Navbar from "@/components/layout/Navbar";
+import { AuthProvider } from "@/components/providers/AuthProvider";
+import { ToastProvider } from "@/components/ui/Toast";
+import { SITE } from "@/lib/config";
 
 const spaceGrotesk = Space_Grotesk({
-	variable: '--font-heading',
-	subsets: ['latin'],
-	weight: ['400', '500', '600', '700'],
+	variable: "--font-heading",
+	subsets: ["latin"],
+	weight: ["400", "500", "600", "700"],
 });
 
 const jetbrainsMono = JetBrains_Mono({
-	variable: '--font-mono',
-	subsets: ['latin'],
-	weight: ['400', '500', '700'],
+	variable: "--font-mono",
+	subsets: ["latin"],
+	weight: ["400", "500", "700"],
 });
 
 export const metadata: Metadata = {
 	title: `${SITE.name} • ${SITE.tagline}`,
 	description: SITE.description,
-	icons: { icon: '/favicon.ico' },
+	icons: { icon: "/favicon.ico" },
 };
 
 export const viewport = {
-	width: 'device-width',
+	width: "device-width",
 	initialScale: 1,
 	maximumScale: 5,
 };
@@ -42,14 +43,9 @@ export default function RootLayout({
 				className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} font-body bg-void text-text-primary antialiased`}
 			>
 				<ToastProvider>
-					<Navbar />
-					<div className="flex">
-						<Sidebar />
-						<main className="flex-1 min-h-[calc(100vh-3.5rem)] pb-20 lg:pb-0 w-full max-w-full overflow-x-hidden">
-							{children}
-						</main>
-					</div>
-					<MobileNav />
+					<AuthProvider>
+						<AppShell>{children}</AppShell>
+					</AuthProvider>
 				</ToastProvider>
 			</body>
 		</html>

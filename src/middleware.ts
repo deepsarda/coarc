@@ -21,6 +21,7 @@ const SETUP_REQUIRED_ROUTES = [
 	"/admin",
 	"/profile",
 	"/compare",
+	"/contests",
 ];
 
 export async function middleware(request: NextRequest) {
@@ -37,54 +38,65 @@ export async function middleware(request: NextRequest) {
 					return request.cookies.getAll();
 				},
 				setAll(cookiesToSet) {
-					cookiesToSet.forEach(({ name, value }) => {
+					for (const { name, value } of cookiesToSet) {
 						request.cookies.set(name, value);
-					});
+					}
 					supabaseResponse = NextResponse.next({
 						request,
 					});
-					cookiesToSet.forEach(({ name, value, options }) => {
+					for (const { name, value, options } of cookiesToSet) {
 						supabaseResponse.cookies.set(name, value, options);
-					});
+					}
 				},
 			},
 		},
 	);
 
-	// Refresh session
+	// Refresh session (important: must call getUser, not getSession)
 	const {
 		data: { user },
 	} = await supabase.auth.getUser();
 
 	const pathname = request.nextUrl.pathname;
 
+	// Skip auth checks for API routes (they handle auth themselves)
+	if (pathname.startsWith("/api/")) {
+		return supabaseResponse;
+	}
+
 	// Check if current route is public
 	const isPublicRoute = PUBLIC_ROUTES.some(
 		(route) => pathname === route || pathname.startsWith("/auth/"),
 	);
 
-	// If not authenticated and trying to access protected route
+	// If not authenticated and trying to access protected route → login
 	if (!user && !isPublicRoute) {
 		const url = request.nextUrl.clone();
 		url.pathname = "/login";
 		return NextResponse.redirect(url);
 	}
 
-	// If authenticated and on login page, redirect to dashboard
+	// If authenticated and on login page → check profile
 	if (user && pathname === "/login") {
+		const { data: profile } = await supabase
+			.from("profiles")
+			.select("id")
+			.eq("id", user.id)
+			.single();
+
 		const url = request.nextUrl.clone();
-		url.pathname = "/dashboard";
+		url.pathname = profile ? "/dashboard" : "/setup";
 		return NextResponse.redirect(url);
 	}
 
-	// If authenticated, check if profile is set up
+	// If authenticated, check if profile is set up for protected routes
 	if (
 		user &&
 		SETUP_REQUIRED_ROUTES.some((route) => pathname.startsWith(route))
 	) {
 		const { data: profile } = await supabase
 			.from("profiles")
-			.select("display_name")
+			.select("id")
 			.eq("id", user.id)
 			.single();
 
@@ -92,6 +104,21 @@ export async function middleware(request: NextRequest) {
 		if (!profile) {
 			const url = request.nextUrl.clone();
 			url.pathname = "/setup";
+			return NextResponse.redirect(url);
+		}
+	}
+
+	// If authenticated but on setup and ALREADY has a profile → dashboard
+	if (user && pathname === "/setup") {
+		const { data: profile } = await supabase
+			.from("profiles")
+			.select("id")
+			.eq("id", user.id)
+			.single();
+
+		if (profile) {
+			const url = request.nextUrl.clone();
+			url.pathname = "/dashboard";
 			return NextResponse.redirect(url);
 		}
 	}

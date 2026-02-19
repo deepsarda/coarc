@@ -87,7 +87,7 @@ export default function LandingPage() {
 				{/* Features */}
 				<div className="pt-16">
 					<div className="flex flex-col items-center mb-16 text-center">
-						<div className="h-16 w-[2px] bg-gradient-to-t from-neon-cyan to-transparent mb-6" />
+						<div className="h-16 w-[2px] bg-linear-to-t from-neon-cyan to-transparent mb-6" />
 						<motion.h2
 							initial={{ opacity: 0, y: 10 }}
 							whileInView={{ opacity: 1, y: 0 }}
@@ -136,7 +136,7 @@ export default function LandingPage() {
 									</div>
 								</div>
 
-								<h4 className="font-mono font-black text-base md:text-lg mb-3 tracking-widest uppercase relative z-10 text-neon-cyan">
+								<h4 className="font-mono font-black md:text-lg mb-3 tracking-widest uppercase relative z-10 text-neon-cyan">
 									{feature.title}
 								</h4>
 								<p className="text-text-secondary text-sm font-mono leading-relaxed opacity-80 min-h-[3em] relative z-10">
@@ -151,8 +151,8 @@ export default function LandingPage() {
 										</span>
 									</div>
 									<div className="flex gap-1.5">
-										<div className="w-1.5 h-[1px] bg-neon-cyan" />
-										<div className="w-1.5 h-[1px] bg-neon-cyan/50" />
+										<div className="w-1.5 h-px bg-neon-cyan" />
+										<div className="w-1.5 h-px bg-neon-cyan/50" />
 									</div>
 								</div>
 							</motion.div>
@@ -181,8 +181,8 @@ export default function LandingPage() {
 								.
 							</h3>
 							<p className="text-text-secondary font-mono text-sm leading-relaxed">
-								Sync your profiles from Codeforces, LeetCode, and AtCoder to
-								start competing in the global SVNIT ecosystem. Earn XP for every
+								Sync your profiles from Codeforces and LeetCode to start
+								competing in the global SVNIT ecosystem. Earn XP for every
 								problem solved and climb the ranks to become the top node.
 							</p>
 						</div>
@@ -254,7 +254,7 @@ export default function LandingPage() {
 									</p>
 								</div>
 
-								<div className="h-[1px] w-full bg-gradient-to-r from-neon-cyan/30 via-neon-cyan/10 to-transparent" />
+								<div className="h-px w-full bg-linear-to-r from-neon-cyan/30 via-neon-cyan/10 to-transparent" />
 
 								<div className="flex items-center gap-8">
 									<div>
@@ -274,7 +274,7 @@ export default function LandingPage() {
 											</span>
 										</div>
 									</div>
-									<div className="h-14 w-[1px] bg-border-hard/50" />
+									<div className="h-14 w-px bg-border-hard/50" />
 									<div className="flex-1">
 										<div className="h-2.5 w-full bg-void border border-border-hard p-[2px] rounded-none">
 											<div className="h-full w-full bg-neon-cyan/20 animate-pulse" />
@@ -286,9 +286,9 @@ export default function LandingPage() {
 								</div>
 							</div>
 
-							<div className="w-32 h-32 md:w-44 md:h-44 flex-shrink-0 relative">
+							<div className="w-32 h-32 md:w-44 md:h-44 shrink-0 relative">
 								<div className="absolute inset-0 bg-neon-cyan/15 blur-2xl animate-pulse pointer-events-none" />
-								<div className="w-full h-full border-2 border-neon-cyan/40 rounded-none transform rotate-45 flex items-center justify-center p-4 bg-zinc-900 border-double border-4 border-neon-cyan/20 relative z-10 shadow-[0_0_30px_rgba(0,240,255,0.1)]">
+								<div className="w-full h-full rounded-none transform rotate-45 flex items-center justify-center p-4 bg-zinc-900 border-double border-4 border-neon-cyan/20 relative z-10 shadow-[0_0_30px_rgba(0,240,255,0.1)]">
 									<div className="transform -rotate-45 text-4xl md:text-6xl drop-shadow-[0_0_15px_rgba(0,240,255,0.5)]">
 										🌌
 									</div>
@@ -337,15 +337,15 @@ export default function LandingPage() {
 					<div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 text-xs md:text-small font-mono text-text-secondary tracking-mega uppercase mb-4 font-black">
 						<span className="hover:text-neon-cyan transition-colors cursor-pointer relative group whitespace-nowrap">
 							Security
-							<div className="absolute -bottom-1 left-0 w-0 h-[1px] bg-neon-cyan transition-all group-hover:w-full" />
+							<div className="absolute -bottom-1 left-0 w-0 h-px bg-neon-cyan transition-all group-hover:w-full" />
 						</span>
 						<span className="hover:text-neon-cyan transition-colors cursor-pointer relative group whitespace-nowrap">
 							Protocol
-							<div className="absolute -bottom-1 left-0 w-0 h-[1px] bg-neon-cyan transition-all group-hover:w-full" />
+							<div className="absolute -bottom-1 left-0 w-0 h-px bg-neon-cyan transition-all group-hover:w-full" />
 						</span>
 						<span className="hover:text-neon-cyan transition-colors cursor-pointer relative group whitespace-nowrap">
 							Terminal
-							<div className="absolute -bottom-1 left-0 w-0 h-[1px] bg-neon-cyan transition-all group-hover:w-full" />
+							<div className="absolute -bottom-1 left-0 w-0 h-px bg-neon-cyan transition-all group-hover:w-full" />
 						</span>
 					</div>
 					<p className="text-text-primary text-xs font-mono uppercase tracking-mega font-black opacity-100 flex items-center justify-center gap-3 text-center w-full px-4">

@@ -1,12 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useSearchParams } from "next/navigation";
-import { Suspense, useId, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useId, useState } from "react";
+import { useAuthContext } from "@/components/providers/AuthProvider";
 import { ROLL } from "@/lib/config";
 
 function LoginForm() {
+	const router = useRouter();
 	const searchParams = useSearchParams();
+	const { user, hasProfile, loading: authLoading } = useAuthContext();
 	const [rollNumber, setRollNumber] = useState("");
 	const [email, setEmail] = useState("");
 	const [step, setStep] = useState<"input" | "confirm" | "sent">("input");
@@ -17,6 +20,17 @@ function LoginForm() {
 	);
 	const [loading, setLoading] = useState(false);
 	const rollId = useId();
+
+	// If already authenticated, redirect
+	useEffect(() => {
+		if (!authLoading && user) {
+			if (hasProfile) {
+				router.replace("/dashboard");
+			} else {
+				router.replace("/setup");
+			}
+		}
+	}, [authLoading, user, hasProfile, router]);
 
 	const handleSubmit = () => {
 		const roll = parseInt(rollNumber, 10);
@@ -109,21 +123,21 @@ function LoginForm() {
 									>
 										:: ENTER YOUR ROLL NUMBER
 									</label>
-									
-										<input
-											id={rollId}
-											type="text"
-											inputMode="numeric"
-											maxLength={2}
-											placeholder="01"
-											value={rollNumber}
-											onChange={(e) => {
-												setRollNumber(e.target.value.replace(/\D/g, ""));
-												setError("");
-											}}
-											onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-											className="w-full bg-zinc-950 border-2 border-border-hard p-3 md:p-4 text-center text-2xl md:text-3xl font-mono tracking-[0.3em] md:tracking-[0.4em] focus:border-neon-cyan focus:outline-none transition-colors text-white font-black "
-										/>
+
+									<input
+										id={rollId}
+										type="text"
+										inputMode="numeric"
+										maxLength={2}
+										placeholder="01"
+										value={rollNumber}
+										onChange={(e) => {
+											setRollNumber(e.target.value.replace(/\D/g, ""));
+											setError("");
+										}}
+										onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+										className="w-full bg-zinc-950 border-2 border-border-hard p-3 md:p-4 text-center text-2xl md:text-3xl font-mono tracking-[0.3em] md:tracking-[0.4em] focus:border-neon-cyan focus:outline-none transition-colors text-white font-black "
+									/>
 								</div>
 
 								<button
@@ -188,7 +202,7 @@ function LoginForm() {
 								animate={{ opacity: 1, scale: 1 }}
 								className="text-center space-y-6 pt-4 pb-2"
 							>
-								<div className="inline-flex w-20 h-20 bg-neon-cyan/10 border-2 border-neon-cyan/30 flex items-center justify-center relative group">
+								<div className="inline-flex w-20 h-20 bg-neon-cyan/10 border-2 border-neon-cyan/30 items-center justify-center relative group">
 									<div className="absolute inset-0 bg-neon-cyan/20 animate-pulse" />
 									<span className="text-4xl text-neon-cyan drop-shadow-[0_0_10px_#00f0ff] relative z-10">
 										📧

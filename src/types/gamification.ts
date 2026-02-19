@@ -1,4 +1,4 @@
-// ── App Domain Types ──
+// App Domain Types
 
 export interface Profile {
 	id: string;
@@ -24,7 +24,7 @@ export interface Badge {
 	description: string;
 	icon: string;
 	category: BadgeCategory;
-	condition_type: 'auto' | 'manual';
+	condition_type: "auto" | "manual";
 	condition_value?: Record<string, unknown>;
 }
 
@@ -98,14 +98,14 @@ export interface UserQuest {
 export interface SharedProblem {
 	id: number;
 	user_id: string;
-	platform: 'cf' | 'lc';
+	platform: "cf" | "lc";
 	problem_id?: string | null;
 	problem_url: string;
 	problem_title: string;
 	difficulty?: string | null;
 	tags: string[];
 	note?: string | null;
-	source: 'manual' | 'auto_lc';
+	source: "manual" | "auto_lc";
 	created_at: string;
 	// Joined data
 	user?: Profile;
@@ -148,10 +148,10 @@ export interface DailyProblem {
 }
 
 export interface Recommendation {
-	slot: 'weak' | 'practice' | 'rusty' | 'stretch';
+	slot: "weak" | "practice" | "rusty" | "stretch";
 	label: string;
 	topic: string;
-	problem: import('./codeforces').CFProblem;
+	problem: import("./codeforces").CFProblem;
 	classmates_solved: number;
 	days_since_last_solve?: number;
 }
@@ -163,7 +163,7 @@ export interface AttendanceInsight {
 	total: number;
 	percentage: number;
 	skippable: number;
-	risk_level: 'safe' | 'warning' | 'danger';
+	risk_level: "safe" | "warning" | "danger";
 	projected_semester_end: number;
 }
 
@@ -211,7 +211,7 @@ export interface FlashcardProgress {
 	id: number;
 	user_id: string;
 	card_id: number;
-	status: 'unseen' | 'got_it' | 'needs_review';
+	status: "unseen" | "got_it" | "needs_review";
 	last_reviewed_at?: string | null;
 }
 
@@ -223,7 +223,7 @@ export interface Resource {
 	topic: string;
 	submitted_by?: string | null;
 	approved_by?: string | null;
-	status: 'pending' | 'approved' | 'rejected';
+	status: "pending" | "approved" | "rejected";
 	created_at: string;
 	submitter?: Profile;
 }
@@ -232,7 +232,7 @@ export interface Announcement {
 	id: number;
 	title: string;
 	body: string;
-	priority: 'normal' | 'important' | 'urgent';
+	priority: "normal" | "important" | "urgent";
 	created_by?: string | null;
 	created_at: string;
 	creator?: Profile;
@@ -281,26 +281,42 @@ export interface LeaderboardEntry {
 	rank_change?: number; // positive = moved up
 }
 
-// ── Enums / Union Types ──
+// Enums / Union Types
 
-export type BadgeCategory = 'solve' | 'streak' | 'social' | 'contest' | 'special';
-export type DuelStatus = 'pending' | 'active' | 'completed' | 'expired' | 'declined';
-export type QuestType = 'topic' | 'difficulty' | 'streak' | 'social' | 'duel' | 'study';
-export type ReactionType = 'fire' | 'brain' | 'skull';
-export type AttendanceStatus = 'attended' | 'bunked';
-export type BookmarkList = 'want_to_solve' | 'revisit_later';
+export type BadgeCategory =
+	| "solve"
+	| "streak"
+	| "social"
+	| "contest"
+	| "special";
+export type DuelStatus =
+	| "pending"
+	| "active"
+	| "completed"
+	| "expired"
+	| "declined";
+export type QuestType =
+	| "topic"
+	| "difficulty"
+	| "streak"
+	| "social"
+	| "duel"
+	| "study";
+export type ReactionType = "fire" | "brain" | "skull";
+export type AttendanceStatus = "attended" | "bunked";
+export type BookmarkList = "want_to_solve" | "revisit_later";
 export type NotificationType =
-	| 'overtake'
-	| 'dark_horse'
-	| 'duel_challenge'
-	| 'duel_result'
-	| 'boss_new'
-	| 'boss_solved'
-	| 'badge_earned'
-	| 'quest_complete'
-	| 'streak_warning'
-	| 'streak_lost'
-	| 'daily_problem'
-	| 'announcement'
-	| 'resource_approved'
-	| 'weekly_digest';
+	| "overtake"
+	| "dark_horse"
+	| "duel_challenge"
+	| "duel_result"
+	| "boss_new"
+	| "boss_solved"
+	| "badge_earned"
+	| "quest_complete"
+	| "streak_warning"
+	| "streak_lost"
+	| "daily_problem"
+	| "announcement"
+	| "resource_approved"
+	| "weekly_digest";
