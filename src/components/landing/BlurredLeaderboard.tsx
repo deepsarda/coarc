@@ -50,7 +50,7 @@ export default function BlurredLeaderboard() {
 						<span className="text-neon-cyan">::</span> Global_Leaderboard
 					</h3>
 				</div>
-				<div className="flex items-center gap-4 relative z-10 sm:hidden">
+				<div className="flex items-center gap-4 relative z-10 hidden sm:block">
 					<span className="px-2 py-0.5 bg-neon-cyan/10 border border-neon-cyan/30 rounded-none font-mono text-neon-cyan text-tiny uppercase tracking-widest font-black">
 						Live_Data
 					</span>
