@@ -69,7 +69,7 @@ function LoginForm() {
 						co<span className="text-neon-cyan">.</span>arc
 					</h1>
 					<p className="text-text-muted mt-3 font-mono text-small uppercase tracking-epic font-bold">
-						SEASON 01 :: ACCESS PROTOCOL
+						SYSTEM :: ACCESS PROTOCOL
 					</p>
 				</div>
 
@@ -81,7 +81,7 @@ function LoginForm() {
 					<div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-neon-cyan opacity-40 z-20" />
 					<div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-neon-cyan opacity-40 z-20" />
 
-					<div className="px-5 py-2.5 border-b border-border-hard flex items-center justify-between bg-zinc-950/80 backdrop-blur-md relative z-10">
+					<div className="px-2.5 md:px-5 py-2.5 border-b border-border-hard flex items-center justify-between bg-zinc-950/80 backdrop-blur-md relative z-10">
 						<div className="flex items-center gap-3">
 							<div className="flex gap-1.5">
 								<div className="w-2 h-2 rounded-full bg-neon-red shadow-[0_0_8px_#ff0040]" />
