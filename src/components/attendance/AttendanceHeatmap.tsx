@@ -35,7 +35,7 @@ export function AttendanceHeatmap() {
 				for (let i = 364; i >= 0; i--) {
 					const d = new Date(today);
 					d.setDate(d.getDate() - i);
-					const ds = d.toISOString().split('T')[0];
+					const ds = dateStr(d.getFullYear(), d.getMonth(), d.getDate());
 					days.push({ date: ds, ...(map.get(ds) ?? { attended: 0, bunked: 0 }) });
 				}
 				setData(days);

@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { currentMonthIST, nowIST } from '@/lib/utils/ist';
 
 export interface AttendanceSummary {
 	course_id: number;
@@ -50,8 +51,8 @@ export async function computeAttendanceInsights(
 	const recordsByCourse = new Map<number, { attended: number; bunked: number }>();
 	const monthlyByCourse = new Map<number, { attended: number; bunked: number }>();
 
-	const now = new Date();
-	const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+	const now = nowIST();
+	const currentMonth = currentMonthIST();
 
 	for (const r of records ?? []) {
 		const existing = recordsByCourse.get(r.course_id) ?? {

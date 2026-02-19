@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { createNotification } from '@/lib/notifications/send';
 import { XP_REWARDS } from '@/lib/utils/constants';
+import { daysAgoIST, todayIST, yesterdayIST } from '@/lib/utils/ist';
 import { checkAndAwardBadges } from './badges';
 import { awardXP } from './xp';
 
@@ -19,14 +20,8 @@ export async function processAllStreaks(admin: SupabaseClient) {
 
 	if (!profiles) return;
 
-	const today = new Date();
-	today.setHours(0, 0, 0, 0);
-
-	const yesterday = new Date(today);
-	yesterday.setDate(yesterday.getDate() - 1);
-
-	const yesterdayStr = yesterday.toISOString().split('T')[0];
-	const dayBeforeStr = new Date(yesterday.getTime() - 86400000).toISOString().split('T')[0];
+	const yesterdayStr = yesterdayIST();
+	const dayBeforeStr = daysAgoIST(2);
 
 	for (const profile of profiles) {
 		if (!profile.last_solve_date) continue;
@@ -103,7 +98,7 @@ export async function processAllStreaks(admin: SupabaseClient) {
  * who haven't solved today and have streak >= 3.
  */
 export async function sendStreakWarnings(admin: SupabaseClient) {
-	const todayStr = new Date().toISOString().split('T')[0];
+	const todayStr = todayIST();
 
 	const { data: atRiskUsers } = await admin
 		.from('profiles')
@@ -131,7 +126,7 @@ export async function sendStreakWarnings(admin: SupabaseClient) {
  * Update a single user's streak after a new solve is detected.
  */
 export async function updateUserStreak(admin: SupabaseClient, userId: string) {
-	const todayStr = new Date().toISOString().split('T')[0];
+	const todayStr = todayIST();
 
 	const { data: profile } = await admin
 		.from('profiles')
@@ -144,9 +139,7 @@ export async function updateUserStreak(admin: SupabaseClient, userId: string) {
 	// Already solved today
 	if (profile.last_solve_date === todayStr) return;
 
-	const yesterday = new Date();
-	yesterday.setDate(yesterday.getDate() - 1);
-	const yesterdayStr = yesterday.toISOString().split('T')[0];
+	const yesterdayStr = yesterdayIST();
 
 	let newStreak: number;
 

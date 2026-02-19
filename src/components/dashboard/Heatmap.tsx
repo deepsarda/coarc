@@ -3,6 +3,7 @@
 import { CalendarRange } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { epochToDateIST, isoToDateIST } from '@/lib/utils/ist';
 
 // 365-day GitHub-style heatmap
 
@@ -37,7 +38,7 @@ export default function Heatmap({ userId }: HeatmapProps) {
 		if (lcStats?.submission_calendar) {
 			const cal = lcStats.submission_calendar as Record<string, number>;
 			for (const [ts, count] of Object.entries(cal)) {
-				const d = new Date(Number(ts) * 1000).toISOString().split('T')[0];
+				const d = epochToDateIST(Number(ts) * 1000);
 				dayMap.set(d, (dayMap.get(d) ?? 0) + count);
 			}
 		}
@@ -55,7 +56,7 @@ export default function Heatmap({ userId }: HeatmapProps) {
 
 		if (cfSubs) {
 			for (const s of cfSubs) {
-				const d = s.submitted_at.split('T')[0];
+				const d = isoToDateIST(s.submitted_at);
 				dayMap.set(d, (dayMap.get(d) ?? 0) + 1);
 			}
 		}
@@ -69,7 +70,7 @@ export default function Heatmap({ userId }: HeatmapProps) {
 
 		if (lcSubs) {
 			for (const s of lcSubs) {
-				const d = s.submitted_at.split('T')[0];
+				const d = isoToDateIST(s.submitted_at);
 				dayMap.set(d, (dayMap.get(d) ?? 0) + 1);
 			}
 		}
@@ -80,7 +81,7 @@ export default function Heatmap({ userId }: HeatmapProps) {
 		for (let i = DAYS - 1; i >= 0; i--) {
 			const d = new Date(today);
 			d.setDate(d.getDate() - i);
-			const ds = d.toISOString().split('T')[0];
+			const ds = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 			days.push({ date: ds, count: dayMap.get(ds) ?? 0 });
 		}
 
