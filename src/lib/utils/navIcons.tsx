@@ -9,6 +9,7 @@ import {
 	Code,
 	Crosshair,
 	Crown,
+	GitCompareArrows,
 	Layers,
 	LayoutDashboard,
 	Megaphone,
@@ -41,6 +42,8 @@ const NAV_ICON_MAP: Record<string, ReactNode> = {
 	'/resources': <BookOpen className={SIZE} />,
 	'/announcements': <Megaphone className={SIZE} />,
 	'/hall-of-fame': <Crown className={SIZE} />,
+	'/head-to-head': <GitCompareArrows className={SIZE} />,
+	'/profile': <Users className={SIZE} />,
 	'/profile/me': <User className={SIZE} />,
 	// admin
 	'/admin': <Settings className={SIZE} />,

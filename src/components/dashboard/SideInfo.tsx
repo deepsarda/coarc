@@ -1,16 +1,9 @@
 /** biome-ignore-all lint/suspicious/noArrayIndexKey: decorative icons */
-"use client";
+'use client';
 
-import {
-	Award,
-	CalendarDays,
-	ChevronRight,
-	Flame,
-	Shield,
-	ShieldOff,
-} from "lucide-react";
-import Link from "next/link";
-import type { Profile } from "@/types/gamification";
+import { Award, CalendarDays, ChevronRight, Flame, Shield, ShieldOff } from 'lucide-react';
+import Link from 'next/link';
+import type { Profile } from '@/types/gamification';
 
 interface SideInfoProps {
 	profile: Profile;
@@ -19,11 +12,7 @@ interface SideInfoProps {
 }
 
 /** Combined streak + badges info */
-export default function SideInfo({
-	profile,
-	badgesEarned,
-	badgesTotal,
-}: SideInfoProps) {
+export default function SideInfo({ profile, badgesEarned, badgesTotal }: SideInfoProps) {
 	const streakActive = profile.current_streak > 0;
 	const shieldCount = profile.streak_shields;
 
@@ -40,7 +29,7 @@ export default function SideInfo({
 					<div className="pr-5 flex-1">
 						<p className="dash-sub mb-1">Current</p>
 						<p
-							className={`font-mono text-2xl font-black tracking-tighter ${streakActive ? "text-neon-orange" : "text-text-dim"}`}
+							className={`font-mono text-2xl font-black tracking-tighter ${streakActive ? 'text-neon-orange' : 'text-text-dim'}`}
 						>
 							{profile.current_streak}d
 						</p>
@@ -48,18 +37,11 @@ export default function SideInfo({
 							<div className="flex mt-1 gap-0.5">
 								{Array.from({
 									length: Math.min(
-										profile.current_streak >= 7
-											? 3
-											: profile.current_streak >= 3
-												? 2
-												: 1,
+										profile.current_streak >= 7 ? 3 : profile.current_streak >= 3 ? 2 : 1,
 										3,
 									),
 								}).map((_, i) => (
-									<Flame
-										key={`streak-fire-${i}`}
-										className="w-3.5 h-3.5 text-orange-400/70"
-									/>
+									<Flame key={`streak-fire-${i}`} className="w-3.5 h-3.5 text-orange-400/70" />
 								))}
 							</div>
 						)}
@@ -75,14 +57,9 @@ export default function SideInfo({
 						<div className="flex items-center gap-0.5 mt-1">
 							{shieldCount > 0 ? (
 								<>
-									{Array.from({ length: Math.min(shieldCount, 3) }).map(
-										(_, i) => (
-											<Shield
-												key={`shield-${i}`}
-												className="w-4 h-4 text-emerald-400"
-											/>
-										),
-									)}
+									{Array.from({ length: Math.min(shieldCount, 3) }).map((_, i) => (
+										<Shield key={`shield-${i}`} className="w-4 h-4 text-emerald-400" />
+									))}
 									{shieldCount > 3 && (
 										<span className="text-emerald-400 font-mono text-[11px] font-bold ml-0.5">
 											+{shieldCount - 3}
@@ -123,9 +100,7 @@ export default function SideInfo({
 					<span className="font-mono text-3xl font-black text-neon-orange tracking-tighter">
 						{badgesEarned}
 					</span>
-					<span className="font-mono text-lg font-black text-text-dim">
-						/ {badgesTotal}
-					</span>
+					<span className="font-mono text-lg font-black text-text-dim">/ {badgesTotal}</span>
 					<span className="dash-sub ml-auto">earned</span>
 				</div>
 				{badgesTotal > 0 && (

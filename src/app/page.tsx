@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion';
 import {
 	Award,
 	BarChart3,
@@ -12,13 +12,13 @@ import {
 	Swords,
 	Target,
 	Trophy,
-} from "lucide-react";
-import Link from "next/link";
-import { type ReactNode, useEffect, useState } from "react";
-import BlurredLeaderboard from "@/components/landing/BlurredLeaderboard";
-import HeroSection from "@/components/landing/HeroSection";
-import JoinCounter from "@/components/landing/JoinCounter";
-import { SITE } from "@/lib/config";
+} from 'lucide-react';
+import Link from 'next/link';
+import { type ReactNode, useEffect, useState } from 'react';
+import BlurredLeaderboard from '@/components/landing/BlurredLeaderboard';
+import HeroSection from '@/components/landing/HeroSection';
+import JoinCounter from '@/components/landing/JoinCounter';
+import { SITE } from '@/lib/config';
 
 /* Feature clusters */
 interface Feature {
@@ -38,79 +38,79 @@ interface FeatureCluster {
 
 const CLUSTERS: FeatureCluster[] = [
 	{
-		label: "GROWTH_MODULES",
-		title: "Beyond Code",
-		color: "text-neon-cyan",
-		borderColor: "border-neon-cyan/40",
+		label: 'GROWTH_MODULES',
+		title: 'Beyond Code',
+		color: 'text-neon-cyan',
+		borderColor: 'border-neon-cyan/40',
 		features: [
 			{
 				icon: <CalendarCheck className="w-7 h-7" />,
-				title: "Attendance",
-				desc: "Track classes, predict skips, never fall below 76%.",
-				xp: "Skip calculator",
+				title: 'Attendance',
+				desc: 'Track classes, predict skips, never fall below 76%.',
+				xp: 'Skip calculator',
 			},
 			{
 				icon: <BookOpen className="w-7 h-7" />,
-				title: "Flashcards",
-				desc: "Admin-curated study decks. Earn XP for every card you master.",
-				xp: "+5 XP per card",
+				title: 'Flashcards',
+				desc: 'Admin-curated study decks. Earn XP for every card you master.',
+				xp: '+5 XP per card',
 			},
 			{
 				icon: <Library className="w-7 h-7" />,
-				title: "Resources",
-				desc: "Community-shared links approved by peers.",
-				xp: "+20 XP approved",
+				title: 'Resources',
+				desc: 'Community-shared links approved by peers.',
+				xp: '+20 XP approved',
 			},
 		],
 	},
 	{
-		label: "TRACKING_ENGINE",
-		title: "Your Progress",
-		color: "text-neon-green",
-		borderColor: "border-neon-green/40",
+		label: 'TRACKING_ENGINE',
+		title: 'Your Progress',
+		color: 'text-neon-green',
+		borderColor: 'border-neon-green/40',
 		features: [
 			{
 				icon: <Flame className="w-7 h-7" />,
-				title: "Streaks",
-				desc: "Consecutive solve days with shields. Fire grows with your streak.",
-				xp: "+5–50 XP/day",
+				title: 'Streaks',
+				desc: 'Consecutive solve days with shields. Fire grows with your streak.',
+				xp: '+5–50 XP/day',
 			},
 			{
 				icon: <Trophy className="w-7 h-7" />,
-				title: "Leaderboards",
-				desc: "Weekly, monthly, all-time rankings. Dark horse alerts.",
-				xp: "Monarch badge",
+				title: 'Leaderboards',
+				desc: 'Weekly, monthly, all-time rankings. Dark horse alerts.',
+				xp: 'Monarch badge',
 			},
 			{
 				icon: <BarChart3 className="w-7 h-7" />,
-				title: "Analytics",
-				desc: "Heatmaps, topic radars, rating trajectories. All real-time.",
+				title: 'Analytics',
+				desc: 'Heatmaps, topic radars, rating trajectories. All real-time.',
 			},
 		],
 	},
 	{
-		label: "COMBAT_SYSTEMS",
-		title: "Battle Modes",
-		color: "text-neon-red",
-		borderColor: "border-neon-red/40",
+		label: 'COMBAT_SYSTEMS',
+		title: 'Battle Modes',
+		color: 'text-neon-red',
+		borderColor: 'border-neon-red/40',
 		features: [
 			{
 				icon: <Swords className="w-7 h-7" />,
-				title: "Duels",
-				desc: "Challenge classmates to 1v1 coding battles. Auto-matched problems.",
-				xp: "+75 XP win",
+				title: 'Duels',
+				desc: 'Challenge classmates to 1v1 coding battles. Auto-matched problems.',
+				xp: '+75 XP win',
 			},
 			{
 				icon: <Target className="w-7 h-7" />,
-				title: "Boss Raids",
-				desc: "Community bosses with HP bars. Defeat them as a class.",
-				xp: "+500 XP first solve",
+				title: 'Boss Raids',
+				desc: 'Community bosses with HP bars. Defeat them as a class.',
+				xp: '+500 XP first solve',
 			},
 			{
 				icon: <Award className="w-7 h-7" />,
-				title: "Weekly Quests",
-				desc: "3 quests per week. Complete all for bonus XP.",
-				xp: "+50 XP each",
+				title: 'Weekly Quests',
+				desc: '3 quests per week. Complete all for bonus XP.',
+				xp: '+50 XP each',
 			},
 		],
 	},
@@ -143,7 +143,7 @@ export default function LandingPage() {
 	});
 
 	useEffect(() => {
-		fetch("/api/stats")
+		fetch('/api/stats')
 			.then((r) => r.json())
 			.then(setStats)
 			.catch(() => {});
@@ -197,7 +197,7 @@ export default function LandingPage() {
 							key={cluster.label}
 							initial={{ opacity: 0, y: 30 }}
 							whileInView={{ opacity: 1, y: 0 }}
-							viewport={{ once: true, margin: "-60px" }}
+							viewport={{ once: true, margin: '-60px' }}
 							transition={{ duration: 0.5, delay: ci * 0.1 }}
 							className="relative"
 						>
@@ -221,7 +221,7 @@ export default function LandingPage() {
 								variants={containerVariants}
 								initial="hidden"
 								whileInView="visible"
-								viewport={{ once: true, margin: "-50px" }}
+								viewport={{ once: true, margin: '-50px' }}
 								className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
 							>
 								{cluster.features.map((feature) => (
@@ -268,7 +268,7 @@ export default function LandingPage() {
 					<motion.div
 						initial={{ opacity: 0, x: -20 }}
 						whileInView={{ opacity: 1, x: 0 }}
-						viewport={{ once: true, margin: "-50px" }}
+						viewport={{ once: true, margin: '-50px' }}
 						transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
 						className="h-full"
 					>
@@ -280,13 +280,11 @@ export default function LandingPage() {
 					<div className="flex flex-col justify-center space-y-8 p-4">
 						<div className="space-y-4">
 							<h3 className="font-heading font-black text-2xl text-text-primary tracking-tight uppercase">
-								Your journey starts <span className="text-neon-cyan">here</span>
-								.
+								Your journey starts <span className="text-neon-cyan">here</span>.
 							</h3>
 							<p className="text-text-secondary font-mono text-sm leading-relaxed">
-								Sync your profiles from Codeforces and LeetCode to start earning
-								XP. Track your attendance. Study with flashcards. Everything you
-								need, all in one place.
+								Sync your profiles from Codeforces and LeetCode to start earning XP. Track your
+								attendance. Study with flashcards. Everything you need, all in one place.
 							</p>
 						</div>
 						<div className="flex flex-wrap gap-4">
@@ -310,7 +308,7 @@ export default function LandingPage() {
 				<motion.div
 					initial={{ opacity: 0, scale: 0.95 }}
 					whileInView={{ opacity: 1, scale: 1 }}
-					viewport={{ once: true, margin: "-100px" }}
+					viewport={{ once: true, margin: '-100px' }}
 					transition={{ duration: 0.6 }}
 					className="max-w-3xl mx-auto pt-12"
 				>
@@ -334,9 +332,7 @@ export default function LandingPage() {
 									<div className="status-dot status-dot-yellow" />
 									<div className="status-dot status-dot-green" />
 								</div>
-								<h3 className="scifi-label tracking-mega">
-									:: REWARDS :: GENESIS_BADGE
-								</h3>
+								<h3 className="scifi-label tracking-mega">:: REWARDS :: GENESIS_BADGE</h3>
 							</div>
 							<span className="font-mono text-tiny text-text-dim font-black tracking-widest hidden sm:block">
 								EST_2026
@@ -347,16 +343,13 @@ export default function LandingPage() {
 							<div className="flex-1 space-y-7">
 								<div className="space-y-3">
 									<p className="text-white font-mono text-lg md:text-xl font-black leading-tight uppercase tracking-tight">
-										JOIN THE{" "}
-										<span className="text-neon-cyan">
-											FIRST {stats.genesisLimit} STUDENTS
-										</span>
+										JOIN THE{' '}
+										<span className="text-neon-cyan">FIRST {stats.genesisLimit} STUDENTS</span>
 									</p>
 									<p className="text-text-secondary text-xs sm:text-small font-mono leading-relaxed">
-										The first {stats.genesisLimit} students to connect their
-										profiles earn a unique Genesis Badge. This badge is a
-										permanent mark on your profile, proving you were here from
-										day one.
+										The first {stats.genesisLimit} students to connect their profiles earn a unique
+										Genesis Badge. This badge is a permanent mark on your profile, proving you were
+										here from day one.
 									</p>
 								</div>
 
@@ -393,7 +386,7 @@ export default function LandingPage() {
 										<p className="text-tiny font-mono text-neon-cyan mt-3 tracking-widest uppercase font-black">
 											{stats.genesisClaimed > 0
 												? `${stats.genesisClaimed} of ${stats.genesisLimit} badges claimed`
-												: "Waiting for first students to join"}
+												: 'Waiting for first students to join'}
 										</p>
 									</div>
 								</div>

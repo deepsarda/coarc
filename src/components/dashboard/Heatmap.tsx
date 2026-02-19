@@ -1,13 +1,10 @@
-"use client";
+'use client';
 
-import { CalendarRange } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { CalendarRange } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
 
-// 365-day GitHub-style heatmap rendered as pure CSS grid
-// Data from:  lc_stats.submission_calendar (JSON: { unixTimestamp: count })
-//             cf_submissions.submitted_at
-// Both merged into a single day→count map.
+// 365-day GitHub-style heatmap 
 
 interface HeatmapProps {
 	userId: string;
@@ -32,15 +29,15 @@ export default function Heatmap({ userId }: HeatmapProps) {
 
 		// 1. LC submission calendar
 		const { data: lcStats } = await supabase
-			.from("lc_stats")
-			.select("submission_calendar")
-			.eq("user_id", userId)
+			.from('lc_stats')
+			.select('submission_calendar')
+			.eq('user_id', userId)
 			.single();
 
 		if (lcStats?.submission_calendar) {
 			const cal = lcStats.submission_calendar as Record<string, number>;
 			for (const [ts, count] of Object.entries(cal)) {
-				const d = new Date(Number(ts) * 1000).toISOString().split("T")[0];
+				const d = new Date(Number(ts) * 1000).toISOString().split('T')[0];
 				dayMap.set(d, (dayMap.get(d) ?? 0) + count);
 			}
 		}
@@ -50,29 +47,29 @@ export default function Heatmap({ userId }: HeatmapProps) {
 		oneYearAgo.setDate(oneYearAgo.getDate() - DAYS);
 
 		const { data: cfSubs } = await supabase
-			.from("cf_submissions")
-			.select("submitted_at")
-			.eq("user_id", userId)
-			.gte("submitted_at", oneYearAgo.toISOString())
-			.order("submitted_at", { ascending: false });
+			.from('cf_submissions')
+			.select('submitted_at')
+			.eq('user_id', userId)
+			.gte('submitted_at', oneYearAgo.toISOString())
+			.order('submitted_at', { ascending: false });
 
 		if (cfSubs) {
 			for (const s of cfSubs) {
-				const d = s.submitted_at.split("T")[0];
+				const d = s.submitted_at.split('T')[0];
 				dayMap.set(d, (dayMap.get(d) ?? 0) + 1);
 			}
 		}
 
 		// 3. Also count LC submissions directly (in case submission_calendar is incomplete)
 		const { data: lcSubs } = await supabase
-			.from("lc_submissions")
-			.select("submitted_at")
-			.eq("user_id", userId)
-			.gte("submitted_at", oneYearAgo.toISOString());
+			.from('lc_submissions')
+			.select('submitted_at')
+			.eq('user_id', userId)
+			.gte('submitted_at', oneYearAgo.toISOString());
 
 		if (lcSubs) {
 			for (const s of lcSubs) {
-				const d = s.submitted_at.split("T")[0];
+				const d = s.submitted_at.split('T')[0];
 				dayMap.set(d, (dayMap.get(d) ?? 0) + 1);
 			}
 		}
@@ -83,7 +80,7 @@ export default function Heatmap({ userId }: HeatmapProps) {
 		for (let i = DAYS - 1; i >= 0; i--) {
 			const d = new Date(today);
 			d.setDate(d.getDate() - i);
-			const ds = d.toISOString().split("T")[0];
+			const ds = d.toISOString().split('T')[0];
 			days.push({ date: ds, count: dayMap.get(ds) ?? 0 });
 		}
 
@@ -97,10 +94,7 @@ export default function Heatmap({ userId }: HeatmapProps) {
 	}, [fetch]);
 
 	// Compute max for color scaling
-	const maxCount = useMemo(
-		() => Math.max(1, ...data.map((d) => d.count)),
-		[data],
-	);
+	const maxCount = useMemo(() => Math.max(1, ...data.map((d) => d.count)), [data]);
 
 	if (data.length === 0) return null;
 
@@ -117,16 +111,14 @@ export default function Heatmap({ userId }: HeatmapProps) {
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<h3 className="dash-heading">
-					<CalendarRange className="w-4 h-4 text-neon-cyan opacity-50" />{" "}
-					Submissions
+					<CalendarRange className="w-4 h-4 text-neon-cyan opacity-50" /> Submissions
 				</h3>
 				<div className="flex gap-5 dash-sub">
 					<span>
 						<span className="text-neon-cyan text-xs">{totalSolves}</span> solves
 					</span>
 					<span>
-						<span className="text-emerald-400 text-xs">{activeDays}</span>{" "}
-						active
+						<span className="text-emerald-400 text-xs">{activeDays}</span> active
 					</span>
 				</div>
 			</div>
@@ -136,9 +128,9 @@ export default function Heatmap({ userId }: HeatmapProps) {
 				<div
 					className="grid gap-[3px]"
 					style={{
-						gridTemplateRows: "repeat(7, 1fr)",
+						gridTemplateRows: 'repeat(7, 1fr)',
 						gridTemplateColumns: `repeat(${COLS}, 1fr)`,
-						gridAutoFlow: "column",
+						gridAutoFlow: 'column',
 					}}
 				>
 					{padded.slice(0, COLS * 7).map((d, i) => {
@@ -154,18 +146,18 @@ export default function Heatmap({ userId }: HeatmapProps) {
 								style={{
 									backgroundColor:
 										d.count === 0
-											? "rgba(255,255,255,0.03)"
+											? 'rgba(255,255,255,0.03)'
 											: `rgba(0, 240, 255, ${0.15 + intensity * 0.85})`,
 									borderColor:
 										d.count === 0
-											? "rgba(255,255,255,0.06)"
+											? 'rgba(255,255,255,0.06)'
 											: `rgba(0, 240, 255, ${0.2 + intensity * 0.5})`,
 									boxShadow:
 										d.count > 0
 											? `0 0 ${Math.round(intensity * 6)}px rgba(0, 240, 255, ${intensity * 0.4})`
-											: "none",
+											: 'none',
 								}}
-								title={`${d.date}: ${d.count} solve${d.count !== 1 ? "s" : ""}`}
+								title={`${d.date}: ${d.count} solve${d.count !== 1 ? 's' : ''}`}
 							/>
 						);
 					})}
@@ -174,9 +166,7 @@ export default function Heatmap({ userId }: HeatmapProps) {
 
 			{/* Legend */}
 			<div className="flex items-center gap-2 justify-end">
-				<span className="text-text-dim font-mono text-[10px] uppercase tracking-widest">
-					Less
-				</span>
+				<span className="text-text-dim font-mono text-[10px] uppercase tracking-widest">Less</span>
 				{[0, 0.25, 0.5, 0.75, 1].map((level) => (
 					<div
 						key={level}
@@ -184,18 +174,14 @@ export default function Heatmap({ userId }: HeatmapProps) {
 						style={{
 							backgroundColor:
 								level === 0
-									? "rgba(255,255,255,0.03)"
+									? 'rgba(255,255,255,0.03)'
 									: `rgba(0, 240, 255, ${0.15 + level * 0.85})`,
 							borderColor:
-								level === 0
-									? "rgba(255,255,255,0.06)"
-									: `rgba(0, 240, 255, ${0.2 + level * 0.5})`,
+								level === 0 ? 'rgba(255,255,255,0.06)' : `rgba(0, 240, 255, ${0.2 + level * 0.5})`,
 						}}
 					/>
 				))}
-				<span className="text-text-dim font-mono text-[10px] uppercase tracking-widest">
-					More
-				</span>
+				<span className="text-text-dim font-mono text-[10px] uppercase tracking-widest">More</span>
 			</div>
 		</div>
 	);

@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { CalendarDays, Flame, Shield, ShieldOff } from "lucide-react";
-import Card from "@/components/ui/Card";
-import type { Profile } from "@/types/gamification";
+import { CalendarDays, Flame, Shield, ShieldOff } from 'lucide-react';
+import Card from '@/components/ui/Card';
+import type { Profile } from '@/types/gamification';
 
 interface StreakCardProps {
 	profile: Profile;
@@ -23,7 +23,7 @@ export default function StreakCard({ profile }: StreakCardProps) {
 					<div className="flex items-center gap-1.5">
 						<span
 							className={`font-mono text-xl font-black ${
-								streakActive ? "text-neon-orange" : "text-neon-red/60"
+								streakActive ? 'text-neon-orange' : 'text-neon-red/60'
 							}`}
 						>
 							{profile.current_streak}d
@@ -32,11 +32,7 @@ export default function StreakCard({ profile }: StreakCardProps) {
 							<div className="flex">
 								{Array.from({
 									length: Math.min(
-										profile.current_streak >= 7
-											? 3
-											: profile.current_streak >= 3
-												? 2
-												: 1,
+										profile.current_streak >= 7 ? 3 : profile.current_streak >= 3 ? 2 : 1,
 										3,
 									),
 								}).map((_, i) => (
@@ -66,12 +62,10 @@ export default function StreakCard({ profile }: StreakCardProps) {
 					<div className="flex items-center gap-1">
 						{shieldCount > 0 ? (
 							<>
-								{Array.from({ length: Math.min(shieldCount, 3) }).map(
-									(_, i) => (
-										// biome-ignore lint/suspicious/noArrayIndexKey: decorative icons
-										<Shield key={i} className="w-4 h-4 text-emerald-400" />
-									),
-								)}
+								{Array.from({ length: Math.min(shieldCount, 3) }).map((_, i) => (
+									// biome-ignore lint/suspicious/noArrayIndexKey: decorative icons
+									<Shield key={i} className="w-4 h-4 text-emerald-400" />
+								))}
 								{shieldCount > 3 && (
 									<span className="text-emerald-400 font-mono text-tiny font-bold">
 										+{shieldCount - 3}

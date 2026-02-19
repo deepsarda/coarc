@@ -102,17 +102,20 @@ export interface NavItem {
 /* Icons are injected from the component layer, see navIcons.tsx */
 export const NAV_ITEMS_RAW: Omit<NavItem, 'icon'>[] = [
 	{ label: 'Dashboard', href: '/dashboard' },
+	{ label: 'Me', href: '/profile/me' },
+	{ label: 'Announcements', href: '/announcements' },
 	{ label: 'Leaderboard', href: '/leaderboard' },
+	{ label: 'Attendance', href: '/attendance' },
 	{ label: 'Problems', href: '/problems' },
 	{ label: 'Daily', href: '/problems/daily' },
 	{ label: 'Duels', href: '/duels' },
 	{ label: 'Boss', href: '/boss' },
 	{ label: 'Quests', href: '/quests' },
-	{ label: 'Attendance', href: '/attendance' },
 	{ label: 'Flashcards', href: '/flashcards' },
 	{ label: 'Resources', href: '/resources' },
-	{ label: 'Announcements', href: '/announcements' },
 	{ label: 'Hall of Fame', href: '/hall-of-fame' },
+	{ label: 'Head to Head', href: '/head-to-head' },
+	{ label: 'Profiles', href: '/profile' },
 ];
 
 export const ADMIN_NAV_ITEMS_RAW: Omit<NavItem, 'icon'>[] = [
@@ -132,7 +135,7 @@ export const MOBILE_NAV_ITEMS_RAW: Omit<NavItem, 'icon'>[] = [
 	{ label: 'Leaderboard', href: '/leaderboard' },
 	{ label: 'Problems', href: '/problems' },
 	{ label: 'Duels', href: '/duels' },
-	{ label: 'Profile', href: '/profile/me' },
+	{ label: 'Me', href: '/profile/me' },
 ];
 
 // Notification type labels

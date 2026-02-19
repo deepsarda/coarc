@@ -232,12 +232,7 @@ body {
 
 	.dash-divider {
 		height: 1px;
-		background: linear-gradient(
-			to right,
-			transparent,
-			var(--color-border-hard),
-			transparent
-		);
+		background: linear-gradient(to right, transparent, var(--color-border-hard), transparent);
 	}
 
 	.dash-row-hover {
@@ -417,12 +412,7 @@ body {
 		left: 20px;
 		right: 20px;
 		height: 1px;
-		background: linear-gradient(
-			90deg,
-			transparent,
-			var(--color-neon-cyan),
-			transparent
-		);
+		background: linear-gradient(90deg, transparent, var(--color-neon-cyan), transparent);
 		z-index: 10;
 		opacity: 0.5;
 	}
@@ -431,11 +421,7 @@ body {
 		content: "";
 		position: absolute;
 		inset: 0;
-		background: linear-gradient(
-			to bottom,
-			transparent 50%,
-			rgba(0, 240, 255, 0.02) 50%
-		);
+		background: linear-gradient(to bottom, transparent 50%, rgba(0, 240, 255, 0.02) 50%);
 		background-size: 100% 4px;
 		pointer-events: none;
 		z-index: 1;
@@ -492,12 +478,7 @@ body {
 			background-size: 50px 50px;
 			animation: grid-scroll 25s linear infinite;
 			pointer-events: none;
-			mask-image: linear-gradient(
-				to bottom,
-				black 0%,
-				black 20%,
-				transparent 80%
-			);
+			mask-image: linear-gradient(to bottom, black 0%, black 20%, transparent 80%);
 		}
 	}
 

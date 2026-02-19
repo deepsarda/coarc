@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
-import { updateUserStreak } from "@/lib/gamification/streaks";
-import { awardXP } from "@/lib/gamification/xp";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
-import { XP_REWARDS } from "@/lib/utils/constants";
+import { NextResponse } from 'next/server';
+import { updateUserStreak } from '@/lib/gamification/streaks';
+import { awardXP } from '@/lib/gamification/xp';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
+import { XP_REWARDS } from '@/lib/utils/constants';
 
 /**
  * GET /api/problems/daily
@@ -19,35 +19,34 @@ export async function GET(request: Request) {
 			data: { user },
 		} = await supabase.auth.getUser();
 		if (!user) {
-			return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+			return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 		}
 
 		const url = new URL(request.url);
-		const date =
-			url.searchParams.get("date") ?? new Date().toISOString().split("T")[0];
+		const date = url.searchParams.get('date') ?? new Date().toISOString().split('T')[0];
 
 		const { data: daily } = await supabase
-			.from("daily_problems")
-			.select("*")
-			.eq("date", date)
+			.from('daily_problems')
+			.select('*')
+			.eq('date', date)
 			.single();
 
 		if (!daily) {
-			return NextResponse.json({ error: "No daily problem set", daily: null });
+			return NextResponse.json({ error: 'No daily problem set', daily: null });
 		}
 
 		// Get solve count
 		const { count: solvesCount } = await supabase
-			.from("daily_problem_solves")
-			.select("id", { count: "exact", head: true })
-			.eq("daily_problem_id", daily.id);
+			.from('daily_problem_solves')
+			.select('id', { count: 'exact', head: true })
+			.eq('daily_problem_id', daily.id);
 
 		// Check if user solved
 		const { data: userSolve } = await supabase
-			.from("daily_problem_solves")
-			.select("id, solved_at")
-			.eq("daily_problem_id", daily.id)
-			.eq("user_id", user.id)
+			.from('daily_problem_solves')
+			.select('id, solved_at')
+			.eq('daily_problem_id', daily.id)
+			.eq('user_id', user.id)
 			.single();
 
 		return NextResponse.json({
@@ -57,10 +56,7 @@ export async function GET(request: Request) {
 			user_solve_time: userSolve?.solved_at ?? null,
 		});
 	} catch {
-		return NextResponse.json(
-			{ error: "Internal server error" },
-			{ status: 500 },
-		);
+		return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 	}
 }
 
@@ -71,40 +67,37 @@ export async function POST(_request: Request) {
 			data: { user },
 		} = await supabase.auth.getUser();
 		if (!user) {
-			return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+			return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 		}
 
-		const todayStr = new Date().toISOString().split("T")[0];
+		const todayStr = new Date().toISOString().split('T')[0];
 		const admin = createAdminClient();
 
 		// Get today's daily
 		const { data: daily } = await admin
-			.from("daily_problems")
-			.select("id")
-			.eq("date", todayStr)
+			.from('daily_problems')
+			.select('id')
+			.eq('date', todayStr)
 			.single();
 
 		if (!daily) {
-			return NextResponse.json(
-				{ error: "No daily problem today" },
-				{ status: 404 },
-			);
+			return NextResponse.json({ error: 'No daily problem today' }, { status: 404 });
 		}
 
 		// Check if already solved
 		const { data: existing } = await admin
-			.from("daily_problem_solves")
-			.select("id")
-			.eq("daily_problem_id", daily.id)
-			.eq("user_id", user.id)
+			.from('daily_problem_solves')
+			.select('id')
+			.eq('daily_problem_id', daily.id)
+			.eq('user_id', user.id)
 			.single();
 
 		if (existing) {
-			return NextResponse.json({ error: "Already solved" }, { status: 409 });
+			return NextResponse.json({ error: 'Already solved' }, { status: 409 });
 		}
 
 		// Record solve
-		await admin.from("daily_problem_solves").insert({
+		await admin.from('daily_problem_solves').insert({
 			daily_problem_id: daily.id,
 			user_id: user.id,
 		});
@@ -114,7 +107,7 @@ export async function POST(_request: Request) {
 			admin,
 			user.id,
 			XP_REWARDS.SOLVE_DAILY,
-			"Daily problem solved",
+			'Daily problem solved',
 			`daily_${daily.id}`,
 		);
 
@@ -126,9 +119,6 @@ export async function POST(_request: Request) {
 			xp_earned: XP_REWARDS.SOLVE_DAILY,
 		});
 	} catch {
-		return NextResponse.json(
-			{ error: "Internal server error" },
-			{ status: 500 },
-		);
+		return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 	}
 }

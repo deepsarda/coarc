@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { Flame } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useAuthContext } from "@/components/providers/AuthProvider";
-import { ADMIN_NAV_ITEMS, NAV_ITEMS } from "@/lib/utils/navIcons";
+import { Flame } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useAuthContext } from '@/components/providers/AuthProvider';
+import { ADMIN_NAV_ITEMS, NAV_ITEMS } from '@/lib/utils/navIcons';
 
 export default function Sidebar() {
 	const pathname = usePathname();
@@ -24,7 +24,7 @@ export default function Sidebar() {
 								{profile.display_name}
 							</p>
 							<p className="text-tiny font-mono text-text-muted uppercase tracking-widest">
-								Roll #{String(profile.roll_number).padStart(2, "0")}
+								Roll #{String(profile.roll_number).padStart(2, '0')}
 							</p>
 						</div>
 					</div>
@@ -42,16 +42,23 @@ export default function Sidebar() {
 
 			<nav className="flex-1 py-4 px-2 space-y-1 overflow-y-auto">
 				{NAV_ITEMS.map((item) => {
+					// Resolve /profile/me to actual user profile
+					const href =
+						item.href === '/profile/me' && profile ? `/profile/${profile.id}` : item.href;
 					const isActive =
-						pathname === item.href || pathname.startsWith(`${item.href}/`);
+						item.href === '/profile/me'
+							? pathname.startsWith('/profile/') && pathname !== '/profile'
+							: item.href === '/profile'
+								? pathname === '/profile'
+								: pathname === href || pathname.startsWith(`${href}/`);
 					return (
 						<Link
 							key={item.href}
-							href={item.href}
+							href={href}
 							className={`flex items-center gap-3 px-3 py-2.5 text-sm font-body rounded-brutal-sm transition-all duration-150 ${
 								isActive
-									? "bg-neon-cyan/10 text-neon-cyan border-l-[3px] border-neon-cyan -ml-px"
-									: "text-text-secondary hover:text-text-primary hover:bg-elevated"
+									? 'bg-neon-cyan/10 text-neon-cyan border-l-[3px] border-neon-cyan -ml-px'
+									: 'text-text-secondary hover:text-text-primary hover:bg-elevated'
 							}`}
 						>
 							<span className="shrink-0 opacity-70">{item.icon}</span>
@@ -76,8 +83,8 @@ export default function Sidebar() {
 									href={item.href}
 									className={`flex items-center gap-3 px-3 py-2 text-sm font-body rounded-brutal-sm transition-all duration-150 ${
 										isActive
-											? "bg-neon-magenta/10 text-neon-magenta border-l-[3px] border-neon-magenta -ml-px"
-											: "text-text-secondary hover:text-text-primary hover:bg-elevated"
+											? 'bg-neon-magenta/10 text-neon-magenta border-l-[3px] border-neon-magenta -ml-px'
+											: 'text-text-secondary hover:text-text-primary hover:bg-elevated'
 									}`}
 								>
 									<span className="shrink-0 opacity-70">{item.icon}</span>
