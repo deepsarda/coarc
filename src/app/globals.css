@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 /* ── Theme Tokens (TailwindCSS v4) ── */
+/* biome-ignore lint/suspicious/noUnknownAtRules: Tailwind css rule */
 @theme inline {
 	/* Background layers - slightly lighter to show black shadows */
 	--color-void: #020205;

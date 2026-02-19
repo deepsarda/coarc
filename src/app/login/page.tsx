@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense, useId, useState } from "react";
 import { ROLL } from "@/lib/config";
 
 function LoginForm() {
@@ -16,6 +16,7 @@ function LoginForm() {
 			: "",
 	);
 	const [loading, setLoading] = useState(false);
+	const rollId = useId();
 
 	const handleSubmit = () => {
 		const roll = parseInt(rollNumber, 10);
@@ -94,7 +95,7 @@ function LoginForm() {
 						</div>
 					</div>
 
-					<div className="p-8 relative z-10">
+					<div className="p-4 md:p-8 relative z-10">
 						{step === "input" && (
 							<motion.div
 								initial={{ opacity: 0, x: 20 }}
@@ -103,14 +104,14 @@ function LoginForm() {
 							>
 								<div>
 									<label
-										htmlFor="roll-input"
+										htmlFor={rollId}
 										className="block text-neon-cyan font-mono mb-4 text-small uppercase tracking-mega font-black"
 									>
 										:: ENTER YOUR ROLL NUMBER
 									</label>
-									<div className="flex gap-4">
+									
 										<input
-											id="roll-input"
+											id={rollId}
 											type="text"
 											inputMode="numeric"
 											maxLength={2}
@@ -121,9 +122,8 @@ function LoginForm() {
 												setError("");
 											}}
 											onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-											className="flex-1 bg-zinc-950 border-2 border-border-hard p-3 md:p-4 text-center text-2xl md:text-3xl font-mono tracking-[0.3em] md:tracking-[0.4em] focus:border-neon-cyan focus:outline-none transition-colors text-white font-black"
+											className="w-full bg-zinc-950 border-2 border-border-hard p-3 md:p-4 text-center text-2xl md:text-3xl font-mono tracking-[0.3em] md:tracking-[0.4em] focus:border-neon-cyan focus:outline-none transition-colors text-white font-black "
 										/>
-									</div>
 								</div>
 
 								<button

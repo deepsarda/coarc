@@ -49,16 +49,16 @@ export default function JoinCounter({
 		>
 			<div className="absolute inset-0 bg-void pointer-events-none z-0" />
 			<div className="absolute inset-0 bg-grid-full opacity-10 pointer-events-none z-0" />
-			
+
 			{/* Component Corner Decorations */}
-			<div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-neon-green opacity-40 z-20 group-hover:opacity-100 transition-opacity" />
-			<div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-neon-green opacity-40 z-20 group-hover:opacity-100 transition-opacity" />
-			<div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-neon-green opacity-40 z-20 group-hover:opacity-100 transition-opacity" />
-			<div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-neon-green opacity-40 z-20 group-hover:opacity-100 transition-opacity" />
+			<div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-neon-green opacity-40 z-20 group-hover:opacity-100 transition-opacity pointer-events-none" />
+			<div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-neon-green opacity-40 z-20 group-hover:opacity-100 transition-opacity pointer-events-none" />
+			<div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-neon-green opacity-40 z-20 group-hover:opacity-100 transition-opacity pointer-events-none" />
+			<div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-neon-green opacity-40 z-20 group-hover:opacity-100 transition-opacity pointer-events-none" />
 
 			{/* Window Ribbon */}
 			<div className="px-5 py-2.5 border-b border-border-hard flex items-center justify-between bg-zinc-900/80 backdrop-blur-md relative overflow-hidden z-10">
-				<div className="absolute inset-x-0 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-neon-green/40 to-transparent" />
+				<div className="absolute inset-x-0 bottom-0 h-px bg-linear-to-r from-transparent via-neon-green/40 to-transparent" />
 				<div className="flex items-center gap-3 relative z-10">
 					<div className="flex gap-1">
 						<div className="w-1.5 h-1.5 rounded-full bg-neon-green/40" />
@@ -78,12 +78,14 @@ export default function JoinCounter({
 			{/* Body */}
 			<div className="p-6 md:p-8 relative flex-1 flex flex-col justify-center z-10">
 				{/* Background scanline effect placeholder (handled by scifi-window-scan) */}
-				
+
 				<div className="flex items-baseline justify-center gap-3 mb-8 relative z-10">
 					<span className="font-mono text-7xl font-black text-neon-green tabular-nums counter-glow tracking-tighter drop-shadow-[0_0_15px_rgba(57,255,20,0.3)]">
 						<AnimatedNumber value={count} />
 					</span>
-					<span className="font-mono text-2xl text-text-muted opacity-40">/{total}</span>
+					<span className="font-mono text-2xl text-text-muted opacity-40">
+						/{total}
+					</span>
 				</div>
 				<p className="text-text-secondary font-mono text-tiny text-center mb-10 uppercase tracking-mega opacity-60 font-bold">
 					Classmates indexed in the arc
@@ -101,14 +103,17 @@ export default function JoinCounter({
 							background: "linear-gradient(90deg, #39ff14, #00f0ff)",
 						}}
 					>
-						<div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.4)_50%,transparent_100%)] w-24 animate-[move-light_2s_infinite]" />
+						<div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.4)_50%,transparent_100%)] w-24 animate-[move-light_2s_infinite] pointer-events-none" />
 					</motion.div>
 				</div>
 
 				<div className="flex justify-between mt-4">
 					<div className="flex gap-1.5">
-						{['d1', 'd2', 'd3'].map((key, i) => (
-							<div key={key} className={`w-${4-i} h-[2px] bg-neon-green/30`} />
+						{["d1", "d2", "d3"].map((key, i) => (
+							<div
+								key={key}
+								className={`w-${4 - i} h-[2px] bg-neon-green/30`}
+							/>
 						))}
 					</div>
 					<span className="font-mono text-micro text-text-muted tracking-mega uppercase font-bold">

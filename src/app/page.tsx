@@ -1,19 +1,43 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import Link from 'next/link';
-import BlurredLeaderboard from '@/components/landing/BlurredLeaderboard';
-import HeroSection from '@/components/landing/HeroSection';
-import JoinCounter from '@/components/landing/JoinCounter';
-import { SITE } from '@/lib/config';
+import { motion } from "framer-motion";
+import Link from "next/link";
+import BlurredLeaderboard from "@/components/landing/BlurredLeaderboard";
+import HeroSection from "@/components/landing/HeroSection";
+import JoinCounter from "@/components/landing/JoinCounter";
+import { SITE } from "@/lib/config";
 
 const FEATURES = [
-	{ icon: '⚔️', title: 'Duels', desc: 'Challenge classmates to 1v1 coding battles.' },
-	{ icon: '🐉', title: 'Boss Raids', desc: 'Weekly community bosses. Defeat them as a class.' },
-	{ icon: '🔥', title: 'Streaks', desc: 'Maintain daily solve streaks with shields & fire.' },
-	{ icon: '🏆', title: 'Leaderboards', desc: 'Global rankings for XP, ELO, and Seasonal titles.' },
-	{ icon: '🎖️', title: 'Badges', desc: 'Unlock rare technical achievement badges.' },
-	{ icon: '📊', title: 'Analytics', desc: 'Your CF & LC progress tracked in real-time.' },
+	{
+		icon: "⚔️",
+		title: "Duels",
+		desc: "Challenge classmates to 1v1 coding battles.",
+	},
+	{
+		icon: "🐉",
+		title: "Boss Raids",
+		desc: "Weekly community bosses. Defeat them as a class.",
+	},
+	{
+		icon: "🔥",
+		title: "Streaks",
+		desc: "Maintain daily solve streaks with shields & fire.",
+	},
+	{
+		icon: "🏆",
+		title: "Leaderboards",
+		desc: "Global rankings for XP, ELO, and Seasonal titles.",
+	},
+	{
+		icon: "🎖️",
+		title: "Badges",
+		desc: "Unlock rare technical achievement badges.",
+	},
+	{
+		icon: "📊",
+		title: "Analytics",
+		desc: "Your CF & LC progress tracked in real-time.",
+	},
 ];
 
 const containerVariants = {
@@ -82,7 +106,7 @@ export default function LandingPage() {
 						variants={containerVariants}
 						initial="hidden"
 						whileInView="visible"
-						viewport={{ once: true, margin: '-50px' }}
+						viewport={{ once: true, margin: "-50px" }}
 						className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10"
 					>
 						{FEATURES.map((feature) => (
@@ -92,35 +116,39 @@ export default function LandingPage() {
 								className="p-8 card-brutal scifi-window border-t-2 border-t-neon-cyan group transition-all duration-300 relative overflow-hidden"
 							>
 								<div className="absolute inset-0 bg-void/50 pointer-events-none z-0" />
-								
+
 								{/* Component Corner Decorations */}
-								<div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-neon-cyan opacity-40 z-20 group-hover:opacity-100 transition-opacity" />
-								<div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-neon-cyan opacity-40 z-20 group-hover:opacity-100 transition-opacity" />
-								
+								<div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-neon-cyan opacity-40 z-20 group-hover:opacity-100 transition-opacity pointer-events-none" />
+								<div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-neon-cyan opacity-40 z-20 group-hover:opacity-100 transition-opacity pointer-events-none" />
+
 								<div className="flex items-start justify-between mb-8 relative z-10">
 									<div className="w-16 h-16 rounded-sm bg-zinc-900 border border-border-hard flex items-center justify-center text-4xl grayscale group-hover:grayscale-0 transition-all duration-300 group-hover:scale-110 relative">
 										<div className="absolute inset-0 bg-neon-cyan/5 opacity-0 group-hover:opacity-100 transition-opacity" />
 										{feature.icon}
 									</div>
 									<div className="text-right">
-										<div className="font-mono text-tiny text-neon-cyan/60 font-black mb-1 tracking-widest">ARC_ID</div>
+										<div className="font-mono text-tiny text-neon-cyan/60 font-black mb-1 tracking-widest">
+											ARC_ID
+										</div>
 										<div className="font-mono text-small text-text-muted font-black tracking-tighter">
 											NODE_CONNECTED
 										</div>
 									</div>
 								</div>
-								
+
 								<h4 className="font-mono font-black text-base md:text-lg mb-3 tracking-widest uppercase relative z-10 text-neon-cyan">
 									{feature.title}
 								</h4>
 								<p className="text-text-secondary text-sm font-mono leading-relaxed opacity-80 min-h-[3em] relative z-10">
 									{feature.desc}
 								</p>
-								
+
 								<div className="mt-8 pt-6 border-t border-border-hard/50 flex items-center justify-between relative z-10">
 									<div className="flex items-center gap-2">
 										<div className="w-1.5 h-1.5 bg-neon-green rounded-full animate-pulse shadow-[0_0_8px_rgba(57,255,20,0.5)]" />
-										<span className="font-mono text-tiny text-text-muted uppercase tracking-mega font-black">LINK_ACTIVE</span>
+										<span className="font-mono text-tiny text-text-muted uppercase tracking-mega font-black">
+											LINK_ACTIVE
+										</span>
 									</div>
 									<div className="flex gap-1.5">
 										<div className="w-1.5 h-[1px] bg-neon-cyan" />
@@ -137,7 +165,7 @@ export default function LandingPage() {
 					<motion.div
 						initial={{ opacity: 0, x: -20 }}
 						whileInView={{ opacity: 1, x: 0 }}
-						viewport={{ once: true, margin: '-50px' }}
+						viewport={{ once: true, margin: "-50px" }}
 						transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
 						className="h-full"
 					>
@@ -149,20 +177,27 @@ export default function LandingPage() {
 					<div className="flex flex-col justify-center space-y-8 p-4">
 						<div className="space-y-4">
 							<h3 className="font-heading font-black text-2xl text-text-primary tracking-tight uppercase">
-								Your journey starts <span className="text-neon-cyan">here</span>.
+								Your journey starts <span className="text-neon-cyan">here</span>
+								.
 							</h3>
 							<p className="text-text-secondary font-mono text-sm leading-relaxed">
-								Sync your profiles from Codeforces, LeetCode, and AtCoder to start competing in the global SVNIT ecosystem. Earn XP for every problem solved and climb the ranks to become the top node.
+								Sync your profiles from Codeforces, LeetCode, and AtCoder to
+								start competing in the global SVNIT ecosystem. Earn XP for every
+								problem solved and climb the ranks to become the top node.
 							</p>
 						</div>
 						<div className="flex flex-wrap gap-4">
 							<div className="px-4 py-2 bg-zinc-900 border border-border-hard rounded-sm flex items-center gap-3">
 								<div className="w-2 h-2 bg-neon-green rounded-full animate-pulse" />
-								<span className="font-mono text-tiny text-text-primary uppercase tracking-widest">Codeforces</span>
+								<span className="font-mono text-tiny text-text-primary uppercase tracking-widest">
+									Codeforces
+								</span>
 							</div>
 							<div className="px-4 py-2 bg-zinc-900 border border-border-hard rounded-sm flex items-center gap-3">
 								<div className="w-2 h-2 bg-neon-cyan rounded-full animate-pulse" />
-								<span className="font-mono text-tiny text-text-primary uppercase tracking-widest">LeetCode</span>
+								<span className="font-mono text-tiny text-text-primary uppercase tracking-widest">
+									LeetCode
+								</span>
 							</div>
 						</div>
 					</div>
@@ -172,23 +207,23 @@ export default function LandingPage() {
 				<motion.div
 					initial={{ opacity: 0, scale: 0.95 }}
 					whileInView={{ opacity: 1, scale: 1 }}
-					viewport={{ once: true, margin: '-100px' }}
+					viewport={{ once: true, margin: "-100px" }}
 					transition={{ duration: 0.6 }}
 					className="max-w-3xl mx-auto pt-12"
 				>
 					<div className="card-brutal-accent scifi-window p-0 overflow-hidden relative group">
 						<div className="absolute inset-0 bg-void pointer-events-none z-0" />
-						
+
 						{/* Component Corner Decorations */}
-						<div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-neon-cyan opacity-50 z-20 group-hover:opacity-100 transition-opacity" />
-						<div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-neon-cyan opacity-50 z-20 group-hover:opacity-100 transition-opacity" />
-						<div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-neon-cyan opacity-50 z-20 group-hover:opacity-100 transition-opacity" />
-						<div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-neon-cyan opacity-50 z-20 group-hover:opacity-100 transition-opacity" />
+						<div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-neon-cyan opacity-50 z-20 group-hover:opacity-100 transition-opacity pointer-events-none" />
+						<div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-neon-cyan opacity-50 z-20 group-hover:opacity-100 transition-opacity pointer-events-none" />
+						<div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-neon-cyan opacity-50 z-20 group-hover:opacity-100 transition-opacity pointer-events-none" />
+						<div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-neon-cyan opacity-50 z-20 group-hover:opacity-100 transition-opacity pointer-events-none" />
 
 						{/* Background decorative elements */}
 						<div className="absolute top-0 right-0 w-32 h-32 bg-neon-cyan/5 -mr-16 -mt-16 rounded-full blur-3xl pointer-events-none" />
 						<div className="absolute bottom-0 left-0 w-32 h-32 bg-neon-magenta/5 -ml-16 -mb-16 rounded-full blur-3xl pointer-events-none" />
-						
+
 						<div className="px-5 py-2.5 border-b border-neon-cyan/30 flex items-center justify-between bg-zinc-950/90 backdrop-blur-md relative z-10">
 							<div className="flex items-center gap-3">
 								<div className="flex gap-1.5">
@@ -200,25 +235,32 @@ export default function LandingPage() {
 									:: REWARDS :: GENESIS_BADGE
 								</h3>
 							</div>
-							<span className="font-mono text-tiny text-neon-cyan/40 font-black tracking-widest hidden sm:block">EST_2026</span>
+							<span className="font-mono text-tiny text-neon-cyan/40 font-black tracking-widest hidden sm:block">
+								EST_2026
+							</span>
 						</div>
-						
+
 						<div className="p-6 md:p-10 flex flex-col md:flex-row items-center gap-6 md:gap-10 relative z-10">
 							<div className="flex-1 space-y-7">
 								<div className="space-y-3">
 									<p className="text-white font-mono text-lg md:text-xl font-black leading-tight uppercase tracking-tight">
-										JOIN THE <span className="text-neon-cyan">FIRST 20 STUDENTS</span>
+										JOIN THE{" "}
+										<span className="text-neon-cyan">FIRST 20 STUDENTS</span>
 									</p>
 									<p className="text-text-secondary text-xs sm:text-small font-mono leading-relaxed">
-										The first 20 students to connect their profiles earn a unique Genesis Badge. This badge is a permanent mark on your profile, proving you were here from day one.
+										The first 20 students to connect their profiles earn a
+										unique Genesis Badge. This badge is a permanent mark on your
+										profile, proving you were here from day one.
 									</p>
 								</div>
-								
+
 								<div className="h-[1px] w-full bg-gradient-to-r from-neon-cyan/30 via-neon-cyan/10 to-transparent" />
-								
+
 								<div className="flex items-center gap-8">
 									<div>
-										<div className="text-small font-mono text-text-muted mb-1 font-black uppercase tracking-widest">Remaining</div>
+										<div className="text-small font-mono text-text-muted mb-1 font-black uppercase tracking-widest">
+											Remaining
+										</div>
 										<div className="flex items-baseline gap-1">
 											<motion.span
 												animate={{ opacity: [1, 0.4, 1] }}
@@ -227,7 +269,9 @@ export default function LandingPage() {
 											>
 												20
 											</motion.span>
-											<span className="text-text-muted font-mono text-lg md:text-xl font-black opacity-40">/20</span>
+											<span className="text-text-muted font-mono text-lg md:text-xl font-black opacity-40">
+												/20
+											</span>
 										</div>
 									</div>
 									<div className="h-14 w-[1px] bg-border-hard/50" />
@@ -235,19 +279,23 @@ export default function LandingPage() {
 										<div className="h-2.5 w-full bg-void border border-border-hard p-[2px] rounded-none">
 											<div className="h-full w-full bg-neon-cyan/20 animate-pulse" />
 										</div>
-										<p className="text-tiny font-mono text-neon-cyan mt-3 tracking-widest uppercase font-black">Waiting for first students to join</p>
+										<p className="text-tiny font-mono text-neon-cyan mt-3 tracking-widest uppercase font-black">
+											Waiting for first students to join
+										</p>
 									</div>
 								</div>
 							</div>
-							
+
 							<div className="w-32 h-32 md:w-44 md:h-44 flex-shrink-0 relative">
-								<div className="absolute inset-0 bg-neon-cyan/15 blur-2xl animate-pulse" />
+								<div className="absolute inset-0 bg-neon-cyan/15 blur-2xl animate-pulse pointer-events-none" />
 								<div className="w-full h-full border-2 border-neon-cyan/40 rounded-none transform rotate-45 flex items-center justify-center p-4 bg-zinc-900 border-double border-4 border-neon-cyan/20 relative z-10 shadow-[0_0_30px_rgba(0,240,255,0.1)]">
-									<div className="transform -rotate-45 text-4xl md:text-6xl drop-shadow-[0_0_15px_rgba(0,240,255,0.5)]">🌌</div>
+									<div className="transform -rotate-45 text-4xl md:text-6xl drop-shadow-[0_0_15px_rgba(0,240,255,0.5)]">
+										🌌
+									</div>
 								</div>
 								{/* Technical accents */}
-								<div className="absolute -top-3 -left-3 w-6 h-6 border-t-2 border-l-2 border-neon-cyan z-20" />
-								<div className="absolute -bottom-3 -right-3 w-6 h-6 border-b-2 border-r-2 border-neon-cyan z-20" />
+								<div className="absolute -top-3 -left-3 w-6 h-6 border-t-2 border-l-2 border-neon-cyan z-20 pointer-events-none" />
+								<div className="absolute -bottom-3 -right-3 w-6 h-6 border-b-2 border-r-2 border-neon-cyan z-20 pointer-events-none" />
 							</div>
 						</div>
 					</div>
@@ -262,12 +310,20 @@ export default function LandingPage() {
 					className="text-center py-20 w-full max-w-full overflow-hidden"
 				>
 					<div className="inline-block relative">
-						<div className="absolute -inset-8 bg-neon-cyan/5 blur-3xl rounded-full" />
+						<div className="absolute -inset-8 bg-neon-cyan/5 blur-3xl rounded-full pointer-events-none" />
 						<p className="text-text-muted text-xs font-mono mb-8 uppercase tracking-epic relative">
 							Ready to compete?
 						</p>
-						<motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-							<Link href="/login" className="btn-neon px-8 sm:px-16 py-3 sm:py-4 text-base inline-block">
+
+						<motion.div
+							whileHover={{ scale: 1.05 }}
+							whileTap={{ scale: 0.98 }}
+							className="w-full flex justify-center"
+						>
+							<Link
+								href="/login"
+								className="btn-neon px-8 sm:px-16 py-3 sm:py-4 text-base inline-block"
+							>
 								START COMPETING →
 							</Link>
 						</motion.div>

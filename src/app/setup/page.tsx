@@ -177,6 +177,7 @@ export default function SetupPage() {
 									value={displayName}
 									onChange={(e) => setDisplayName(e.target.value)}
 									className="w-full bg-zinc-950 border border-border-hard p-4 font-mono text-sm focus:border-neon-cyan focus:outline-none transition-colors group-hover:border-border-accent/40"
+									// biome-ignore lint/a11y/noAutofocus: Better UI
 									autoFocus
 								/>
 								{errors.name && (

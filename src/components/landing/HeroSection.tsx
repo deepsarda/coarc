@@ -45,7 +45,7 @@ export default function HeroSection() {
 				</p>
 
 				{/* Feature tags */}
-				<div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 mb-14 px-2 w-full max-w-[calc(100vw-2rem)] md:max-w-lg">
+				<div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 mb-14 px-2 w-full max-w-[calc(100vw-2rem)]">
 					{['XP', 'BADGES', 'DUELS', 'LEADERBOARDS', 'STREAKS'].map((label, i) => (
 						<motion.span
 							key={label}
