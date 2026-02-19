@@ -1,33 +1,41 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { AlertTriangle, Bell, CircleDot, RefreshCw, Zap } from "lucide-react";
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import ActivityLog, {
+	type ActivityItem,
+} from "@/components/dashboard/ActivityLog";
+import AttendanceCard from "@/components/dashboard/AttendanceCard";
+import DailyProblemCard from "@/components/dashboard/DailyProblem";
+import Heatmap from "@/components/dashboard/Heatmap";
+import PlatformCards, {
+	type CfStatsRow,
+	type LcStatsRow,
+} from "@/components/dashboard/PlatformCards";
+import QuestsPanel, {
+	type QuestItem,
+} from "@/components/dashboard/QuestsPanel";
+import SideInfo from "@/components/dashboard/SideInfo";
+import StatsGrid from "@/components/dashboard/StatsGrid";
+import TopicRadar from "@/components/dashboard/TopicRadar";
 import { useAuthContext } from "@/components/providers/AuthProvider";
-import Card from "@/components/ui/Card";
 import { createClient } from "@/lib/supabase/client";
 import { getLevelForXP } from "@/lib/utils/constants";
 
-interface LcStatsRow {
-	easy_solved: number;
-	medium_solved: number;
-	hard_solved: number;
-	total_solved: number;
-	contest_rating: number | null;
-	synced_at: string;
-}
+/* Local Types */
 
-interface CfStatsRow {
-	submission_count: number;
-	latest_rating: number | null;
-}
-
-interface ActivityItem {
+interface DailyProblem {
 	id: string;
-	platform: "cf" | "lc";
-	title: string;
-	subtitle: string;
-	timestamp: string;
+	problem_name: string;
+	problem_rating: number | null;
+	problem_url: string;
+	tags: string[];
+	solved: boolean;
 }
+
+/* Page */
 
 export default function DashboardPage() {
 	const { profile, loading } = useAuthContext();
@@ -36,21 +44,24 @@ export default function DashboardPage() {
 	const [lcStats, setLcStats] = useState<LcStatsRow | null>(null);
 	const [cfStats, setCfStats] = useState<CfStatsRow | null>(null);
 	const [activity, setActivity] = useState<ActivityItem[]>([]);
+	const [daily, setDaily] = useState<DailyProblem | null>(null);
+	const [quests, setQuests] = useState<QuestItem[]>([]);
+	const [notifCount, setNotifCount] = useState(0);
+	const [badgeSummary, setBadgeSummary] = useState({ earned: 0, total: 0 });
+	const [countdown, setCountdown] = useState("00:00:00");
 
 	const supabase = useMemo(() => createClient(), []);
-
 	const levelInfo = profile ? getLevelForXP(profile.xp) : null;
 	const xpProgress = levelInfo?.xpForNext
 		? Math.round((levelInfo.xpProgress / levelInfo.xpForNext) * 100)
 		: 0;
 
-	// Fetch platform stats + activity from DB
+	/* Data Fetching */
+
 	const fetchPlatformStats = useCallback(async () => {
 		if (!profile) return;
+		const items: ActivityItem[] = [];
 
-		const activityItems: ActivityItem[] = [];
-
-		// Fetch LC stats
 		if (profile.lc_handle) {
 			const { data } = await supabase
 				.from("lc_stats")
@@ -61,28 +72,43 @@ export default function DashboardPage() {
 				.single();
 			if (data) setLcStats(data);
 
-			// Fetch recent LC submissions for activity log
 			const { data: lcSubs } = await supabase
 				.from("lc_submissions")
 				.select("id, problem_title, problem_slug, difficulty, submitted_at")
 				.eq("user_id", profile.id)
 				.order("submitted_at", { ascending: false })
-				.limit(100);
+				.limit(50);
 
 			if (lcSubs) {
+				const unknownSlugs = lcSubs
+					.filter((s) => !s.difficulty || s.difficulty === "Unknown")
+					.map((s) => s.problem_slug);
+
+				let diffMap = new Map<string, string>();
+				if (unknownSlugs.length > 0) {
+					const { data: probs } = await supabase
+						.from("lc_problems")
+						.select("slug, difficulty")
+						.in("slug", [...new Set(unknownSlugs)]);
+					if (probs)
+						diffMap = new Map(probs.map((p) => [p.slug, p.difficulty]));
+				}
+
 				for (const s of lcSubs) {
-					activityItems.push({
+					items.push({
 						id: `lc-${s.id}`,
 						platform: "lc",
 						title: s.problem_title,
-						subtitle: s.difficulty,
+						subtitle:
+							s.difficulty && s.difficulty !== "Unknown"
+								? s.difficulty
+								: (diffMap.get(s.problem_slug) ?? "Unknown"),
 						timestamp: s.submitted_at,
 					});
 				}
 			}
 		}
 
-		// Fetch CF stats
 		if (profile.cf_handle) {
 			const { count } = await supabase
 				.from("cf_submissions")
@@ -102,17 +128,16 @@ export default function DashboardPage() {
 				latest_rating: latestRating?.new_rating ?? null,
 			});
 
-			// Fetch recent CF submissions for activity log
 			const { data: cfSubs } = await supabase
 				.from("cf_submissions")
 				.select("id, problem_name, problem_rating, submitted_at")
 				.eq("user_id", profile.id)
 				.order("submitted_at", { ascending: false })
-				.limit(100);
+				.limit(50);
 
 			if (cfSubs) {
 				for (const s of cfSubs) {
-					activityItems.push({
+					items.push({
 						id: `cf-${s.id}`,
 						platform: "cf",
 						title: s.problem_name,
@@ -125,28 +150,123 @@ export default function DashboardPage() {
 			}
 		}
 
-		// Sort by timestamp descending
-		activityItems.sort(
+		items.sort(
 			(a, b) =>
 				new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
 		);
-
-		// Deduplicate by problem title + platform (keep most recent)
 		const seen = new Set<string>();
-		const unique = activityItems.filter((item) => {
-			const key = `${item.platform}:${item.title}`;
-			if (seen.has(key)) return false;
-			seen.add(key);
-			return true;
-		});
-
-		setActivity(unique.slice(0, 50));
+		setActivity(
+			items.filter((item) => {
+				const key = `${item.platform}:${item.title}`;
+				if (seen.has(key)) return false;
+				seen.add(key);
+				return true;
+			}),
+		);
 	}, [profile, supabase]);
+
+	const fetchDailyProblem = useCallback(async () => {
+		try {
+			const res = await fetch("/api/problems/daily");
+			if (!res.ok) return;
+			const data = await res.json();
+			if (data.daily) setDaily({ ...data.daily, solved: data.solved ?? false });
+		} catch {
+			/* silent */
+		}
+	}, []);
+
+	const fetchQuests = useCallback(async () => {
+		try {
+			const res = await fetch("/api/quests/active");
+			if (!res.ok) return;
+			const data = await res.json();
+			if (data.quests) {
+				setQuests(
+					data.quests.map((q: Record<string, unknown>) => ({
+						id: q.id,
+						title: q.title,
+						description: q.description,
+						xp_reward: q.xp_reward,
+						progress: (q as Record<string, unknown>).user_progress ?? 0,
+						target:
+							(
+								(q as Record<string, unknown>).condition as Record<
+									string,
+									number
+								>
+							)?.count ?? 1,
+						completed: (q as Record<string, unknown>).user_completed ?? false,
+					})),
+				);
+			}
+		} catch {
+			/* silent */
+		}
+	}, []);
+
+	const fetchNotifCount = useCallback(async () => {
+		try {
+			const res = await fetch("/api/notifications/list?limit=1");
+			if (!res.ok) return;
+			const data = await res.json();
+			setNotifCount(data.unread_count ?? 0);
+		} catch {
+			/* silent */
+		}
+	}, []);
+
+	const fetchBadges = useCallback(async () => {
+		try {
+			const res = await fetch("/api/gamification/badges");
+			if (!res.ok) return;
+			const data = await res.json();
+			const badges = data.badges ?? [];
+			setBadgeSummary({
+				total: badges.length,
+				earned: badges.filter((b: { earned: boolean }) => b.earned).length,
+			});
+		} catch {
+			/* silent */
+		}
+	}, []);
 
 	useEffect(() => {
 		fetchPlatformStats();
-	}, [fetchPlatformStats]);
+		fetchDailyProblem();
+		fetchQuests();
+		fetchNotifCount();
+		fetchBadges();
+	}, [
+		fetchPlatformStats,
+		fetchDailyProblem,
+		fetchQuests,
+		fetchNotifCount,
+		fetchBadges,
+	]);
 
+	// Countdown to 08:00 IST (02:30 UTC)
+	useEffect(() => {
+		const tick = () => {
+			const now = new Date();
+			const tomorrow = new Date(now);
+			tomorrow.setUTCHours(2, 30, 0, 0);
+			if (tomorrow.getTime() <= now.getTime())
+				tomorrow.setDate(tomorrow.getDate() + 1);
+			const diff = tomorrow.getTime() - now.getTime();
+			const h = Math.floor(diff / 3_600_000);
+			const m = Math.floor((diff % 3_600_000) / 60_000);
+			const s = Math.floor((diff % 60_000) / 1000);
+			setCountdown(
+				`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`,
+			);
+		};
+		tick();
+		const id = setInterval(tick, 1000);
+		return () => clearInterval(id);
+	}, []);
+
+	// Sync
 	const handleSync = useCallback(async () => {
 		setSyncing(true);
 		setSyncMessage(null);
@@ -154,14 +274,11 @@ export default function DashboardPage() {
 			const res = await fetch("/api/users/sync", { method: "POST" });
 			const data = await res.json();
 			if (res.ok && data.success) {
-				// Build per-platform status message
 				const parts: string[] = [];
-				if (data.lc) {
+				if (data.lc)
 					parts.push(data.lc.success ? "LC ✓" : `LC ✗ ${data.lc.error ?? ""}`);
-				}
-				if (data.cf) {
+				if (data.cf)
 					parts.push(data.cf.success ? "CF ✓" : `CF ✗ ${data.cf.error ?? ""}`);
-				}
 				const allOk = (data.lc?.success ?? true) && (data.cf?.success ?? true);
 				setSyncMessage(
 					allOk ? "Sync complete!" : `Partial: ${parts.join(" | ")}`,
@@ -178,6 +295,7 @@ export default function DashboardPage() {
 		}
 	}, [fetchPlatformStats]);
 
+	// Computed
 	const totalProblems = useMemo(() => {
 		let total = 0;
 		if (lcStats) total += lcStats.total_solved;
@@ -185,38 +303,9 @@ export default function DashboardPage() {
 		return total;
 	}, [lcStats, cfStats]);
 
-	const stats = useMemo(
-		() => [
-			{
-				label: "XP_VAL",
-				value: profile ? profile.xp.toLocaleString() : "0",
-				icon: "⚡",
-				color: "text-neon-cyan",
-			},
-			{
-				label: "LVL_INDEX",
-				value: levelInfo ? String(levelInfo.level).padStart(2, "0") : "01",
-				icon: "📊",
-				color: "text-text-primary",
-			},
-			{
-				label: "STREAK_VAL",
-				value: profile ? `${profile.current_streak}d` : "0d",
-				icon: "🔥",
-				color:
-					profile && profile.current_streak > 0
-						? "text-neon-orange"
-						: "text-neon-red/80",
-			},
-			{
-				label: "PROBLEMS",
-				value: totalProblems > 0 ? totalProblems.toString() : "---",
-				icon: "🏆",
-				color: "text-neon-cyan",
-			},
-		],
-		[profile, levelInfo, totalProblems],
-	);
+	const hasPlatforms = !!(profile?.cf_handle || profile?.lc_handle);
+
+	/* Loading */
 
 	if (loading) {
 		return (
@@ -231,18 +320,18 @@ export default function DashboardPage() {
 		);
 	}
 
-	const hasPlatforms = profile?.cf_handle || profile?.lc_handle;
+	/* Render */
 
 	return (
-		<div className="p-4 sm:p-8 pb-24 sm:pb-8 space-y-6 md:space-y-10 relative">
-			{/* Ambient background accent */}
+		<div className="px-4 sm:px-8 py-6 sm:py-10 pb-24 sm:pb-10 max-w-[1400px] mx-auto relative">
+			{/* Background glow */}
 			<div className="absolute top-0 right-0 w-[400px] h-[400px] bg-neon-cyan/2 rounded-full blur-[120px] pointer-events-none" />
 
-			{/* Header */}
-			<motion.div
+			{/* HEADER */}
+			<motion.header
 				initial={{ opacity: 0, x: -20 }}
 				animate={{ opacity: 1, x: 0 }}
-				className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-l-4 border-neon-cyan pl-6"
+				className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-l-2 border-neon-cyan pl-6 mb-10"
 			>
 				<div>
 					<h1 className="font-heading text-2xl md:text-4xl font-black text-text-primary uppercase tracking-tighter">
@@ -255,400 +344,178 @@ export default function DashboardPage() {
 							"CONTROL_DASHBOARD"
 						)}
 					</h1>
-					<p className="text-text-muted text-small font-mono mt-2 uppercase tracking-epic font-bold">
+					<p className="text-text-muted text-small font-mono mt-1 uppercase tracking-epic font-bold">
 						{profile
 							? `ROLL_${String(profile.roll_number).padStart(2, "0")} :: ${levelInfo?.title?.toUpperCase() ?? "NEWBIE"}`
 							: "SYSTEM_STATUS :: CONNECTED"}
 					</p>
 				</div>
-				<div className="flex items-center gap-3">
+				<div className="flex items-center gap-2.5">
 					<button
 						type="button"
 						onClick={handleSync}
 						disabled={syncing}
-						className="flex items-center gap-2 px-3 py-1.5 border border-border-hard bg-zinc-950 hover:border-neon-cyan/50 transition-colors font-mono text-tiny uppercase tracking-widest font-black disabled:opacity-30"
+						className="flex items-center gap-1.5 px-3 py-1.5 border border-border-hard bg-zinc-950 hover:border-neon-cyan/50 transition-colors font-mono text-tiny uppercase tracking-widest font-black disabled:opacity-30"
 					>
-						<span className={syncing ? "animate-spin" : ""}>⟳</span>
+						<RefreshCw className={`w-3 h-3 ${syncing ? "animate-spin" : ""}`} />
 						{syncing ? "SYNCING..." : "SYNC"}
 					</button>
 					{syncMessage && (
 						<span
-							className={`font-mono text-tiny uppercase tracking-widest font-bold max-w-[300px] truncate ${
+							className={`font-mono text-tiny uppercase tracking-widest font-bold max-w-[250px] truncate ${
 								syncMessage.includes("complete")
-									? "text-neon-green"
+									? "text-emerald-400"
 									: syncMessage.includes("Partial")
-										? "text-neon-orange"
-										: "text-neon-red"
+										? "text-amber-400"
+										: "text-red-400"
 							}`}
 							title={syncMessage}
 						>
 							{syncMessage}
 						</span>
 					)}
-					<div className="w-2.5 h-2.5 bg-neon-green rounded-none animate-pulse" />
-					<span className="font-mono text-tiny text-text-muted uppercase tracking-widest font-black">
-						Online
-					</span>
+					<Link
+						href="/notifications"
+						className="relative flex items-center justify-center w-8 h-8 border border-border-hard bg-zinc-950 hover:border-neon-cyan/50 transition-colors"
+					>
+						<Bell className="w-3.5 h-3.5 text-text-muted" />
+						{notifCount > 0 && (
+							<span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-[9px] font-mono font-black text-white flex items-center justify-center">
+								{notifCount > 9 ? "9+" : notifCount}
+							</span>
+						)}
+					</Link>
+					<div className="flex items-center gap-1.5">
+						<CircleDot className="w-3 h-3 text-emerald-400 animate-pulse" />
+						<span className="font-mono text-tiny text-text-muted uppercase tracking-widest font-black">
+							Online
+						</span>
+					</div>
 				</div>
-			</motion.div>
+			</motion.header>
 
-			{/* XP Progress bar */}
+			{/* XP BAR */}
 			{levelInfo?.xpForNext && (
 				<motion.div
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					transition={{ delay: 0.15 }}
+					initial={{ opacity: 0, scaleX: 0.8 }}
+					animate={{ opacity: 1, scaleX: 1 }}
+					transition={{ delay: 0.15, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+					className="mb-10 origin-left"
 				>
-					<div className="flex justify-between text-tiny font-mono text-text-muted uppercase font-black mb-2 tracking-widest">
-						<span>
+					<div className="flex justify-between text-tiny font-mono text-text-muted uppercase font-black mb-1.5 tracking-widest">
+						<span className="flex items-center gap-1">
+							<Zap className="w-3 h-3 text-cyan-400" />
 							Level {levelInfo.level} → {levelInfo.level + 1}
 						</span>
-						<span>
+						<span className="tabular-nums">
 							{levelInfo.xpProgress.toLocaleString()} /{" "}
 							{levelInfo.xpForNext.toLocaleString()} XP
 						</span>
 					</div>
-					<div className="h-2 w-full bg-void border border-border-hard p-[2px]">
+					<div className="h-[6px] w-full bg-void border border-border-hard/30 p-px relative">
 						<motion.div
-							className="h-full bg-neon-cyan shadow-[0_0_8px_#00f0ff]"
+							className="h-full bg-neon-cyan relative"
 							initial={{ width: 0 }}
 							animate={{ width: `${xpProgress}%` }}
-							transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-						/>
+							transition={{
+								duration: 1.2,
+								delay: 0.3,
+								ease: [0.16, 1, 0.3, 1],
+							}}
+							style={{ boxShadow: "0 0 12px #00f0ff, 0 0 4px #00f0ff" }}
+						>
+							<div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-white shadow-[0_0_8px_#00f0ff,0_0_16px_#00f0ff]" />
+						</motion.div>
 					</div>
 				</motion.div>
 			)}
 
-			{/* Quick stats */}
-			<div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-				{stats.map((stat, i) => (
+			{/* SECTIONS */}
+			<div className="space-y-12">
+				{/* STATS */}
+				<StatsGrid
+					profile={profile}
+					levelInfo={levelInfo}
+					totalProblems={totalProblems}
+				/>
+
+				{/* DAILY PROBLEM */}
+				<DailyProblemCard daily={daily} countdown={countdown} />
+
+				{/* HEATMAP */}
+				{profile && (
 					<motion.div
-						key={stat.label}
-						initial={{ opacity: 0, y: 10 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ delay: i * 0.1 }}
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						transition={{ delay: 0.3 }}
 					>
-						<Card className="h-full">
-							<div className="flex items-center justify-between">
-								<div className="space-y-1">
-									<p className="text-text-muted text-tiny md:text-small font-mono uppercase tracking-widest font-black">
-										{stat.label}
-									</p>
-									<p
-										className={`text-2xl md:text-4xl font-mono font-black tracking-tighter ${stat.color}`}
-									>
-										{stat.value}
-									</p>
-								</div>
-								<div className="w-10 h-10 rounded-none bg-void border border-border-hard flex items-center justify-center text-xl grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 transition-all">
-									{stat.icon}
-								</div>
-							</div>
-						</Card>
+						<Heatmap userId={profile.id} />
 					</motion.div>
-				))}
-			</div>
+				)}
 
-			{/* Platform Stats — always show both side-by-side when handles linked */}
-			{hasPlatforms && (
+				{/* SEPARATOR */}
+				<div className="dash-divider" />
+
+				{/* PLATFORMS */}
+				<PlatformCards profile={profile} lcStats={lcStats} cfStats={cfStats} />
+
+				{/* ACTIVITY LOG (full width, scrollable) */}
 				<motion.div
-					initial={{ opacity: 0, y: 10 }}
+					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
-					transition={{ delay: 0.3 }}
+					transition={{ delay: 0.4, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
 				>
-					<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-						{/* LeetCode Card */}
-						{profile?.lc_handle && (
-							<Card title="LeetCode" glow>
-								{lcStats ? (
-									<div className="space-y-4">
-										<div className="grid grid-cols-3 gap-3">
-											<div className="text-center p-3 bg-zinc-950 border border-neon-green/20">
-												<p className="text-neon-green font-mono text-2xl font-black">
-													{lcStats.easy_solved}
-												</p>
-												<p className="text-text-muted font-mono text-tiny uppercase tracking-widest mt-1">
-													Easy
-												</p>
-											</div>
-											<div className="text-center p-3 bg-zinc-950 border border-neon-orange/20">
-												<p className="text-neon-orange font-mono text-2xl font-black">
-													{lcStats.medium_solved}
-												</p>
-												<p className="text-text-muted font-mono text-tiny uppercase tracking-widest mt-1">
-													Medium
-												</p>
-											</div>
-											<div className="text-center p-3 bg-zinc-950 border border-neon-red/20">
-												<p className="text-neon-red font-mono text-2xl font-black">
-													{lcStats.hard_solved}
-												</p>
-												<p className="text-text-muted font-mono text-tiny uppercase tracking-widest mt-1">
-													Hard
-												</p>
-											</div>
-										</div>
-										<div className="flex items-center justify-between p-3 bg-zinc-950 border border-border-hard/50">
-											<span className="text-text-muted font-mono text-small uppercase font-black">
-												Total Solved
-											</span>
-											<span className="text-neon-cyan font-mono text-lg font-black">
-												{lcStats.total_solved}
-											</span>
-										</div>
-										{lcStats.contest_rating && (
-											<div className="flex items-center justify-between p-3 bg-zinc-950 border border-border-hard/50">
-												<span className="text-text-muted font-mono text-small uppercase font-black">
-													Contest Rating
-												</span>
-												<span className="text-text-primary font-mono text-lg font-black">
-													{Math.round(lcStats.contest_rating)}
-												</span>
-											</div>
-										)}
-										<p className="text-text-muted text-tiny font-mono uppercase tracking-widest">
-											Synced:{" "}
-											{new Date(lcStats.synced_at).toLocaleString("en-IN", {
-												timeZone: "Asia/Kolkata",
-											})}
-										</p>
-									</div>
-								) : (
-									<div className="flex flex-col items-center justify-center py-8 space-y-3">
-										<p className="text-text-muted font-mono text-small uppercase tracking-widest font-black">
-											No data yet
-										</p>
-										<p className="text-text-secondary text-sm font-mono text-center">
-											Hit SYNC to fetch your LeetCode stats for{" "}
-											<span className="text-neon-cyan">
-												{profile.lc_handle}
-											</span>
-										</p>
-									</div>
-								)}
-							</Card>
-						)}
+					<ActivityLog activity={activity} hasPlatforms={hasPlatforms} />
+				</motion.div>
 
-						{/* Codeforces Card */}
-						{profile?.cf_handle && (
-							<Card title="Codeforces" glow>
-								{cfStats &&
-								(cfStats.latest_rating !== null ||
-									cfStats.submission_count > 0) ? (
-									<div className="space-y-4">
-										<div className="flex items-center justify-between p-3 bg-zinc-950 border border-border-hard/50">
-											<span className="text-text-muted font-mono text-small uppercase font-black">
-												Rating
-											</span>
-											<span className="text-neon-cyan font-mono text-lg font-black">
-												{cfStats.latest_rating ?? "Unrated"}
-											</span>
-										</div>
-										<div className="flex items-center justify-between p-3 bg-zinc-950 border border-border-hard/50">
-											<span className="text-text-muted font-mono text-small uppercase font-black">
-												AC Submissions
-											</span>
-											<span className="text-text-primary font-mono text-lg font-black">
-												{cfStats.submission_count}
-											</span>
-										</div>
-									</div>
-								) : (
-									<div className="flex flex-col items-center justify-center py-8 space-y-3">
-										<p className="text-text-muted font-mono text-small uppercase tracking-widest font-black">
-											No data yet
-										</p>
-										<p className="text-text-secondary text-sm font-mono text-center">
-											Hit SYNC to fetch your Codeforces stats for{" "}
-											<span className="text-neon-cyan">
-												{profile.cf_handle}
-											</span>
-										</p>
-									</div>
-								)}
-							</Card>
+				{/* SEPARATOR */}
+				<div className="dash-divider" />
+
+				{/* LOWER SECTION: Topic Radar + Side Info (2 col) */}
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+					{/* Left: Topic Radar + Quests */}
+					<motion.div
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ delay: 0.5, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+						className="space-y-10"
+					>
+						{profile && <TopicRadar userId={profile.id} />}
+						<QuestsPanel quests={quests} />
+					</motion.div>
+
+					{/* Right: Streak/Badges + Attendance */}
+					<motion.div
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ delay: 0.55, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+						className="space-y-10"
+					>
+						{profile && (
+							<SideInfo
+								profile={profile}
+								badgesEarned={badgeSummary.earned}
+								badgesTotal={badgeSummary.total}
+							/>
 						)}
+						<AttendanceCard />
+					</motion.div>
+				</div>
+
+				{/* SETUP PROMPT */}
+				{profile && (!profile.cf_handle || !profile.lc_handle) && (
+					<div className="flex items-center gap-3 px-4 py-3 border-l-2 border-l-amber-400/40">
+						<AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+						<span className="text-tiny font-mono text-amber-400/80 uppercase tracking-widest font-bold">
+							{!profile.cf_handle && !profile.lc_handle
+								? "Link your Codeforces & LeetCode handles in Settings"
+								: !profile.cf_handle
+									? "Link your Codeforces handle in Settings"
+									: "Link your LeetCode handle in Settings"}
+						</span>
 					</div>
-				</motion.div>
-			)}
-
-			{/* Daily Problem section */}
-			<motion.div
-				initial={{ opacity: 0, scale: 0.98 }}
-				animate={{ opacity: 1, scale: 1 }}
-				transition={{ delay: 0.4 }}
-			>
-				<Card
-					title="Daily Problem"
-					glow
-					className="border-l-4 border-l-neon-cyan"
-				>
-					<div className="flex flex-col md:flex-row items-center justify-between gap-8 py-4">
-						<div className="flex-1 space-y-3">
-							<div className="flex items-center gap-3">
-								<div className="px-2 py-1 bg-neon-cyan/10 border border-neon-cyan/30 text-neon-cyan font-mono text-tiny font-black uppercase tracking-widest">
-									Pending
-								</div>
-								<span className="text-text-muted font-mono text-small uppercase font-bold tracking-tighter">
-									Status: Queued
-								</span>
-							</div>
-							<h4 className="text-white font-mono text-lg md:text-xl font-black uppercase tracking-tight">
-								Daily problem has not been set yet.
-							</h4>
-							<p className="text-text-secondary text-sm font-mono leading-relaxed">
-								Check back later for today&apos;s challenge. The reset occurs
-								every day at 08:00 IST.
-							</p>
-						</div>
-						<div className="w-full md:w-auto">
-							<div className="p-6 bg-zinc-950 border border-border-hard flex flex-col items-center justify-center gap-2 min-w-[200px]">
-								<p className="text-text-muted font-mono text-tiny uppercase tracking-widest font-black">
-									Reset_In
-								</p>
-								<p className="text-text-primary font-mono text-2xl font-black tabular-nums tracking-tighter">
-									00:00:00
-								</p>
-							</div>
-						</div>
-					</div>
-				</Card>
-			</motion.div>
-
-			{/* Main Grid */}
-			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-				{/* Activity Log */}
-				<motion.div
-					initial={{ opacity: 0, y: 10 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ delay: 0.5 }}
-					className="lg:col-span-2"
-				>
-					<Card title="Activity_Log" className="h-full">
-						{activity.length > 0 ? (
-							<div className="space-y-1 max-h-[400px] overflow-y-auto">
-								{activity.map((item, i) => (
-									<motion.div
-										key={item.id}
-										initial={{ opacity: 0, x: -10 }}
-										animate={{ opacity: 1, x: 0 }}
-										transition={{ delay: 0.05 * i }}
-										className="flex items-center gap-4 p-3 hover:bg-zinc-950/50 transition-colors border-b border-border-hard/20 last:border-0"
-									>
-										{/* Platform badge */}
-										<div
-											className={`shrink-0 w-8 h-8 flex items-center justify-center border font-mono text-tiny font-black uppercase ${
-												item.platform === "lc"
-													? "border-neon-orange/30 bg-neon-orange/5 text-neon-orange"
-													: "border-neon-cyan/30 bg-neon-cyan/5 text-neon-cyan"
-											}`}
-										>
-											{item.platform === "lc" ? "LC" : "CF"}
-										</div>
-
-										{/* Problem info */}
-										<div className="flex-1 min-w-0">
-											<p className="text-text-primary font-mono text-sm font-bold truncate">
-												{item.title}
-											</p>
-											<p className="text-text-muted font-mono text-tiny uppercase tracking-widest">
-												{item.subtitle}
-											</p>
-										</div>
-
-										{/* Timestamp */}
-										<span className="text-text-muted font-mono text-tiny tabular-nums shrink-0">
-											{formatTimeAgo(item.timestamp)}
-										</span>
-									</motion.div>
-								))}
-							</div>
-						) : (
-							<div className="flex flex-col items-center justify-center py-16 text-center space-y-4">
-								<div className="w-16 h-16 rounded-none border border-border-hard flex items-center justify-center text-3xl opacity-20">
-									📡
-								</div>
-								<div className="space-y-1">
-									<p className="text-text-muted font-mono text-small uppercase tracking-widest font-black">
-										LOG_DATA_EMPTY
-									</p>
-									<p className="text-text-secondary text-sm font-mono max-w-sm text-center">
-										{hasPlatforms
-											? "Hit SYNC to fetch your recent submissions."
-											: "Link your CF or LC handle to see activity."}
-									</p>
-								</div>
-							</div>
-						)}
-					</Card>
-				</motion.div>
-
-				{/* Side Panels */}
-				<motion.div
-					initial={{ opacity: 0, y: 10 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ delay: 0.6 }}
-					className="space-y-6"
-				>
-					<Card title="Weekly Quests">
-						<div className="space-y-6">
-							<div className="space-y-2">
-								<div className="flex justify-between text-tiny font-mono text-text-muted uppercase font-black">
-									<span>Progress</span>
-									<span>0%</span>
-								</div>
-								<div className="h-1.5 w-full bg-void border border-border-hard p-px">
-									<div className="h-full w-0 bg-neon-cyan shadow-[0_0_8px_#00f0ff]" />
-								</div>
-							</div>
-							<p className="text-text-muted text-small font-mono leading-relaxed italic">
-								Complete weekly challenges to earn more XP.
-							</p>
-						</div>
-					</Card>
-
-					{/* Quick links */}
-					{profile && (!profile.cf_handle || !profile.lc_handle) && (
-						<Card title="Quick Setup">
-							<div className="space-y-3">
-								{!profile.cf_handle && (
-									<div className="flex items-center gap-3 p-3 bg-zinc-950 border border-neon-orange/20">
-										<span className="text-sm">⚠️</span>
-										<span className="text-tiny font-mono text-neon-orange uppercase tracking-widest font-bold">
-											Link your CF handle
-										</span>
-									</div>
-								)}
-								{!profile.lc_handle && (
-									<div className="flex items-center gap-3 p-3 bg-zinc-950 border border-neon-orange/20">
-										<span className="text-sm">⚠️</span>
-										<span className="text-tiny font-mono text-neon-orange uppercase tracking-widest font-bold">
-											Link your LC handle
-										</span>
-									</div>
-								)}
-							</div>
-						</Card>
-					)}
-				</motion.div>
+				)}
 			</div>
 		</div>
 	);
-}
-
-// Helpers
-
-function formatTimeAgo(timestamp: string): string {
-	const now = Date.now();
-	const then = new Date(timestamp).getTime();
-	const diffMs = now - then;
-	const diffMins = Math.floor(diffMs / 60_000);
-	const diffHours = Math.floor(diffMs / 3_600_000);
-	const diffDays = Math.floor(diffMs / 86_400_000);
-
-	if (diffMins < 1) return "now";
-	if (diffMins < 60) return `${diffMins}m ago`;
-	if (diffHours < 24) return `${diffHours}h ago`;
-	if (diffDays < 30) return `${diffDays}d ago`;
-	return new Date(timestamp).toLocaleDateString("en-IN");
 }

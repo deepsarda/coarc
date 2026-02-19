@@ -1,42 +1,119 @@
 "use client";
 
 import { motion } from "framer-motion";
+import {
+	Award,
+	BarChart3,
+	BookOpen,
+	CalendarCheck,
+	Flame,
+	Library,
+	Lightbulb,
+	Sparkles,
+	Swords,
+	Target,
+	Trophy,
+} from "lucide-react";
 import Link from "next/link";
+import { type ReactNode, useEffect, useState } from "react";
 import BlurredLeaderboard from "@/components/landing/BlurredLeaderboard";
 import HeroSection from "@/components/landing/HeroSection";
 import JoinCounter from "@/components/landing/JoinCounter";
 import { SITE } from "@/lib/config";
 
-const FEATURES = [
+/* Feature clusters */
+interface Feature {
+	icon: ReactNode;
+	title: string;
+	desc: string;
+	xp?: string;
+}
+
+interface FeatureCluster {
+	label: string;
+	title: string;
+	color: string;
+	borderColor: string;
+	features: Feature[];
+}
+
+const CLUSTERS: FeatureCluster[] = [
 	{
-		icon: "⚔️",
-		title: "Duels",
-		desc: "Challenge classmates to 1v1 coding battles.",
+		label: "GROWTH_MODULES",
+		title: "Beyond Code",
+		color: "text-neon-cyan",
+		borderColor: "border-neon-cyan/40",
+		features: [
+			{
+				icon: <CalendarCheck className="w-7 h-7" />,
+				title: "Attendance",
+				desc: "Track classes, predict skips, never fall below 76%.",
+				xp: "Skip calculator",
+			},
+			{
+				icon: <BookOpen className="w-7 h-7" />,
+				title: "Flashcards",
+				desc: "Admin-curated study decks. Earn XP for every card you master.",
+				xp: "+5 XP per card",
+			},
+			{
+				icon: <Library className="w-7 h-7" />,
+				title: "Resources",
+				desc: "Community-shared links approved by peers.",
+				xp: "+20 XP approved",
+			},
+		],
 	},
 	{
-		icon: "🐉",
-		title: "Boss Raids",
-		desc: "Weekly community bosses. Defeat them as a class.",
+		label: "TRACKING_ENGINE",
+		title: "Your Progress",
+		color: "text-neon-green",
+		borderColor: "border-neon-green/40",
+		features: [
+			{
+				icon: <Flame className="w-7 h-7" />,
+				title: "Streaks",
+				desc: "Consecutive solve days with shields. Fire grows with your streak.",
+				xp: "+5–50 XP/day",
+			},
+			{
+				icon: <Trophy className="w-7 h-7" />,
+				title: "Leaderboards",
+				desc: "Weekly, monthly, all-time rankings. Dark horse alerts.",
+				xp: "Monarch badge",
+			},
+			{
+				icon: <BarChart3 className="w-7 h-7" />,
+				title: "Analytics",
+				desc: "Heatmaps, topic radars, rating trajectories. All real-time.",
+			},
+		],
 	},
 	{
-		icon: "🔥",
-		title: "Streaks",
-		desc: "Maintain daily solve streaks with shields & fire.",
-	},
-	{
-		icon: "🏆",
-		title: "Leaderboards",
-		desc: "Global rankings for XP, ELO, and Seasonal titles.",
-	},
-	{
-		icon: "🎖️",
-		title: "Badges",
-		desc: "Unlock rare technical achievement badges.",
-	},
-	{
-		icon: "📊",
-		title: "Analytics",
-		desc: "Your CF & LC progress tracked in real-time.",
+		label: "COMBAT_SYSTEMS",
+		title: "Battle Modes",
+		color: "text-neon-red",
+		borderColor: "border-neon-red/40",
+		features: [
+			{
+				icon: <Swords className="w-7 h-7" />,
+				title: "Duels",
+				desc: "Challenge classmates to 1v1 coding battles. Auto-matched problems.",
+				xp: "+75 XP win",
+			},
+			{
+				icon: <Target className="w-7 h-7" />,
+				title: "Boss Raids",
+				desc: "Community bosses with HP bars. Defeat them as a class.",
+				xp: "+500 XP first solve",
+			},
+			{
+				icon: <Award className="w-7 h-7" />,
+				title: "Weekly Quests",
+				desc: "3 quests per week. Complete all for bonus XP.",
+				xp: "+50 XP each",
+			},
+		],
 	},
 ];
 
@@ -59,6 +136,20 @@ const itemVariants = {
 };
 
 export default function LandingPage() {
+	const [stats, setStats] = useState({
+		userCount: 0,
+		genesisClaimed: 0,
+		genesisRemaining: 20,
+		genesisLimit: 20,
+	});
+
+	useEffect(() => {
+		fetch("/api/stats")
+			.then((r) => r.json())
+			.then(setStats)
+			.catch(() => {});
+	}, []);
+
 	return (
 		<div className="min-h-svh bg-grid-full overflow-x-hidden w-full max-w-full relative">
 			<HeroSection />
@@ -84,9 +175,9 @@ export default function LandingPage() {
 					<BlurredLeaderboard />
 				</div>
 
-				{/* Features */}
-				<div className="pt-16">
-					<div className="flex flex-col items-center mb-16 text-center">
+				{/* Feature Clusters */}
+				<div className="space-y-20 md:space-y-28">
+					<div className="flex flex-col items-center mb-8 text-center">
 						<div className="h-16 w-[2px] bg-linear-to-t from-neon-cyan to-transparent mb-6" />
 						<motion.h2
 							initial={{ opacity: 0, y: 10 }}
@@ -95,69 +186,82 @@ export default function LandingPage() {
 							transition={{ duration: 0.4 }}
 							className="font-heading font-bold text-3xl md:text-4xl tracking-tighter uppercase"
 						>
-							Inside the <span className="text-neon-cyan">Arc</span>
+							The Full <span className="text-neon-cyan">Arsenal</span>
 						</motion.h2>
 						<p className="font-mono text-small md:text-xs text-text-muted mt-2 tracking-mega uppercase">
-							SYSTEM_CORE :: MODULES_LOADED
+							MORE_THAN_CODE :: ALL_SYSTEMS_LOADED
 						</p>
 					</div>
 
-					<motion.div
-						variants={containerVariants}
-						initial="hidden"
-						whileInView="visible"
-						viewport={{ once: true, margin: "-50px" }}
-						className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10"
-					>
-						{FEATURES.map((feature) => (
+					{CLUSTERS.map((cluster, ci) => (
+						<motion.div
+							key={cluster.label}
+							initial={{ opacity: 0, y: 30 }}
+							whileInView={{ opacity: 1, y: 0 }}
+							viewport={{ once: true, margin: "-60px" }}
+							transition={{ duration: 0.5, delay: ci * 0.1 }}
+							className="relative"
+						>
+							{/* Cluster header */}
+							<div className="flex items-center gap-4 mb-8">
+								<div className={`w-1 h-12 ${cluster.borderColor} border-l-2`} />
+								<div>
+									<p className="font-mono text-tiny text-text-dim uppercase tracking-mega font-black">
+										{cluster.label}
+									</p>
+									<h3
+										className={`font-heading font-bold text-2xl md:text-3xl tracking-tight uppercase ${cluster.color}`}
+									>
+										{cluster.title}
+									</h3>
+								</div>
+							</div>
+
+							{/* Feature cards */}
 							<motion.div
-								key={feature.title}
-								variants={itemVariants}
-								className="p-8 card-brutal scifi-window border-t-2 border-t-neon-cyan group transition-all duration-300 relative overflow-hidden"
+								variants={containerVariants}
+								initial="hidden"
+								whileInView="visible"
+								viewport={{ once: true, margin: "-50px" }}
+								className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
 							>
-								<div className="absolute inset-0 bg-void/50 pointer-events-none z-0" />
+								{cluster.features.map((feature) => (
+									<motion.div
+										key={feature.title}
+										variants={itemVariants}
+										className={`p-6 card-brutal scifi-window border-t-2 ${cluster.borderColor} group transition-all duration-300 relative overflow-hidden`}
+									>
+										<div className="card-overlay bg-void/50!" />
 
-								{/* Component Corner Decorations */}
-								<div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-neon-cyan opacity-40 z-20 group-hover:opacity-100 transition-opacity pointer-events-none" />
-								<div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-neon-cyan opacity-40 z-20 group-hover:opacity-100 transition-opacity pointer-events-none" />
+										<div className="corner-deco corner-tl w-3 h-3" />
+										<div className="corner-deco corner-br w-3 h-3" />
 
-								<div className="flex items-start justify-between mb-8 relative z-10">
-									<div className="w-16 h-16 rounded-sm bg-zinc-900 border border-border-hard flex items-center justify-center text-4xl grayscale group-hover:grayscale-0 transition-all duration-300 group-hover:scale-110 relative">
-										<div className="absolute inset-0 bg-neon-cyan/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-										{feature.icon}
-									</div>
-									<div className="text-right">
-										<div className="font-mono text-tiny text-neon-cyan/60 font-black mb-1 tracking-widest">
-											ARC_ID
+										<div className="flex items-start justify-between mb-5 relative z-10">
+											<div
+												className={`w-12 h-12 rounded-sm bg-zinc-900 border border-border-hard flex items-center justify-center ${cluster.color} opacity-40 grayscale group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300`}
+											>
+												{feature.icon}
+											</div>
+											{feature.xp && (
+												<span className="font-mono text-tiny text-neon-green font-black tracking-widest uppercase bg-neon-green/5 border border-neon-green/20 px-2 py-0.5">
+													{feature.xp}
+												</span>
+											)}
 										</div>
-										<div className="font-mono text-small text-text-muted font-black tracking-tighter">
-											NODE_CONNECTED
-										</div>
-									</div>
-								</div>
 
-								<h4 className="font-mono font-black md:text-lg mb-3 tracking-widest uppercase relative z-10 text-neon-cyan">
-									{feature.title}
-								</h4>
-								<p className="text-text-secondary text-sm font-mono leading-relaxed opacity-80 min-h-[3em] relative z-10">
-									{feature.desc}
-								</p>
-
-								<div className="mt-8 pt-6 border-t border-border-hard/50 flex items-center justify-between relative z-10">
-									<div className="flex items-center gap-2">
-										<div className="w-1.5 h-1.5 bg-neon-green rounded-full animate-pulse shadow-[0_0_8px_rgba(57,255,20,0.5)]" />
-										<span className="font-mono text-tiny text-text-muted uppercase tracking-mega font-black">
-											LINK_ACTIVE
-										</span>
-									</div>
-									<div className="flex gap-1.5">
-										<div className="w-1.5 h-px bg-neon-cyan" />
-										<div className="w-1.5 h-px bg-neon-cyan/50" />
-									</div>
-								</div>
+										<h4
+											className={`font-mono font-black text-base mb-2 tracking-widest uppercase relative z-10 ${cluster.color}`}
+										>
+											{feature.title}
+										</h4>
+										<p className="text-text-secondary text-sm font-mono leading-relaxed opacity-80 relative z-10">
+											{feature.desc}
+										</p>
+									</motion.div>
+								))}
 							</motion.div>
-						))}
-					</motion.div>
+						</motion.div>
+					))}
 				</div>
 
 				{/* Combined Join Counter + Info Row */}
@@ -170,7 +274,7 @@ export default function LandingPage() {
 						className="h-full"
 					>
 						<div className="h-full">
-							<JoinCounter />
+							<JoinCounter count={stats.userCount} />
 						</div>
 					</motion.div>
 
@@ -181,9 +285,9 @@ export default function LandingPage() {
 								.
 							</h3>
 							<p className="text-text-secondary font-mono text-sm leading-relaxed">
-								Sync your profiles from Codeforces and LeetCode to start
-								competing in the global SVNIT ecosystem. Earn XP for every
-								problem solved and climb the ranks to become the top node.
+								Sync your profiles from Codeforces and LeetCode to start earning
+								XP. Track your attendance. Study with flashcards. Everything you
+								need, all in one place.
 							</p>
 						</div>
 						<div className="flex flex-wrap gap-4">
@@ -212,30 +316,30 @@ export default function LandingPage() {
 					className="max-w-3xl mx-auto pt-12"
 				>
 					<div className="card-brutal-accent scifi-window p-0 overflow-hidden relative group">
-						<div className="absolute inset-0 bg-void pointer-events-none z-0" />
+						<div className="card-overlay bg-void!" />
 
-						{/* Component Corner Decorations */}
-						<div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-neon-cyan opacity-50 z-20 group-hover:opacity-100 transition-opacity pointer-events-none" />
-						<div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-neon-cyan opacity-50 z-20 group-hover:opacity-100 transition-opacity pointer-events-none" />
-						<div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-neon-cyan opacity-50 z-20 group-hover:opacity-100 transition-opacity pointer-events-none" />
-						<div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-neon-cyan opacity-50 z-20 group-hover:opacity-100 transition-opacity pointer-events-none" />
+						{/* Corner Decorations */}
+						<div className="corner-deco corner-tl" style={{ opacity: 0.5 }} />
+						<div className="corner-deco corner-tr" style={{ opacity: 0.5 }} />
+						<div className="corner-deco corner-bl" style={{ opacity: 0.5 }} />
+						<div className="corner-deco corner-br" style={{ opacity: 0.5 }} />
 
 						{/* Background decorative elements */}
 						<div className="absolute top-0 right-0 w-32 h-32 bg-neon-cyan/5 -mr-16 -mt-16 rounded-full blur-3xl pointer-events-none" />
 						<div className="absolute bottom-0 left-0 w-32 h-32 bg-neon-magenta/5 -ml-16 -mb-16 rounded-full blur-3xl pointer-events-none" />
 
-						<div className="px-5 py-2.5 border-b border-neon-cyan/30 flex items-center justify-between bg-zinc-950/90 backdrop-blur-md relative z-10">
+						<div className="terminal-bar px-5 border-b-neon-cyan/30">
 							<div className="flex items-center gap-3">
-								<div className="flex gap-1.5">
-									<div className="w-2 h-2 rounded-full bg-neon-red shadow-[0_0_8px_#ff0040]" />
-									<div className="w-2 h-2 rounded-full bg-neon-yellow shadow-[0_0_8px_#ffe600]" />
-									<div className="w-2 h-2 rounded-full bg-neon-green shadow-[0_0_8px_#39ff14]" />
+								<div className="traffic-lights">
+									<div className="status-dot status-dot-red" />
+									<div className="status-dot status-dot-yellow" />
+									<div className="status-dot status-dot-green" />
 								</div>
-								<h3 className="font-mono text-small text-neon-cyan uppercase tracking-mega font-black">
+								<h3 className="scifi-label tracking-mega">
 									:: REWARDS :: GENESIS_BADGE
 								</h3>
 							</div>
-							<span className="font-mono text-tiny text-neon-cyan/40 font-black tracking-widest hidden sm:block">
+							<span className="font-mono text-tiny text-text-dim font-black tracking-widest hidden sm:block">
 								EST_2026
 							</span>
 						</div>
@@ -245,12 +349,15 @@ export default function LandingPage() {
 								<div className="space-y-3">
 									<p className="text-white font-mono text-lg md:text-xl font-black leading-tight uppercase tracking-tight">
 										JOIN THE{" "}
-										<span className="text-neon-cyan">FIRST 20 STUDENTS</span>
+										<span className="text-neon-cyan">
+											FIRST {stats.genesisLimit} STUDENTS
+										</span>
 									</p>
 									<p className="text-text-secondary text-xs sm:text-small font-mono leading-relaxed">
-										The first 20 students to connect their profiles earn a
-										unique Genesis Badge. This badge is a permanent mark on your
-										profile, proving you were here from day one.
+										The first {stats.genesisLimit} students to connect their
+										profiles earn a unique Genesis Badge. This badge is a
+										permanent mark on your profile, proving you were here from
+										day one.
 									</p>
 								</div>
 
@@ -267,20 +374,27 @@ export default function LandingPage() {
 												transition={{ duration: 1.5, repeat: Infinity }}
 												className="text-white font-mono text-4xl md:text-5xl font-black tabular-nums tracking-tighter"
 											>
-												20
+												{stats.genesisRemaining}
 											</motion.span>
-											<span className="text-text-muted font-mono text-lg md:text-xl font-black opacity-40">
-												/20
+											<span className="text-text-dim font-mono text-lg md:text-xl font-black">
+												/{stats.genesisLimit}
 											</span>
 										</div>
 									</div>
-									<div className="h-14 w-px bg-border-hard/50" />
+									<div className="h-14 w-px bg-border-subtle" />
 									<div className="flex-1">
 										<div className="h-2.5 w-full bg-void border border-border-hard p-[2px] rounded-none">
-											<div className="h-full w-full bg-neon-cyan/20 animate-pulse" />
+											<div
+												className="h-full bg-neon-cyan/30 transition-all duration-1000"
+												style={{
+													width: `${Math.round((stats.genesisClaimed / stats.genesisLimit) * 100)}%`,
+												}}
+											/>
 										</div>
 										<p className="text-tiny font-mono text-neon-cyan mt-3 tracking-widest uppercase font-black">
-											Waiting for first students to join
+											{stats.genesisClaimed > 0
+												? `${stats.genesisClaimed} of ${stats.genesisLimit} badges claimed`
+												: "Waiting for first students to join"}
 										</p>
 									</div>
 								</div>
@@ -289,8 +403,8 @@ export default function LandingPage() {
 							<div className="w-32 h-32 md:w-44 md:h-44 shrink-0 relative">
 								<div className="absolute inset-0 bg-neon-cyan/15 blur-2xl animate-pulse pointer-events-none" />
 								<div className="w-full h-full rounded-none transform rotate-45 flex items-center justify-center p-4 bg-zinc-900 border-double border-4 border-neon-cyan/20 relative z-10 shadow-[0_0_30px_rgba(0,240,255,0.1)]">
-									<div className="transform -rotate-45 text-4xl md:text-6xl drop-shadow-[0_0_15px_rgba(0,240,255,0.5)]">
-										🌌
+									<div className="transform -rotate-45 text-neon-cyan drop-shadow-[0_0_15px_rgba(0,240,255,0.5)]">
+										<Sparkles className="w-10 h-10 md:w-14 md:h-14" />
 									</div>
 								</div>
 								{/* Technical accents */}
@@ -312,7 +426,7 @@ export default function LandingPage() {
 					<div className="inline-block relative">
 						<div className="absolute -inset-8 bg-neon-cyan/5 blur-3xl rounded-full pointer-events-none" />
 						<p className="text-text-muted text-xs font-mono mb-8 uppercase tracking-epic relative">
-							Ready to compete?
+							Ready to level up?
 						</p>
 
 						<motion.div
@@ -324,7 +438,7 @@ export default function LandingPage() {
 								href="/login"
 								className="btn-neon px-8 sm:px-16 py-3 sm:py-4 text-base inline-block"
 							>
-								START COMPETING →
+								JOIN THE ARC →
 							</Link>
 						</motion.div>
 					</div>
@@ -332,7 +446,7 @@ export default function LandingPage() {
 			</section>
 
 			{/* Footer */}
-			<footer className="relative z-10 border-t border-border-hard/50 py-12 bg-void/50 backdrop-blur-sm w-full max-w-full overflow-hidden">
+			<footer className="relative z-10 border-t border-border-subtle py-12 bg-void/50 backdrop-blur-sm w-full max-w-full overflow-hidden">
 				<div className="max-w-5xl mx-auto px-4 flex flex-col items-center gap-6">
 					<div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 text-xs md:text-small font-mono text-text-secondary tracking-mega uppercase mb-4 font-black">
 						<span className="hover:text-neon-cyan transition-colors cursor-pointer relative group whitespace-nowrap">

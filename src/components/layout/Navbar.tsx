@@ -16,16 +16,16 @@ export default function Navbar() {
 	const levelInfo = profile ? getLevelForXP(profile.xp) : null;
 
 	return (
-		<header className="sticky top-0 z-40 bg-void/80 backdrop-blur-md border-b border-white/5">
+		<header className="sticky top-0 z-40 bg-void/80 backdrop-blur-md border-b border-border-subtle">
 			<div className="flex items-center justify-between px-4 md:px-6 h-16 max-w-full w-full">
 				{/* Logo */}
 				<Link
 					href="/dashboard"
 					className="font-mono text-lg font-bold text-text-primary tracking-tight group shrink-0"
 				>
-					<span className="text-neon-cyan">co</span>
+					<span className="text-neon-cyan">CO</span>
 					<span className="text-text-primary">.</span>
-					<span className="text-text-secondary font-light">arc</span>
+					<span className="text-text-secondary font-light">ARC</span>
 				</Link>
 
 				{/* Right side */}

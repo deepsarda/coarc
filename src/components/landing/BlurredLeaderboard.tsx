@@ -28,23 +28,23 @@ export default function BlurredLeaderboard() {
 			onMouseEnter={() => setIsHovered(true)}
 			onMouseLeave={() => setIsHovered(false)}
 		>
-			<div className="absolute inset-0 bg-void pointer-events-none z-0" />
+			<div className="card-overlay bg-void!" />
 			<div className="absolute inset-0 bg-grid-full opacity-10 pointer-events-none z-0" />
 
-			{/* Component Corner Decorations */}
-			<div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-neon-cyan opacity-40 z-20 group-hover:opacity-100 transition-opacity pointer-events-none" />
-			<div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-neon-cyan opacity-40 z-20 group-hover:opacity-100 transition-opacity pointer-events-none" />
-			<div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-neon-cyan opacity-40 z-20 group-hover:opacity-100 transition-opacity pointer-events-none" />
-			<div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-neon-cyan opacity-40 z-20 group-hover:opacity-100 transition-opacity pointer-events-none" />
+			{/* Corner Decorations */}
+			<div className="corner-deco corner-tl" />
+			<div className="corner-deco corner-tr" />
+			<div className="corner-deco corner-bl" />
+			<div className="corner-deco corner-br" />
 
 			{/* Window Ribbon */}
-			<div className="px-5 py-2.5 border-b border-border-hard flex items-center justify-between bg-zinc-900/80 backdrop-blur-md relative overflow-hidden z-10">
+			<div className="terminal-bar px-5 bg-zinc-900/80">
 				<div className="absolute inset-x-0 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-neon-cyan/50 to-transparent" />
 				<div className="flex items-center gap-3 relative z-10">
-					<div className="flex gap-1.5">
-						<div className="w-2 h-2 rounded-full bg-neon-red/70 shadow-[0_0_8px_#ff0040]" />
-						<div className="w-2 h-2 rounded-full bg-neon-yellow/70 shadow-[0_0_8px_#ffe600]" />
-						<div className="w-2 h-2 rounded-full bg-neon-green/70 shadow-[0_0_8px_#39ff14]" />
+					<div className="traffic-lights">
+						<div className="status-dot status-dot-red opacity-70" />
+						<div className="status-dot status-dot-yellow opacity-70" />
+						<div className="status-dot status-dot-green opacity-70" />
 					</div>
 					<h3 className="font-mono font-black text-text-primary text-tiny uppercase tracking-mega flex items-center gap-2">
 						<span className="text-neon-cyan">::</span> Global_Leaderboard
@@ -72,7 +72,7 @@ export default function BlurredLeaderboard() {
 								<th className="text-right px-6 py-4 font-black">Streak</th>
 							</tr>
 						</thead>
-						<tbody className="divide-y divide-border-hard/30">
+						<tbody className="divide-y divide-border-subtle">
 							{MOCK_LEADERBOARD.map((row) => (
 								<tr
 									key={row.rank}

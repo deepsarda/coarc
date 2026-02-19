@@ -200,13 +200,25 @@ async function syncLcData(
 
 		await admin.from("lc_stats").upsert(statsData, { onConflict: "user_id" });
 
-		// Upsert recent submissions
+		// Upsert recent submissions, enriching with difficulty from lc_problems cache
 		if (recentSubs.length > 0) {
+			// Look up difficulty from lc_problems cache
+			const slugs = [...new Set(recentSubs.map((s) => s.problemSlug))];
+			const { data: cachedProblems } = await admin
+				.from("lc_problems")
+				.select("slug, difficulty")
+				.in("slug", slugs);
+
+			const difficultyMap = new Map<string, string>();
+			for (const p of cachedProblems ?? []) {
+				difficultyMap.set(p.slug, p.difficulty);
+			}
+
 			const subsData = recentSubs.map((s) => ({
 				user_id: userId,
 				problem_slug: s.problemSlug,
 				problem_title: s.problemTitle,
-				difficulty: s.difficulty,
+				difficulty: difficultyMap.get(s.problemSlug) ?? s.difficulty,
 				submitted_at: s.submittedAt.toISOString(),
 				status: s.status,
 			}));

@@ -1,9 +1,10 @@
 "use client";
 
+import { Flame } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuthContext } from "@/components/providers/AuthProvider";
-import { ADMIN_NAV_ITEMS, NAV_ITEMS } from "@/lib/utils/constants";
+import { ADMIN_NAV_ITEMS, NAV_ITEMS } from "@/lib/utils/navIcons";
 
 export default function Sidebar() {
 	const pathname = usePathname();
@@ -30,7 +31,7 @@ export default function Sidebar() {
 					{/* Streak indicator */}
 					{profile.current_streak > 0 && (
 						<div className="flex items-center gap-1.5 px-2 py-1 bg-neon-orange/5 border border-neon-orange/20">
-							<span className="text-sm">🔥</span>
+							<Flame className="w-3.5 h-3.5 text-neon-orange" />
 							<span className="font-mono text-tiny text-neon-orange font-black">
 								{profile.current_streak}d streak
 							</span>
@@ -53,7 +54,7 @@ export default function Sidebar() {
 									: "text-text-secondary hover:text-text-primary hover:bg-elevated"
 							}`}
 						>
-							<span className="text-base">{item.icon}</span>
+							<span className="shrink-0 opacity-70">{item.icon}</span>
 							<span>{item.label}</span>
 						</Link>
 					);
@@ -79,7 +80,7 @@ export default function Sidebar() {
 											: "text-text-secondary hover:text-text-primary hover:bg-elevated"
 									}`}
 								>
-									<span className="text-base">{item.icon}</span>
+									<span className="shrink-0 opacity-70">{item.icon}</span>
 									<span>{item.label}</span>
 								</Link>
 							);

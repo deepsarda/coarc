@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { checkAndAwardBadges } from "@/lib/gamification/badges";
+import { updateUserStreak } from "@/lib/gamification/streaks";
 import { syncUserStats } from "@/lib/services/sync";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -7,6 +9,7 @@ import { createClient } from "@/lib/supabase/server";
  * POST /api/users/sync
  * Trigger a stats sync for the authenticated user.
  * Fetches latest data from Codeforces and LeetCode APIs.
+ * Also updates streak and checks badge eligibility.
  */
 export async function POST() {
 	try {
@@ -45,6 +48,13 @@ export async function POST() {
 			profile.cf_handle,
 			profile.lc_handle,
 		);
+
+		// Update streak and check badges after successful sync
+		const anySyncOk = result.cf.success || result.lc.success;
+		if (anySyncOk) {
+			await updateUserStreak(admin, user.id);
+			await checkAndAwardBadges(admin, user.id);
+		}
 
 		return NextResponse.json({
 			success: true,

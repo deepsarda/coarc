@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuthContext } from "@/components/providers/AuthProvider";
-import { MOBILE_NAV_ITEMS } from "@/lib/utils/constants";
+import { MOBILE_NAV_ITEMS } from "@/lib/utils/navIcons";
 
 export default function MobileNav() {
 	const pathname = usePathname();
@@ -27,7 +27,7 @@ export default function MobileNav() {
 								isActive ? "text-neon-cyan" : "text-text-muted"
 							}`}
 						>
-							<span className="text-xl">{item.icon}</span>
+							<span className="shrink-0">{item.icon}</span>
 							<span className="text-[10px] font-mono">{item.label}</span>
 						</Link>
 					);

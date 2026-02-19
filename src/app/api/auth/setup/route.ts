@@ -82,7 +82,7 @@ export async function POST(request: Request) {
 			);
 		}
 
-		// 1. Create the profile with initial XP
+		// Create the profile with initial XP
 		const { data: profile, error: profileError } = await admin
 			.from("profiles")
 			.insert({
@@ -104,15 +104,15 @@ export async function POST(request: Request) {
 			);
 		}
 
-		// 2. Log the welcome XP
+		// Log the welcome XP
 		await admin.from("xp_log").insert({
 			user_id: user.id,
 			amount: INITIAL_JOIN_XP,
-			reason: "Welcome bonus, joined co.arc",
+			reason: "Welcome bonus, joined CO.ARC",
 			reference_id: `join_${user.id}`,
 		});
 
-		// 3. Check if user qualifies for Genesis badge (first N users)
+		// Check if user qualifies for Genesis badge (first N users)
 		const { count } = await admin
 			.from("profiles")
 			.select("id", { count: "exact", head: true });
@@ -152,7 +152,7 @@ export async function POST(request: Request) {
 			}
 		}
 
-		// 4. Trigger initial stats sync (fire-and-forget, don't block the response)
+		// Trigger initial stats sync (fire-and-forget, don't block the response)
 		const syncPromise = syncUserStats(
 			admin,
 			user.id,

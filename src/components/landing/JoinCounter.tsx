@@ -45,19 +45,31 @@ export default function JoinCounter({
 			whileInView={{ opacity: 1, y: 0 }}
 			viewport={{ once: true, margin: "-50px" }}
 			transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-			className="card-brutal scifi-window p-0 overflow-hidden relative group flex flex-col h-full"
+			className="card-brutal scifi-window p-0 overflow-hidden relative group flex flex-col h-full hover:border-neon-green"
 		>
-			<div className="absolute inset-0 bg-void pointer-events-none z-0" />
+			<div className="card-overlay bg-void!" />
 			<div className="absolute inset-0 bg-grid-full opacity-10 pointer-events-none z-0" />
 
-			{/* Component Corner Decorations */}
-			<div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-neon-green opacity-40 z-20 group-hover:opacity-100 transition-opacity pointer-events-none" />
-			<div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-neon-green opacity-40 z-20 group-hover:opacity-100 transition-opacity pointer-events-none" />
-			<div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-neon-green opacity-40 z-20 group-hover:opacity-100 transition-opacity pointer-events-none" />
-			<div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-neon-green opacity-40 z-20 group-hover:opacity-100 transition-opacity pointer-events-none" />
+			{/* Corner Decorations (green variant) */}
+			<div
+				className="corner-deco corner-tl"
+				style={{ borderColor: "var(--color-neon-green)" }}
+			/>
+			<div
+				className="corner-deco corner-tr"
+				style={{ borderColor: "var(--color-neon-green)" }}
+			/>
+			<div
+				className="corner-deco corner-bl"
+				style={{ borderColor: "var(--color-neon-green)" }}
+			/>
+			<div
+				className="corner-deco corner-br"
+				style={{ borderColor: "var(--color-neon-green)" }}
+			/>
 
 			{/* Window Ribbon */}
-			<div className="px-5 py-2.5 border-b border-border-hard flex items-center justify-between bg-zinc-900/80 backdrop-blur-md relative overflow-hidden z-10">
+			<div className="terminal-bar px-5 bg-zinc-900/80">
 				<div className="absolute inset-x-0 bottom-0 h-px bg-linear-to-r from-transparent via-neon-green/40 to-transparent" />
 				<div className="flex items-center gap-3 relative z-10">
 					<div className="flex gap-1">
@@ -83,9 +95,7 @@ export default function JoinCounter({
 					<span className="font-mono text-7xl font-black text-neon-green tabular-nums counter-glow tracking-tighter drop-shadow-[0_0_15px_rgba(57,255,20,0.3)]">
 						<AnimatedNumber value={count} />
 					</span>
-					<span className="font-mono text-2xl text-text-muted opacity-40">
-						/{total}
-					</span>
+					<span className="font-mono text-2xl text-text-dim">/{total}</span>
 				</div>
 				<p className="text-text-secondary font-mono text-tiny text-center mb-10 uppercase tracking-mega opacity-60 font-bold">
 					Classmates indexed in the arc

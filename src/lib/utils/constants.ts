@@ -1,4 +1,5 @@
-// co.arc Constants
+// CO.ARC Constants
+import type { ReactNode } from "react";
 
 // XP Rewards
 export const XP_REWARDS = {
@@ -14,6 +15,7 @@ export const XP_REWARDS = {
 	BOSS_SOLVED: 150,
 	QUEST_COMPLETE: 50,
 	QUEST_ALL_BONUS: 100,
+	FLASHCARD_CARD: 5,
 	FLASHCARD_DECK_FIRST: 30,
 	RESOURCE_APPROVED: 20,
 	DAILY_LOGIN: 5,
@@ -94,54 +96,44 @@ export const CLASS_SIZE = 70;
 export interface NavItem {
 	label: string;
 	href: string;
-	icon: string; // emoji or icon name
+	icon: ReactNode;
 	adminOnly?: boolean;
 }
 
-export const NAV_ITEMS: NavItem[] = [
-	{ label: "Dashboard", href: "/dashboard", icon: "⚡" },
-	{ label: "Leaderboard", href: "/leaderboard", icon: "🏆" },
-	{ label: "Problems", href: "/problems", icon: "💻" },
-	{ label: "Daily", href: "/problems/daily", icon: "📅" },
-	{ label: "Duels", href: "/duels", icon: "⚔️" },
-	{ label: "Boss", href: "/boss", icon: "👹" },
-	{ label: "Quests", href: "/quests", icon: "📜" },
-	{ label: "Attendance", href: "/attendance", icon: "✅" },
-	{ label: "Flashcards", href: "/flashcards", icon: "🃏" },
-	{ label: "Resources", href: "/resources", icon: "📚" },
-	{ label: "Announcements", href: "/announcements", icon: "📢" },
-	{ label: "Hall of Fame", href: "/hall-of-fame", icon: "🏅" },
+/* Icons are injected from the component layer, see navIcons.tsx */
+export const NAV_ITEMS_RAW: Omit<NavItem, "icon">[] = [
+	{ label: "Dashboard", href: "/dashboard" },
+	{ label: "Leaderboard", href: "/leaderboard" },
+	{ label: "Problems", href: "/problems" },
+	{ label: "Daily", href: "/problems/daily" },
+	{ label: "Duels", href: "/duels" },
+	{ label: "Boss", href: "/boss" },
+	{ label: "Quests", href: "/quests" },
+	{ label: "Attendance", href: "/attendance" },
+	{ label: "Flashcards", href: "/flashcards" },
+	{ label: "Resources", href: "/resources" },
+	{ label: "Announcements", href: "/announcements" },
+	{ label: "Hall of Fame", href: "/hall-of-fame" },
 ];
 
-export const ADMIN_NAV_ITEMS: NavItem[] = [
-	{ label: "Admin", href: "/admin", icon: "🔧", adminOnly: true },
-	{ label: "Manage Users", href: "/admin/users", icon: "👥", adminOnly: true },
-	{ label: "Courses", href: "/admin/courses", icon: "📖", adminOnly: true },
-	{ label: "Set Daily", href: "/admin/daily", icon: "📅", adminOnly: true },
-	{ label: "Boss Battles", href: "/admin/boss", icon: "👹", adminOnly: true },
-	{ label: "Quests", href: "/admin/quests", icon: "📜", adminOnly: true },
-	{
-		label: "Flashcards",
-		href: "/admin/flashcards",
-		icon: "🃏",
-		adminOnly: true,
-	},
-	{ label: "Resources", href: "/admin/resources", icon: "📚", adminOnly: true },
-	{
-		label: "Announcements",
-		href: "/admin/announcements",
-		icon: "📢",
-		adminOnly: true,
-	},
+export const ADMIN_NAV_ITEMS_RAW: Omit<NavItem, "icon">[] = [
+	{ label: "Admin", href: "/admin", adminOnly: true },
+	{ label: "Manage Users", href: "/admin/users", adminOnly: true },
+	{ label: "Courses", href: "/admin/courses", adminOnly: true },
+	{ label: "Set Daily", href: "/admin/daily", adminOnly: true },
+	{ label: "Boss Battles", href: "/admin/boss", adminOnly: true },
+	{ label: "Quests", href: "/admin/quests", adminOnly: true },
+	{ label: "Flashcards", href: "/admin/flashcards", adminOnly: true },
+	{ label: "Resources", href: "/admin/resources", adminOnly: true },
+	{ label: "Announcements", href: "/admin/announcements", adminOnly: true },
 ];
 
-// Mobile bottom nav items (5 max)
-export const MOBILE_NAV_ITEMS: NavItem[] = [
-	{ label: "Home", href: "/dashboard", icon: "⚡" },
-	{ label: "Leaderboard", href: "/leaderboard", icon: "🏆" },
-	{ label: "Problems", href: "/problems", icon: "💻" },
-	{ label: "Duels", href: "/duels", icon: "⚔️" },
-	{ label: "Profile", href: "/profile/me", icon: "👤" },
+export const MOBILE_NAV_ITEMS_RAW: Omit<NavItem, "icon">[] = [
+	{ label: "Home", href: "/dashboard" },
+	{ label: "Leaderboard", href: "/leaderboard" },
+	{ label: "Problems", href: "/problems" },
+	{ label: "Duels", href: "/duels" },
+	{ label: "Profile", href: "/profile/me" },
 ];
 
 // Notification type labels

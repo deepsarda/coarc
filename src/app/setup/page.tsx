@@ -125,11 +125,52 @@ export default function SetupPage() {
 	return (
 		<div className="min-h-screen bg-void flex items-center justify-center p-4 relative overflow-hidden">
 			<div className="absolute inset-0 bg-grid-full opacity-20 pointer-events-none" />
-			<div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-neon-cyan/5 rounded-full blur-[150px] pointer-events-none" />
+			{/* Drifting ambient blobs */}
+			<div className="absolute top-1/4 left-1/3 w-80 h-80 md:w-[500px] md:h-[500px] bg-neon-cyan/5 rounded-full blur-[150px] pointer-events-none animate-drift" />
+			<div className="absolute bottom-1/3 right-1/4 w-64 h-64 md:w-96 md:h-96 bg-neon-magenta/4 rounded-full blur-[120px] pointer-events-none animate-drift-reverse" />
+			{/* Floating tech particles */}
+			<div className="absolute inset-0 pointer-events-none overflow-hidden">
+				<div className="absolute top-[15%] left-[10%] w-1 h-1 bg-neon-cyan/20 animate-float" />
+				<div
+					className="absolute top-[25%] right-[20%] w-0.5 h-0.5 bg-neon-cyan/15 animate-float"
+					style={{ animationDelay: "-1.5s" }}
+				/>
+				<div
+					className="absolute bottom-[30%] left-[25%] w-1 h-1 bg-neon-magenta/15 animate-float"
+					style={{ animationDelay: "-2s" }}
+				/>
+				<div
+					className="absolute top-[60%] right-[15%] w-0.5 h-0.5 bg-neon-cyan/20 animate-float"
+					style={{ animationDelay: "-0.8s" }}
+				/>
+				<div
+					className="absolute bottom-[15%] left-[60%] w-1 h-1 bg-neon-green/10 animate-float"
+					style={{ animationDelay: "-2.5s" }}
+				/>
+				{/* Small + symbols */}
+				<span
+					className="absolute top-[20%] right-[30%] text-neon-cyan/10 font-mono text-xs animate-float"
+					style={{ animationDelay: "-1s" }}
+				>
+					+
+				</span>
+				<span
+					className="absolute bottom-[25%] left-[15%] text-neon-cyan/10 font-mono text-xs animate-float"
+					style={{ animationDelay: "-3s" }}
+				>
+					+
+				</span>
+				<span
+					className="absolute top-[70%] right-[40%] text-neon-magenta/8 font-mono text-xs animate-float"
+					style={{ animationDelay: "-2.2s" }}
+				>
+					+
+				</span>
+			</div>
 
 			<AnimatePresence mode="wait">
 				{rewards ? (
-					/*  Rewards Celebration Screen  */
+					/* Rewards Celebration Screen  */
 					<motion.div
 						key="rewards"
 						initial={{ opacity: 0, scale: 0.9 }}
@@ -137,20 +178,20 @@ export default function SetupPage() {
 						transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
 						className="w-full max-w-lg relative z-10"
 					>
-						<div className="card-brutal scifi-window p-0 overflow-hidden relative">
-							<div className="absolute inset-0 bg-zinc-900/50 pointer-events-none" />
+						<div className="card-brutal scifi-window p-0 overflow-hidden relative group">
+							<div className="card-overlay" />
 
 							{/* Corner decorations */}
-							<div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-neon-cyan opacity-60 z-20" />
-							<div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-neon-cyan opacity-60 z-20" />
-							<div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-neon-cyan opacity-60 z-20" />
-							<div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-neon-cyan opacity-60 z-20" />
+							<div className="corner-deco corner-tl" style={{ opacity: 0.6 }} />
+							<div className="corner-deco corner-tr" style={{ opacity: 0.6 }} />
+							<div className="corner-deco corner-bl" style={{ opacity: 0.6 }} />
+							<div className="corner-deco corner-br" style={{ opacity: 0.6 }} />
 
 							{/* Glow effect */}
 							<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-neon-cyan/10 rounded-full blur-[80px] pointer-events-none" />
 
 							{/* Header */}
-							<div className="px-6 py-4 border-b border-neon-cyan/30 bg-zinc-950/80 backdrop-blur-md relative z-10">
+							<div className="terminal-bar px-6 py-4 border-b-neon-cyan/30">
 								<div className="flex items-center gap-3">
 									<div className="w-2.5 h-2.5 bg-neon-green rounded-none animate-pulse shadow-[0_0_8px_#39ff14]" />
 									<p className="font-mono text-small text-neon-green uppercase tracking-widest font-black">
@@ -181,7 +222,7 @@ export default function SetupPage() {
 
 								<div className="space-y-2">
 									<h2 className="font-heading text-2xl md:text-3xl font-black text-text-primary uppercase tracking-tighter">
-										WELCOME TO <span className="text-neon-cyan">co.arc</span>
+										WELCOME TO <span className="text-neon-cyan">CO.ARC</span>
 									</h2>
 									<p className="text-text-secondary font-mono text-sm uppercase tracking-widest">
 										Your node is now active
@@ -196,7 +237,7 @@ export default function SetupPage() {
 									className="space-y-4"
 								>
 									<div className="bg-zinc-950 border border-neon-cyan/20 p-6 space-y-4">
-										<p className="font-mono text-tiny text-neon-cyan uppercase tracking-widest font-black">
+										<p className="scifi-label text-tiny tracking-widest">
 											:: REWARDS RECEIVED
 										</p>
 
@@ -206,7 +247,7 @@ export default function SetupPage() {
 												initial={{ opacity: 0, x: -20 }}
 												animate={{ opacity: 1, x: 0 }}
 												transition={{ delay: 0.5 + i * 0.15 }}
-												className="flex items-center justify-between py-2 border-b border-border-hard/30 last:border-0"
+												className="flex items-center justify-between py-2 border-b border-border-subtle last:border-0"
 											>
 												<span className="text-text-secondary font-mono text-sm">
 													{xpItem.reason}
@@ -262,7 +303,7 @@ export default function SetupPage() {
 														GENESIS BADGE EARNED
 													</p>
 													<p className="text-text-secondary font-mono text-small mt-1">
-														One of the first to join co.arc, forever on your
+														One of the first to join CO.ARC, forever on your
 														profile
 													</p>
 												</div>
@@ -289,7 +330,7 @@ export default function SetupPage() {
 						</div>
 					</motion.div>
 				) : (
-					/*  Setup Form  */
+					/* Setup Form  */
 					<motion.div
 						key="form"
 						initial={{ opacity: 0, scale: 0.95 }}
@@ -306,18 +347,18 @@ export default function SetupPage() {
 							</p>
 						</div>
 
-						<div className="card-brutal scifi-window p-0 overflow-hidden relative">
-							<div className="absolute inset-0 bg-zinc-900/50 pointer-events-none" />
+						<div className="card-brutal scifi-window p-0 overflow-hidden relative group">
+							<div className="card-overlay" />
 
-							<div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-neon-cyan opacity-40 z-20" />
-							<div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-neon-cyan opacity-40 z-20" />
-							<div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-neon-cyan opacity-40 z-20" />
-							<div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-neon-cyan opacity-40 z-20" />
+							<div className="corner-deco corner-tl" />
+							<div className="corner-deco corner-tr" />
+							<div className="corner-deco corner-bl" />
+							<div className="corner-deco corner-br" />
 
-							<div className="px-6 py-4 border-b border-border-hard bg-zinc-950/80 backdrop-blur-md relative z-10">
+							<div className="terminal-bar px-6 py-4">
 								<div className="flex items-center gap-3">
 									<div className="w-2.5 h-2.5 bg-neon-cyan rounded-none animate-pulse" />
-									<p className="font-mono text-small text-neon-cyan uppercase tracking-widest font-black">
+									<p className="scifi-label tracking-widest">
 										SET UP YOUR PROFILE
 									</p>
 								</div>
@@ -326,10 +367,7 @@ export default function SetupPage() {
 							<div className="p-6 md:p-10 space-y-6 md:space-y-8 relative z-10">
 								<div className="space-y-4">
 									<div className="flex justify-between items-baseline">
-										<label
-											htmlFor={displayNameId}
-											className="text-text-muted font-mono text-small uppercase tracking-widest font-black"
-										>
+										<label htmlFor={displayNameId} className="form-label">
 											DISPLAY_NAME
 										</label>
 										<span className="text-small font-mono text-neon-red/50 uppercase tracking-widest font-bold">
@@ -343,7 +381,7 @@ export default function SetupPage() {
 											placeholder="e.g. Code_Master"
 											value={displayName}
 											onChange={(e) => setDisplayName(e.target.value)}
-											className="w-full bg-zinc-950 border border-border-hard p-4 font-mono text-sm focus:border-neon-cyan focus:outline-none transition-colors group-hover:border-border-accent/40"
+											className="form-input group-hover:border-border-accent/40"
 											autoFocus
 										/>
 										{errors.name && (
@@ -356,10 +394,7 @@ export default function SetupPage() {
 
 								<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 									<div className="space-y-4">
-										<label
-											htmlFor={cfHandleId}
-											className="text-text-muted font-mono text-small uppercase tracking-widest font-black"
-										>
+										<label htmlFor={cfHandleId} className="form-label">
 											CF_HANDLE
 										</label>
 										<div className="relative group">
@@ -369,7 +404,7 @@ export default function SetupPage() {
 												placeholder="tourist or profile URL"
 												value={cfHandle}
 												onChange={(e) => setCfHandle(e.target.value)}
-												className="w-full bg-zinc-950 border border-border-hard p-4 font-mono text-sm focus:border-neon-cyan focus:outline-none transition-colors"
+												className="form-input"
 											/>
 											{cfIsUrl && extractedCf && (
 												<p className="text-neon-green text-small mt-2 font-mono uppercase font-black flex items-center gap-1.5">
@@ -391,10 +426,7 @@ export default function SetupPage() {
 									</div>
 
 									<div className="space-y-4">
-										<label
-											htmlFor={lcHandleId}
-											className="text-text-muted font-mono text-small uppercase tracking-widest font-black"
-										>
+										<label htmlFor={lcHandleId} className="form-label">
 											LC_HANDLE
 										</label>
 										<div className="relative group">
@@ -404,7 +436,7 @@ export default function SetupPage() {
 												placeholder="neal_wu or profile URL"
 												value={lcHandle}
 												onChange={(e) => setLcHandle(e.target.value)}
-												className="w-full bg-zinc-950 border border-border-hard p-4 font-mono text-sm focus:border-neon-cyan focus:outline-none transition-colors"
+												className="form-input"
 											/>
 											{lcIsUrl && extractedLc && (
 												<p className="text-neon-green text-small mt-2 font-mono uppercase font-black flex items-center gap-1.5">
@@ -437,7 +469,7 @@ export default function SetupPage() {
 									</button>
 								</div>
 
-								<div className="bg-zinc-950/50 p-4 border border-border-hard/30">
+								<div className="bg-zinc-950/50 p-4 border border-border-subtle">
 									<p className="text-text-muted text-small font-mono text-center uppercase tracking-widest leading-relaxed">
 										Handles can be updated later in your dashboard.
 									</p>
