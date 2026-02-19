@@ -4,7 +4,7 @@ import { CalendarRange } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 
-// 365-day GitHub-style heatmap 
+// 365-day GitHub-style heatmap
 
 interface HeatmapProps {
 	userId: string;

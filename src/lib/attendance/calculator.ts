@@ -16,6 +16,12 @@ export interface AttendanceSummary {
 	risk_level: 'safe' | 'warning' | 'danger';
 	projected_end: number;
 	safe_to_skip_today: boolean;
+	/* monthly breakdown */
+	monthly_attended: number;
+	monthly_bunked: number;
+	monthly_total: number;
+	monthly_percentage: number;
+	monthly_skippable: number;
 }
 
 const REQUIRED_PERCENTAGE = 0.76;
@@ -38,10 +44,14 @@ export async function computeAttendanceInsights(
 
 	const { data: records } = await admin
 		.from('attendance_records')
-		.select('course_id, status')
+		.select('course_id, status, date')
 		.eq('user_id', userId);
 
 	const recordsByCourse = new Map<number, { attended: number; bunked: number }>();
+	const monthlyByCourse = new Map<number, { attended: number; bunked: number }>();
+
+	const now = new Date();
+	const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 
 	for (const r of records ?? []) {
 		const existing = recordsByCourse.get(r.course_id) ?? {
@@ -54,9 +64,15 @@ export async function computeAttendanceInsights(
 			existing.bunked++;
 		}
 		recordsByCourse.set(r.course_id, existing);
-	}
 
-	const now = new Date();
+		// Monthly
+		if (r.date?.startsWith(currentMonth)) {
+			const mExisting = monthlyByCourse.get(r.course_id) ?? { attended: 0, bunked: 0 };
+			if (r.status === 'attended') mExisting.attended++;
+			else mExisting.bunked++;
+			monthlyByCourse.set(r.course_id, mExisting);
+		}
+	}
 
 	return courses.map((course) => {
 		const stats = recordsByCourse.get(course.id) ?? {
@@ -113,6 +129,20 @@ export async function computeAttendanceInsights(
 		const afterSkip = total + 1 > 0 ? stats.attended / (total + 1) : 0;
 		const safeToSkipToday = afterSkip >= REQUIRED_PERCENTAGE;
 
+		// Monthly stats
+		const monthStats = monthlyByCourse.get(course.id) ?? { attended: 0, bunked: 0 };
+		const monthlyTotal = monthStats.attended + monthStats.bunked;
+		const monthlyPercentage = monthlyTotal > 0 ? monthStats.attended / monthlyTotal : 1;
+		const monthlySkippable =
+			monthlyTotal > 0
+				? Math.max(
+						0,
+						Math.floor(
+							(monthStats.attended - REQUIRED_PERCENTAGE * monthlyTotal) / REQUIRED_PERCENTAGE,
+						),
+					)
+				: 0;
+
 		return {
 			course_id: course.id,
 			course_name: course.name,
@@ -129,6 +159,11 @@ export async function computeAttendanceInsights(
 			risk_level: riskLevel,
 			projected_end: Math.round(projectedEnd * 1000) / 10,
 			safe_to_skip_today: safeToSkipToday,
+			monthly_attended: monthStats.attended,
+			monthly_bunked: monthStats.bunked,
+			monthly_total: monthlyTotal,
+			monthly_percentage: Math.round(monthlyPercentage * 1000) / 10,
+			monthly_skippable: monthlySkippable,
 		};
 	});
 }

@@ -12,7 +12,9 @@ interface AttendanceInsight {
 	percentage: number;
 	skippable: number;
 	risk_level: 'safe' | 'warning' | 'danger';
-	projected_semester_end: number;
+	projected_end: number;
+	monthly_percentage: number;
+	monthly_total: number;
 }
 
 function RiskIcon({ risk }: { risk: string }): ReactNode {
@@ -46,6 +48,16 @@ export default function AttendanceCard() {
 			? Math.round(insights.reduce((a, i) => a + i.percentage, 0) / insights.length)
 			: 0;
 
+	const monthlyAvg =
+		insights.filter((i) => i.monthly_total > 0).length > 0
+			? Math.round(
+					insights
+						.filter((i) => i.monthly_total > 0)
+						.reduce((a, i) => a + i.monthly_percentage, 0) /
+						insights.filter((i) => i.monthly_total > 0).length,
+				)
+			: null;
+
 	const riskColor = (risk: string) =>
 		risk === 'safe' ? 'text-emerald-400' : risk === 'warning' ? 'text-amber-400' : 'text-red-400';
 
@@ -62,13 +74,23 @@ export default function AttendanceCard() {
 				<h3 className="dash-heading">
 					<GraduationCap className="w-4 h-4 text-neon-cyan opacity-60" /> Attendance
 				</h3>
-				<span
-					className={`font-mono text-base font-black tabular-nums ${
-						avgPct >= 75 ? 'text-emerald-400' : avgPct >= 60 ? 'text-amber-400' : 'text-red-400'
-					}`}
-				>
-					{avgPct}%
-				</span>
+				<div className="flex items-center gap-3">
+					{monthlyAvg !== null && (
+						<span className="font-mono text-[11px] text-text-muted uppercase tracking-widest">
+							mo:{' '}
+							<span
+								className={`font-black tabular-nums text-xs ${monthlyAvg >= 75 ? 'text-emerald-400' : monthlyAvg >= 60 ? 'text-amber-400' : 'text-red-400'}`}
+							>
+								{monthlyAvg}%
+							</span>
+						</span>
+					)}
+					<span
+						className={`font-mono text-base font-black tabular-nums ${avgPct >= 75 ? 'text-emerald-400' : avgPct >= 60 ? 'text-amber-400' : 'text-red-400'}`}
+					>
+						{avgPct}%
+					</span>
+				</div>
 			</div>
 
 			<div className="space-y-1.5">
