@@ -226,7 +226,7 @@ function LoginForm() {
 				<div className="mt-8 flex items-center justify-center gap-4 opacity-50">
 					<div className="h-[1px] w-12 bg-border-hard" />
 					<p className="text-text-muted text-small font-mono uppercase tracking-epic font-black">
-						SVNIT EXCLUSIVE
+						EXCLUSIVE TO SVNIT AI 2k29
 					</p>
 					<div className="h-[1px] w-12 bg-border-hard" />
 				</div>
