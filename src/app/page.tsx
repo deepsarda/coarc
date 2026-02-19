@@ -197,10 +197,10 @@ export default function LandingPage() {
 									<div className="w-2 h-2 rounded-full bg-neon-green shadow-[0_0_8px_#39ff14]" />
 								</div>
 								<h3 className="font-mono text-small text-neon-cyan uppercase tracking-mega font-black">
-									:: SEASON_01_REWARDS :: GENESIS_BADGE
+									:: REWARDS :: GENESIS_BADGE
 								</h3>
 							</div>
-							<span className="font-mono text-tiny text-neon-cyan/40 font-black tracking-widest">EST_2026</span>
+							<span className="font-mono text-tiny text-neon-cyan/40 font-black tracking-widest hidden sm:block">EST_2026</span>
 						</div>
 						
 						<div className="p-6 md:p-10 flex flex-col md:flex-row items-center gap-6 md:gap-10 relative z-10">
