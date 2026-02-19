@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useAuth } from '@/hooks/useAuth';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Navbar() {
 	const pathname = usePathname();
 	const { user, signOut, loading } = useAuth();
 
-	// Don't show navbar on public pages
-	if (['/', '/login', '/setup'].includes(pathname)) return null;
+	// Don't show navbar on specific pages
+	if (["/login", "/setup"].includes(pathname)) return null;
 
 	return (
 		<header className="sticky top-0 z-40 bg-void/80 backdrop-blur-md border-b border-white/5">
