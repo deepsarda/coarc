@@ -1,7 +1,7 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
-import { createNotification } from "@/lib/notifications/send";
-import { XP_REWARDS } from "@/lib/utils/constants";
-import { awardXP } from "./xp";
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { createNotification } from '@/lib/notifications/send';
+import { XP_REWARDS } from '@/lib/utils/constants';
+import { awardXP } from './xp';
 
 interface BadgeRow {
 	id: string;
@@ -21,17 +21,17 @@ export async function checkAndAwardBadges(
 ): Promise<string[]> {
 	// Get all auto badges
 	const { data: allBadges } = await admin
-		.from("badges")
-		.select("id, name, condition_type, condition_value")
-		.eq("condition_type", "auto");
+		.from('badges')
+		.select('id, name, condition_type, condition_value')
+		.eq('condition_type', 'auto');
 
 	if (!allBadges || allBadges.length === 0) return [];
 
 	// Get user's existing badges
 	const { data: existingBadges } = await admin
-		.from("user_badges")
-		.select("badge_id")
-		.eq("user_id", userId);
+		.from('user_badges')
+		.select('badge_id')
+		.eq('user_id', userId);
 
 	const earnedSet = new Set((existingBadges ?? []).map((b) => b.badge_id));
 
@@ -49,7 +49,7 @@ export async function checkAndAwardBadges(
 		if (!met) continue;
 
 		// Award the badge
-		const { error } = await admin.from("user_badges").insert({
+		const { error } = await admin.from('user_badges').insert({
 			user_id: userId,
 			badge_id: badge.id,
 		});
@@ -71,10 +71,10 @@ export async function checkAndAwardBadges(
 		await createNotification(
 			admin,
 			userId,
-			"badge_earned",
+			'badge_earned',
 			`🏅 Badge Unlocked!`,
 			`You earned the "${badge.name}" badge!`,
-			{ badge_id: badge.id, url: "/profile/me" },
+			{ badge_id: badge.id, url: '/profile/me' },
 		);
 	}
 
@@ -101,10 +101,7 @@ interface UserStats {
 	lastLostStreak: number;
 }
 
-async function getUserStats(
-	admin: SupabaseClient,
-	userId: string,
-): Promise<UserStats> {
+async function getUserStats(admin: SupabaseClient, userId: string): Promise<UserStats> {
 	const [
 		cfSubsResult,
 		lcStatsResult,
@@ -118,52 +115,31 @@ async function getUserStats(
 		dailySolvesResult,
 	] = await Promise.all([
 		admin
-			.from("cf_submissions")
-			.select("id, tags, submitted_at", { count: "exact" })
-			.eq("user_id", userId)
-			.eq("verdict", "OK"),
+			.from('cf_submissions')
+			.select('id, tags, submitted_at', { count: 'exact' })
+			.eq('user_id', userId)
+			.eq('verdict', 'OK'),
+		admin.from('lc_stats').select('total_solved').eq('user_id', userId).single(),
+		admin.from('profiles').select('current_streak, longest_streak').eq('id', userId).single(),
 		admin
-			.from("lc_stats")
-			.select("total_solved")
-			.eq("user_id", userId)
-			.single(),
+			.from('shared_problems')
+			.select('id', { count: 'exact' })
+			.eq('user_id', userId)
+			.eq('source', 'manual'),
+		admin.from('duels').select('id', { count: 'exact' }).eq('winner_id', userId),
+		admin.from('boss_battle_solves').select('id', { count: 'exact' }).eq('user_id', userId),
 		admin
-			.from("profiles")
-			.select("current_streak, longest_streak")
-			.eq("id", userId)
-			.single(),
+			.from('boss_battle_solves')
+			.select('id', { count: 'exact' })
+			.eq('user_id', userId)
+			.eq('solve_rank', 1),
 		admin
-			.from("shared_problems")
-			.select("id", { count: "exact" })
-			.eq("user_id", userId)
-			.eq("source", "manual"),
-		admin
-			.from("duels")
-			.select("id", { count: "exact" })
-			.eq("winner_id", userId),
-		admin
-			.from("boss_battle_solves")
-			.select("id", { count: "exact" })
-			.eq("user_id", userId),
-		admin
-			.from("boss_battle_solves")
-			.select("id", { count: "exact" })
-			.eq("user_id", userId)
-			.eq("solve_rank", 1),
-		admin
-			.from("resources")
-			.select("id", { count: "exact" })
-			.eq("submitted_by", userId)
-			.eq("status", "approved"),
-		admin
-			.from("user_quests")
-			.select("quest_id")
-			.eq("user_id", userId)
-			.eq("completed", true),
-		admin
-			.from("daily_problem_solves")
-			.select("id", { count: "exact" })
-			.eq("user_id", userId),
+			.from('resources')
+			.select('id', { count: 'exact' })
+			.eq('submitted_by', userId)
+			.eq('status', 'approved'),
+		admin.from('user_quests').select('quest_id').eq('user_id', userId).eq('completed', true),
+		admin.from('daily_problem_solves').select('id', { count: 'exact' }).eq('user_id', userId),
 	]);
 
 	// Count unique topics from CF submissions
@@ -188,9 +164,9 @@ async function getUserStats(
 		// Get quest week_start for each completed quest
 		const questIds = completedQuests.map((q) => q.quest_id);
 		const { data: questWeeks } = await admin
-			.from("quests")
-			.select("id, week_start")
-			.in("id", questIds);
+			.from('quests')
+			.select('id, week_start')
+			.in('id', questIds);
 
 		if (questWeeks) {
 			const weekCounts = new Map<string, number>();
@@ -204,9 +180,9 @@ async function getUserStats(
 			const weeks = [...weekCounts.keys()];
 			for (const w of weeks) {
 				const { count } = await admin
-					.from("quests")
-					.select("id", { count: "exact", head: true })
-					.eq("week_start", w);
+					.from('quests')
+					.select('id', { count: 'exact', head: true })
+					.eq('week_start', w);
 				weekTotals.set(w, count ?? 0);
 			}
 
@@ -242,41 +218,38 @@ async function getUserStats(
 	};
 }
 
-function evaluateCondition(
-	condition: Record<string, unknown>,
-	stats: UserStats,
-): boolean {
+function evaluateCondition(condition: Record<string, unknown>, stats: UserStats): boolean {
 	const type = condition.type as string;
 
 	switch (type) {
-		case "total_solves":
+		case 'total_solves':
 			return stats.totalSolves >= (condition.count as number);
-		case "streak":
+		case 'streak':
 			return stats.currentStreak >= (condition.days as number);
-		case "problems_shared":
+		case 'problems_shared':
 			return stats.problemsShared >= (condition.count as number);
-		case "duels_won":
+		case 'duels_won':
 			return stats.duelsWon >= (condition.count as number);
-		case "bosses_defeated":
+		case 'bosses_defeated':
 			return stats.bossesDefeated >= (condition.count as number);
-		case "boss_first_solves":
+		case 'boss_first_solves':
 			return stats.bossFirstSolves >= (condition.count as number);
-		case "resources_approved":
+		case 'resources_approved':
 			return stats.resourcesApproved >= (condition.count as number);
-		case "all_quests_week":
+		case 'all_quests_week':
 			return stats.allQuestsWeeks >= (condition.count as number);
-		case "unique_topics":
+		case 'unique_topics':
 			return stats.uniqueTopics >= (condition.count as number);
-		case "daily_solves":
+		case 'daily_solves':
 			return stats.dailySolves >= (condition.count as number);
-		case "rank_climb":
+		case 'rank_climb':
 			return stats.rankClimb >= (condition.positions as number);
-		case "solve_hour_range": {
+		case 'solve_hour_range': {
 			const start = condition.start as number;
 			const end = condition.end as number;
 			return stats.solveHours.some((h) => h >= start && h < end);
 		}
-		case "streak_restart_after":
+		case 'streak_restart_after':
 			return stats.lastLostStreak >= (condition.min_lost as number);
 		default:
 			return false;

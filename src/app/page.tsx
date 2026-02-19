@@ -8,7 +8,6 @@ import {
 	CalendarCheck,
 	Flame,
 	Library,
-	Lightbulb,
 	Sparkles,
 	Swords,
 	Target,

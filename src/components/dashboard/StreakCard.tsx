@@ -40,6 +40,7 @@ export default function StreakCard({ profile }: StreakCardProps) {
 										3,
 									),
 								}).map((_, i) => (
+									// biome-ignore lint/suspicious/noArrayIndexKey: decorative icons
 									<Flame key={i} className="w-4 h-4 text-orange-400" />
 								))}
 							</div>
@@ -67,6 +68,7 @@ export default function StreakCard({ profile }: StreakCardProps) {
 							<>
 								{Array.from({ length: Math.min(shieldCount, 3) }).map(
 									(_, i) => (
+										// biome-ignore lint/suspicious/noArrayIndexKey: decorative icons
 										<Shield key={i} className="w-4 h-4 text-emerald-400" />
 									),
 								)}

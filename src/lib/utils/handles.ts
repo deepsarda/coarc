@@ -18,7 +18,7 @@ export function extractCfHandle(input: string): string | null {
 	if (urlMatch) return urlMatch[1];
 
 	// If it looks like a URL but doesn't match the pattern, it's invalid
-	if (trimmed.includes("codeforces.com")) return null;
+	if (trimmed.includes('codeforces.com')) return null;
 
 	// Otherwise treat the entire input as a handle (no spaces allowed)
 	if (/^[A-Za-z0-9_.-]+$/.test(trimmed)) return trimmed;
@@ -46,7 +46,7 @@ export function extractLcHandle(input: string): string | null {
 	if (urlMatch) return urlMatch[1];
 
 	// If it looks like a URL but doesn't match the pattern, it's invalid
-	if (trimmed.includes("leetcode.com")) return null;
+	if (trimmed.includes('leetcode.com')) return null;
 
 	// Otherwise treat the entire input as a handle
 	if (/^[A-Za-z0-9_-]+$/.test(trimmed)) return trimmed;

@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import AppShell from "@/components/layout/AppShell";
-import MobileNav from "@/components/layout/MobileNav";
-import Navbar from "@/components/layout/Navbar";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { ToastProvider } from "@/components/ui/Toast";
 import { SITE } from "@/lib/config";

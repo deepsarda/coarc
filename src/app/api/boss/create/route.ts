@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
-import { notifyAllUsers } from "@/lib/notifications/send";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
+import { NextResponse } from 'next/server';
+import { notifyAllUsers } from '@/lib/notifications/send';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
 
 /**
  * POST /api/boss/create
@@ -14,20 +14,20 @@ export async function POST(request: Request) {
 			data: { user },
 		} = await supabase.auth.getUser();
 		if (!user) {
-			return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+			return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 		}
 
 		const admin = createAdminClient();
 
 		// Check admin
 		const { data: profile } = await admin
-			.from("profiles")
-			.select("is_admin")
-			.eq("id", user.id)
+			.from('profiles')
+			.select('is_admin')
+			.eq('id', user.id)
 			.single();
 
 		if (!profile?.is_admin) {
-			return NextResponse.json({ error: "Admin only" }, { status: 403 });
+			return NextResponse.json({ error: 'Admin only' }, { status: 403 });
 		}
 
 		const {
@@ -45,13 +45,13 @@ export async function POST(request: Request) {
 
 		if (!title || !problem_url || !starts_at || !ends_at) {
 			return NextResponse.json(
-				{ error: "title, problem_url, starts_at, ends_at required" },
+				{ error: 'title, problem_url, starts_at, ends_at required' },
 				{ status: 400 },
 			);
 		}
 
 		const { data: boss, error } = await admin
-			.from("boss_battles")
+			.from('boss_battles')
 			.insert({
 				title,
 				description: description ?? null,
@@ -75,17 +75,14 @@ export async function POST(request: Request) {
 		// Notify all users
 		await notifyAllUsers(
 			admin,
-			"boss_new",
-			"👹 New Boss Battle!",
-			`${title} -- ${difficulty_label ?? "Challenge"} difficulty. Can you defeat it?`,
-			{ boss_id: boss.id, url: "/boss" },
+			'boss_new',
+			'👹 New Boss Battle!',
+			`${title} -- ${difficulty_label ?? 'Challenge'} difficulty. Can you defeat it?`,
+			{ boss_id: boss.id, url: '/boss' },
 		);
 
 		return NextResponse.json({ success: true, boss });
 	} catch {
-		return NextResponse.json(
-			{ error: "Internal server error" },
-			{ status: 500 },
-		);
+		return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 	}
 }

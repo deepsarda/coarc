@@ -143,6 +143,7 @@ export default function Heatmap({ userId }: HeatmapProps) {
 				>
 					{padded.slice(0, COLS * 7).map((d, i) => {
 						if (!d) {
+							// biome-ignore lint/suspicious/noArrayIndexKey: positional grid cells never reorder
 							return <div key={`pad-${i}`} className="w-[11px] h-[11px]" />;
 						}
 						const intensity = d.count / maxCount;

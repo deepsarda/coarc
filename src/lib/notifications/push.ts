@@ -1,4 +1,4 @@
-import webpush from "web-push";
+import webpush from 'web-push';
 
 export interface PushPayload {
 	title: string;
@@ -15,14 +15,9 @@ function ensureVapid(): boolean {
 
 	const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
 	const privateKey = process.env.VAPID_PRIVATE_KEY;
-	const email = process.env.VAPID_EMAIL ?? "mailto:admin@coarc.dev";
+	const email = process.env.VAPID_EMAIL ?? 'mailto:admin@coarc.dev';
 
-	if (
-		!publicKey ||
-		!privateKey ||
-		publicKey.length < 10 ||
-		privateKey.length < 10
-	) {
+	if (!publicKey || !privateKey || publicKey.length < 10 || privateKey.length < 10) {
 		return false;
 	}
 
@@ -31,7 +26,7 @@ function ensureVapid(): boolean {
 		vapidInitialized = true;
 		return true;
 	} catch (err) {
-		console.warn("[Push] VAPID setup failed:", err);
+		console.warn('[Push] VAPID setup failed:', err);
 		return false;
 	}
 }
@@ -45,7 +40,7 @@ export async function sendPush(
 	payload: PushPayload,
 ): Promise<boolean> {
 	if (!ensureVapid()) {
-		console.log("[Push stub] Would send:", payload.title, "-", payload.body);
+		console.log('[Push stub] Would send:', payload.title, '-', payload.body);
 		return false;
 	}
 
@@ -60,9 +55,9 @@ export async function sendPush(
 		const statusCode = (err as { statusCode?: number }).statusCode;
 		if (statusCode === 410 || statusCode === 404) {
 			// Subscription expired / invalid
-			console.warn("[Push] Subscription expired:", statusCode);
+			console.warn('[Push] Subscription expired:', statusCode);
 		} else {
-			console.error("[Push] Send failed:", err);
+			console.error('[Push] Send failed:', err);
 		}
 		return false;
 	}

@@ -1,6 +1,6 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
-import { createNotification } from "@/lib/notifications/send";
-import { getLevelForXP } from "@/lib/utils/constants";
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { createNotification } from '@/lib/notifications/send';
+import { getLevelForXP } from '@/lib/utils/constants';
 
 /**
  * Award XP to a user: logs the transaction, updates profile.xp,
@@ -14,7 +14,7 @@ export async function awardXP(
 	referenceId?: string,
 ): Promise<{ newXP: number; newLevel: number; leveledUp: boolean }> {
 	// Insert XP log entry
-	await admin.from("xp_log").insert({
+	await admin.from('xp_log').insert({
 		user_id: userId,
 		amount,
 		reason,
@@ -23,9 +23,9 @@ export async function awardXP(
 
 	// Get current profile
 	const { data: profile } = await admin
-		.from("profiles")
-		.select("xp, level")
-		.eq("id", userId)
+		.from('profiles')
+		.select('xp, level')
+		.eq('id', userId)
 		.single();
 
 	if (!profile) {
@@ -37,20 +37,17 @@ export async function awardXP(
 	const leveledUp = levelInfo.level > profile.level;
 
 	// Update profile XP + level
-	await admin
-		.from("profiles")
-		.update({ xp: newXP, level: levelInfo.level })
-		.eq("id", userId);
+	await admin.from('profiles').update({ xp: newXP, level: levelInfo.level }).eq('id', userId);
 
 	// Send level-up notification
 	if (leveledUp) {
 		await createNotification(
 			admin,
 			userId,
-			"level_up",
+			'level_up',
 			`🎉 Level Up!`,
 			`You reached Level ${levelInfo.level}: ${levelInfo.title}!`,
-			{ level: levelInfo.level, title: levelInfo.title, url: "/dashboard" },
+			{ level: levelInfo.level, title: levelInfo.title, url: '/dashboard' },
 		);
 	}
 

@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { Award, ChevronRight } from "lucide-react";
-import Link from "next/link";
-import Card from "@/components/ui/Card";
+import { Award, ChevronRight } from 'lucide-react';
+import Link from 'next/link';
+import Card from '@/components/ui/Card';
 
 interface BadgesCardProps {
 	earned: number;
@@ -34,10 +34,7 @@ export default function BadgesCard({ earned, total }: BadgesCardProps) {
 				</div>
 				{total > 0 && (
 					<div className="h-1 w-full bg-void border border-border-hard/30 p-px">
-						<div
-							className="h-full bg-neon-orange/60"
-							style={{ width: `${pct}%` }}
-						/>
+						<div className="h-full bg-neon-orange/60" style={{ width: `${pct}%` }} />
 					</div>
 				)}
 			</div>

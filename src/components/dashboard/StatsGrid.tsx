@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import { Flame, Swords, Trophy, Zap } from "lucide-react";
-import { useAnimatedCounter } from "@/hooks/useAnimatedCounter";
-import type { Profile } from "@/types/gamification";
+import { motion } from 'framer-motion';
+import { Flame, Swords, Trophy, Zap } from 'lucide-react';
+import { useAnimatedCounter } from '@/hooks/useAnimatedCounter';
+import type { Profile } from '@/types/gamification';
 
 interface StatsGridProps {
 	profile: Profile | null;
@@ -44,8 +44,8 @@ function AnimatedStat({
 				ease: [0.16, 1, 0.3, 1],
 			}}
 			className={`relative p-5 md:p-7 group cursor-default ${
-				index < 3 ? "border-r border-border-subtle" : ""
-			} ${index < 2 ? "border-b lg:border-b-0 border-border-subtle" : ""}`}
+				index < 3 ? 'border-r border-border-subtle' : ''
+			} ${index < 2 ? 'border-b lg:border-b-0 border-border-subtle' : ''}`}
 		>
 			{/* Hover glow */}
 			<div className="absolute inset-0 bg-neon-cyan/0 group-hover:bg-neon-cyan/2 transition-colors duration-300" />
@@ -59,46 +59,39 @@ function AnimatedStat({
 					className={`text-3xl md:text-4xl font-mono font-black tracking-tighter ${color} tabular-nums transition-transform duration-200 group-hover:scale-[1.03] origin-left`}
 				>
 					{animatedValue.toLocaleString()}
-					{suffix ?? ""}
+					{suffix ?? ''}
 				</p>
 			</div>
 		</motion.div>
 	);
 }
 
-export default function StatsGrid({
-	profile,
-	levelInfo,
-	totalProblems,
-}: StatsGridProps) {
+export default function StatsGrid({ profile, levelInfo, totalProblems }: StatsGridProps) {
 	const stats = [
 		{
-			label: "XP",
+			label: 'XP',
 			value: profile?.xp ?? 0,
 			Icon: Zap,
-			color: "text-neon-cyan",
+			color: 'text-neon-cyan',
 		},
 		{
-			label: "LEVEL",
+			label: 'LEVEL',
 			value: levelInfo?.level ?? 1,
 			Icon: Swords,
-			color: "text-text-primary",
+			color: 'text-text-primary',
 		},
 		{
-			label: "STREAK",
+			label: 'STREAK',
 			value: profile?.current_streak ?? 0,
-			suffix: "d",
+			suffix: 'd',
 			Icon: Flame,
-			color:
-				profile && profile.current_streak > 0
-					? "text-neon-orange"
-					: "text-text-muted",
+			color: profile && profile.current_streak > 0 ? 'text-neon-orange' : 'text-text-muted',
 		},
 		{
-			label: "SOLVED",
+			label: 'SOLVED',
 			value: totalProblems,
 			Icon: Trophy,
-			color: "text-neon-cyan",
+			color: 'text-neon-cyan',
 		},
 	];
 

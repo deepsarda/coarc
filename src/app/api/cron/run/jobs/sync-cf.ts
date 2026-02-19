@@ -1,7 +1,7 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
-import { checkAndAwardBadges } from "@/lib/gamification/badges";
-import { updateUserStreak } from "@/lib/gamification/streaks";
-import { syncUserStats } from "@/lib/services/sync";
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { checkAndAwardBadges } from '@/lib/gamification/badges';
+import { updateUserStreak } from '@/lib/gamification/streaks';
+import { syncUserStats } from '@/lib/services/sync';
 
 /**
  * Sync Codeforces data for all users with cf_handle set.
@@ -10,9 +10,9 @@ import { syncUserStats } from "@/lib/services/sync";
  */
 export async function syncAllCf(admin: SupabaseClient) {
 	const { data: users } = await admin
-		.from("profiles")
-		.select("id, cf_handle, lc_handle")
-		.not("cf_handle", "is", null);
+		.from('profiles')
+		.select('id, cf_handle, lc_handle')
+		.not('cf_handle', 'is', null);
 
 	if (!users || users.length === 0) return { synced: 0 };
 
@@ -37,9 +37,7 @@ export async function syncAllCf(admin: SupabaseClient) {
 				errors.push(`${user.cf_handle}: ${result.cf.error}`);
 			}
 		} catch (err) {
-			errors.push(
-				`${user.cf_handle}: ${err instanceof Error ? err.message : "Unknown"}`,
-			);
+			errors.push(`${user.cf_handle}: ${err instanceof Error ? err.message : 'Unknown'}`);
 		}
 
 		// Rate-limit: 1s between users
@@ -64,8 +62,8 @@ export async function syncAllCf(admin: SupabaseClient) {
 async function backfillMissingCfProblems(admin: SupabaseClient) {
 	// Get distinct problem IDs from submissions
 	const { data: submissionProblems } = await admin
-		.from("cf_submissions")
-		.select("problem_id, problem_name, problem_rating, tags")
+		.from('cf_submissions')
+		.select('problem_id, problem_name, problem_rating, tags')
 		.limit(2000);
 
 	if (!submissionProblems || submissionProblems.length === 0) return 0;
@@ -89,9 +87,9 @@ async function backfillMissingCfProblems(admin: SupabaseClient) {
 	// Check which are already cached
 	const allIds = [...problemMap.keys()];
 	const { data: existingProblems } = await admin
-		.from("cf_problems")
-		.select("id")
-		.in("id", allIds.slice(0, 1000));
+		.from('cf_problems')
+		.select('id')
+		.in('id', allIds.slice(0, 1000));
 
 	const existingSet = new Set((existingProblems ?? []).map((p) => p.id));
 	const missing = allIds.filter((id) => !existingSet.has(id));
@@ -109,12 +107,10 @@ async function backfillMissingCfProblems(admin: SupabaseClient) {
 		};
 	});
 
-	const { error } = await admin
-		.from("cf_problems")
-		.upsert(rows, { onConflict: "id" });
+	const { error } = await admin.from('cf_problems').upsert(rows, { onConflict: 'id' });
 
 	if (error) {
-		console.error("CF problems backfill error:", error.message);
+		console.error('CF problems backfill error:', error.message);
 		return 0;
 	}
 

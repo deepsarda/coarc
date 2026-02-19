@@ -1,5 +1,5 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
-import { createNotification, notifyAllUsers } from "@/lib/notifications/send";
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { createNotification, notifyAllUsers } from '@/lib/notifications/send';
 
 /**
  * Recompute leaderboard rankings, detect dark horses and overtakes.
@@ -15,9 +15,9 @@ export async function runComputeRankings(admin: SupabaseClient) {
 
 	// Compute weekly XP for all users
 	const { data: xpLogs } = await admin
-		.from("xp_log")
-		.select("user_id, amount")
-		.gte("created_at", weekStartStr);
+		.from('xp_log')
+		.select('user_id, amount')
+		.gte('created_at', weekStartStr);
 
 	const weeklyXP = new Map<string, number>();
 	for (const log of xpLogs ?? []) {
@@ -25,9 +25,7 @@ export async function runComputeRankings(admin: SupabaseClient) {
 	}
 
 	// Get all profiles
-	const { data: profiles } = await admin
-		.from("profiles")
-		.select("id, display_name, xp");
+	const { data: profiles } = await admin.from('profiles').select('id, display_name, xp');
 
 	if (!profiles) return { success: false };
 
@@ -54,20 +52,16 @@ export async function runComputeRankings(admin: SupabaseClient) {
 
 	for (const entry of currentRanking) {
 		// Dark horse: earned 3x the average this week and is in top 20
-		if (
-			entry.weekly_xp > avgWeeklyXP * 3 &&
-			entry.weekly_xp > 50 &&
-			entry.rank <= 20
-		) {
+		if (entry.weekly_xp > avgWeeklyXP * 3 && entry.weekly_xp > 50 && entry.rank <= 20) {
 			darkHorses.push(entry.user_id);
 
 			// Notify all users about the dark horse
 			await notifyAllUsers(
 				admin,
-				"dark_horse",
-				"🐴 Dark Horse Alert!",
+				'dark_horse',
+				'🐴 Dark Horse Alert!',
 				`${entry.display_name} surged to #${entry.rank} this week with ${entry.weekly_xp} XP!`,
-				{ user_id: entry.user_id, url: "/leaderboard" },
+				{ user_id: entry.user_id, url: '/leaderboard' },
 			);
 		}
 	}
@@ -76,19 +70,18 @@ export async function runComputeRankings(admin: SupabaseClient) {
 	// In a production setup, you'd store the previous ranking and diff
 	// For now, we'll store the current snapshot for next time
 	const { data: previousSnapshot } = await admin
-		.from("weekly_digests")
-		.select("content")
-		.order("created_at", { ascending: false })
+		.from('weekly_digests')
+		.select('content')
+		.order('created_at', { ascending: false })
 		.limit(1)
 		.single();
 
-	const previousRanking = (previousSnapshot?.content as Record<string, unknown>)
-		?.ranking as { user_id: string; rank: number }[] | undefined;
+	const previousRanking = (previousSnapshot?.content as Record<string, unknown>)?.ranking as
+		| { user_id: string; rank: number }[]
+		| undefined;
 
 	if (previousRanking) {
-		const prevRankMap = new Map(
-			previousRanking.map((p) => [p.user_id, p.rank]),
-		);
+		const prevRankMap = new Map(previousRanking.map((p) => [p.user_id, p.rank]));
 
 		for (const entry of currentRanking) {
 			const prevRank = prevRankMap.get(entry.user_id);
@@ -108,10 +101,10 @@ export async function runComputeRankings(admin: SupabaseClient) {
 					await createNotification(
 						admin,
 						victim.user_id,
-						"overtake",
+						'overtake',
 						"📈 You've Been Overtaken!",
 						`${entry.display_name} just passed you on the leaderboard. You're now #${victim.rank}.`,
-						{ url: "/leaderboard" },
+						{ url: '/leaderboard' },
 					);
 				}
 			}

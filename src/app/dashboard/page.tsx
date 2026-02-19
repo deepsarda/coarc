@@ -1,28 +1,24 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import { AlertTriangle, Bell, CircleDot, RefreshCw, Zap } from "lucide-react";
-import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import ActivityLog, {
-	type ActivityItem,
-} from "@/components/dashboard/ActivityLog";
-import AttendanceCard from "@/components/dashboard/AttendanceCard";
-import DailyProblemCard from "@/components/dashboard/DailyProblem";
-import Heatmap from "@/components/dashboard/Heatmap";
+import { motion } from 'framer-motion';
+import { AlertTriangle, Bell, CircleDot, RefreshCw, Zap } from 'lucide-react';
+import Link from 'next/link';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import ActivityLog, { type ActivityItem } from '@/components/dashboard/ActivityLog';
+import AttendanceCard from '@/components/dashboard/AttendanceCard';
+import DailyProblemCard from '@/components/dashboard/DailyProblem';
+import Heatmap from '@/components/dashboard/Heatmap';
 import PlatformCards, {
 	type CfStatsRow,
 	type LcStatsRow,
-} from "@/components/dashboard/PlatformCards";
-import QuestsPanel, {
-	type QuestItem,
-} from "@/components/dashboard/QuestsPanel";
-import SideInfo from "@/components/dashboard/SideInfo";
-import StatsGrid from "@/components/dashboard/StatsGrid";
-import TopicRadar from "@/components/dashboard/TopicRadar";
-import { useAuthContext } from "@/components/providers/AuthProvider";
-import { createClient } from "@/lib/supabase/client";
-import { getLevelForXP } from "@/lib/utils/constants";
+} from '@/components/dashboard/PlatformCards';
+import QuestsPanel, { type QuestItem } from '@/components/dashboard/QuestsPanel';
+import SideInfo from '@/components/dashboard/SideInfo';
+import StatsGrid from '@/components/dashboard/StatsGrid';
+import TopicRadar from '@/components/dashboard/TopicRadar';
+import { useAuthContext } from '@/components/providers/AuthProvider';
+import { createClient } from '@/lib/supabase/client';
+import { getLevelForXP } from '@/lib/utils/constants';
 
 /* Local Types */
 
@@ -48,7 +44,7 @@ export default function DashboardPage() {
 	const [quests, setQuests] = useState<QuestItem[]>([]);
 	const [notifCount, setNotifCount] = useState(0);
 	const [badgeSummary, setBadgeSummary] = useState({ earned: 0, total: 0 });
-	const [countdown, setCountdown] = useState("00:00:00");
+	const [countdown, setCountdown] = useState('00:00:00');
 
 	const supabase = useMemo(() => createClient(), []);
 	const levelInfo = profile ? getLevelForXP(profile.xp) : null;
@@ -64,45 +60,42 @@ export default function DashboardPage() {
 
 		if (profile.lc_handle) {
 			const { data } = await supabase
-				.from("lc_stats")
-				.select(
-					"easy_solved, medium_solved, hard_solved, total_solved, contest_rating, synced_at",
-				)
-				.eq("user_id", profile.id)
+				.from('lc_stats')
+				.select('easy_solved, medium_solved, hard_solved, total_solved, contest_rating, synced_at')
+				.eq('user_id', profile.id)
 				.single();
 			if (data) setLcStats(data);
 
 			const { data: lcSubs } = await supabase
-				.from("lc_submissions")
-				.select("id, problem_title, problem_slug, difficulty, submitted_at")
-				.eq("user_id", profile.id)
-				.order("submitted_at", { ascending: false })
+				.from('lc_submissions')
+				.select('id, problem_title, problem_slug, difficulty, submitted_at')
+				.eq('user_id', profile.id)
+				.order('submitted_at', { ascending: false })
 				.limit(50);
 
 			if (lcSubs) {
 				const unknownSlugs = lcSubs
-					.filter((s) => !s.difficulty || s.difficulty === "Unknown")
+					.filter((s) => !s.difficulty || s.difficulty === 'Unknown')
 					.map((s) => s.problem_slug);
 
 				let diffMap = new Map<string, string>();
 				if (unknownSlugs.length > 0) {
 					const { data: probs } = await supabase
-						.from("lc_problems")
-						.select("slug, difficulty")
-						.in("slug", [...new Set(unknownSlugs)]);
-					if (probs)
-						diffMap = new Map(probs.map((p) => [p.slug, p.difficulty]));
+						.from('lc_problems')
+						.select('slug, difficulty')
+						.in('slug', [...new Set(unknownSlugs)]);
+					if (probs) diffMap = new Map(probs.map((p) => [p.slug, p.difficulty]));
 				}
 
 				for (const s of lcSubs) {
 					items.push({
 						id: `lc-${s.id}`,
-						platform: "lc",
+						platform: 'lc',
 						title: s.problem_title,
 						subtitle:
-							s.difficulty && s.difficulty !== "Unknown"
+							s.difficulty && s.difficulty !== 'Unknown'
 								? s.difficulty
-								: (diffMap.get(s.problem_slug) ?? "Unknown"),
+								: (diffMap.get(s.problem_slug) ?? 'Unknown'),
 						timestamp: s.submitted_at,
 					});
 				}
@@ -111,15 +104,15 @@ export default function DashboardPage() {
 
 		if (profile.cf_handle) {
 			const { count } = await supabase
-				.from("cf_submissions")
-				.select("id", { count: "exact", head: true })
-				.eq("user_id", profile.id);
+				.from('cf_submissions')
+				.select('id', { count: 'exact', head: true })
+				.eq('user_id', profile.id);
 
 			const { data: latestRating } = await supabase
-				.from("cf_ratings")
-				.select("new_rating")
-				.eq("user_id", profile.id)
-				.order("timestamp", { ascending: false })
+				.from('cf_ratings')
+				.select('new_rating')
+				.eq('user_id', profile.id)
+				.order('timestamp', { ascending: false })
 				.limit(1)
 				.single();
 
@@ -129,31 +122,26 @@ export default function DashboardPage() {
 			});
 
 			const { data: cfSubs } = await supabase
-				.from("cf_submissions")
-				.select("id, problem_name, problem_rating, submitted_at")
-				.eq("user_id", profile.id)
-				.order("submitted_at", { ascending: false })
+				.from('cf_submissions')
+				.select('id, problem_name, problem_rating, submitted_at')
+				.eq('user_id', profile.id)
+				.order('submitted_at', { ascending: false })
 				.limit(50);
 
 			if (cfSubs) {
 				for (const s of cfSubs) {
 					items.push({
 						id: `cf-${s.id}`,
-						platform: "cf",
+						platform: 'cf',
 						title: s.problem_name,
-						subtitle: s.problem_rating
-							? `Rating ${s.problem_rating}`
-							: "Unrated",
+						subtitle: s.problem_rating ? `Rating ${s.problem_rating}` : 'Unrated',
 						timestamp: s.submitted_at,
 					});
 				}
 			}
 		}
 
-		items.sort(
-			(a, b) =>
-				new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
-		);
+		items.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 		const seen = new Set<string>();
 		setActivity(
 			items.filter((item) => {
@@ -167,7 +155,7 @@ export default function DashboardPage() {
 
 	const fetchDailyProblem = useCallback(async () => {
 		try {
-			const res = await fetch("/api/problems/daily");
+			const res = await fetch('/api/problems/daily');
 			if (!res.ok) return;
 			const data = await res.json();
 			if (data.daily) setDaily({ ...data.daily, solved: data.solved ?? false });
@@ -178,7 +166,7 @@ export default function DashboardPage() {
 
 	const fetchQuests = useCallback(async () => {
 		try {
-			const res = await fetch("/api/quests/active");
+			const res = await fetch('/api/quests/active');
 			if (!res.ok) return;
 			const data = await res.json();
 			if (data.quests) {
@@ -190,12 +178,7 @@ export default function DashboardPage() {
 						xp_reward: q.xp_reward,
 						progress: (q as Record<string, unknown>).user_progress ?? 0,
 						target:
-							(
-								(q as Record<string, unknown>).condition as Record<
-									string,
-									number
-								>
-							)?.count ?? 1,
+							((q as Record<string, unknown>).condition as Record<string, number>)?.count ?? 1,
 						completed: (q as Record<string, unknown>).user_completed ?? false,
 					})),
 				);
@@ -207,7 +190,7 @@ export default function DashboardPage() {
 
 	const fetchNotifCount = useCallback(async () => {
 		try {
-			const res = await fetch("/api/notifications/list?limit=1");
+			const res = await fetch('/api/notifications/list?limit=1');
 			if (!res.ok) return;
 			const data = await res.json();
 			setNotifCount(data.unread_count ?? 0);
@@ -218,7 +201,7 @@ export default function DashboardPage() {
 
 	const fetchBadges = useCallback(async () => {
 		try {
-			const res = await fetch("/api/gamification/badges");
+			const res = await fetch('/api/gamification/badges');
 			if (!res.ok) return;
 			const data = await res.json();
 			const badges = data.badges ?? [];
@@ -237,13 +220,7 @@ export default function DashboardPage() {
 		fetchQuests();
 		fetchNotifCount();
 		fetchBadges();
-	}, [
-		fetchPlatformStats,
-		fetchDailyProblem,
-		fetchQuests,
-		fetchNotifCount,
-		fetchBadges,
-	]);
+	}, [fetchPlatformStats, fetchDailyProblem, fetchQuests, fetchNotifCount, fetchBadges]);
 
 	// Countdown to 08:00 IST (02:30 UTC)
 	useEffect(() => {
@@ -251,14 +228,13 @@ export default function DashboardPage() {
 			const now = new Date();
 			const tomorrow = new Date(now);
 			tomorrow.setUTCHours(2, 30, 0, 0);
-			if (tomorrow.getTime() <= now.getTime())
-				tomorrow.setDate(tomorrow.getDate() + 1);
+			if (tomorrow.getTime() <= now.getTime()) tomorrow.setDate(tomorrow.getDate() + 1);
 			const diff = tomorrow.getTime() - now.getTime();
 			const h = Math.floor(diff / 3_600_000);
 			const m = Math.floor((diff % 3_600_000) / 60_000);
 			const s = Math.floor((diff % 60_000) / 1000);
 			setCountdown(
-				`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`,
+				`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`,
 			);
 		};
 		tick();
@@ -271,24 +247,20 @@ export default function DashboardPage() {
 		setSyncing(true);
 		setSyncMessage(null);
 		try {
-			const res = await fetch("/api/users/sync", { method: "POST" });
+			const res = await fetch('/api/users/sync', { method: 'POST' });
 			const data = await res.json();
 			if (res.ok && data.success) {
 				const parts: string[] = [];
-				if (data.lc)
-					parts.push(data.lc.success ? "LC ✓" : `LC ✗ ${data.lc.error ?? ""}`);
-				if (data.cf)
-					parts.push(data.cf.success ? "CF ✓" : `CF ✗ ${data.cf.error ?? ""}`);
+				if (data.lc) parts.push(data.lc.success ? 'LC ✓' : `LC ✗ ${data.lc.error ?? ''}`);
+				if (data.cf) parts.push(data.cf.success ? 'CF ✓' : `CF ✗ ${data.cf.error ?? ''}`);
 				const allOk = (data.lc?.success ?? true) && (data.cf?.success ?? true);
-				setSyncMessage(
-					allOk ? "Sync complete!" : `Partial: ${parts.join(" | ")}`,
-				);
+				setSyncMessage(allOk ? 'Sync complete!' : `Partial: ${parts.join(' | ')}`);
 				await fetchPlatformStats();
 			} else {
-				setSyncMessage(data.error || "Sync failed");
+				setSyncMessage(data.error || 'Sync failed');
 			}
 		} catch {
-			setSyncMessage("Network error");
+			setSyncMessage('Network error');
 		} finally {
 			setSyncing(false);
 			setTimeout(() => setSyncMessage(null), 6000);
@@ -337,17 +309,16 @@ export default function DashboardPage() {
 					<h1 className="font-heading text-2xl md:text-4xl font-black text-text-primary uppercase tracking-tighter">
 						{profile ? (
 							<>
-								Welcome,{" "}
-								<span className="text-neon-cyan">{profile.display_name}</span>
+								Welcome, <span className="text-neon-cyan">{profile.display_name}</span>
 							</>
 						) : (
-							"CONTROL_DASHBOARD"
+							'CONTROL_DASHBOARD'
 						)}
 					</h1>
 					<p className="text-text-muted text-small font-mono mt-1 uppercase tracking-epic font-bold">
 						{profile
-							? `ROLL_${String(profile.roll_number).padStart(2, "0")} :: ${levelInfo?.title?.toUpperCase() ?? "NEWBIE"}`
-							: "SYSTEM_STATUS :: CONNECTED"}
+							? `ROLL_${String(profile.roll_number).padStart(2, '0')} :: ${levelInfo?.title?.toUpperCase() ?? 'NEWBIE'}`
+							: 'SYSTEM_STATUS :: CONNECTED'}
 					</p>
 				</div>
 				<div className="flex items-center gap-2.5">
@@ -357,17 +328,17 @@ export default function DashboardPage() {
 						disabled={syncing}
 						className="flex items-center gap-1.5 px-3 py-1.5 border border-border-hard bg-zinc-950 hover:border-neon-cyan/50 transition-colors font-mono text-tiny uppercase tracking-widest font-black disabled:opacity-30"
 					>
-						<RefreshCw className={`w-3 h-3 ${syncing ? "animate-spin" : ""}`} />
-						{syncing ? "SYNCING..." : "SYNC"}
+						<RefreshCw className={`w-3 h-3 ${syncing ? 'animate-spin' : ''}`} />
+						{syncing ? 'SYNCING...' : 'SYNC'}
 					</button>
 					{syncMessage && (
 						<span
 							className={`font-mono text-tiny uppercase tracking-widest font-bold max-w-[250px] truncate ${
-								syncMessage.includes("complete")
-									? "text-emerald-400"
-									: syncMessage.includes("Partial")
-										? "text-amber-400"
-										: "text-red-400"
+								syncMessage.includes('complete')
+									? 'text-emerald-400'
+									: syncMessage.includes('Partial')
+										? 'text-amber-400'
+										: 'text-red-400'
 							}`}
 							title={syncMessage}
 						>
@@ -381,7 +352,7 @@ export default function DashboardPage() {
 						<Bell className="w-3.5 h-3.5 text-text-muted" />
 						{notifCount > 0 && (
 							<span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-[9px] font-mono font-black text-white flex items-center justify-center">
-								{notifCount > 9 ? "9+" : notifCount}
+								{notifCount > 9 ? '9+' : notifCount}
 							</span>
 						)}
 					</Link>
@@ -408,8 +379,7 @@ export default function DashboardPage() {
 							Level {levelInfo.level} → {levelInfo.level + 1}
 						</span>
 						<span className="tabular-nums">
-							{levelInfo.xpProgress.toLocaleString()} /{" "}
-							{levelInfo.xpForNext.toLocaleString()} XP
+							{levelInfo.xpProgress.toLocaleString()} / {levelInfo.xpForNext.toLocaleString()} XP
 						</span>
 					</div>
 					<div className="h-[6px] w-full bg-void border border-border-hard/30 p-px relative">
@@ -422,7 +392,7 @@ export default function DashboardPage() {
 								delay: 0.3,
 								ease: [0.16, 1, 0.3, 1],
 							}}
-							style={{ boxShadow: "0 0 12px #00f0ff, 0 0 4px #00f0ff" }}
+							style={{ boxShadow: '0 0 12px #00f0ff, 0 0 4px #00f0ff' }}
 						>
 							<div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-white shadow-[0_0_8px_#00f0ff,0_0_16px_#00f0ff]" />
 						</motion.div>
@@ -433,22 +403,14 @@ export default function DashboardPage() {
 			{/* SECTIONS */}
 			<div className="space-y-12">
 				{/* STATS */}
-				<StatsGrid
-					profile={profile}
-					levelInfo={levelInfo}
-					totalProblems={totalProblems}
-				/>
+				<StatsGrid profile={profile} levelInfo={levelInfo} totalProblems={totalProblems} />
 
 				{/* DAILY PROBLEM */}
 				<DailyProblemCard daily={daily} countdown={countdown} />
 
 				{/* HEATMAP */}
 				{profile && (
-					<motion.div
-						initial={{ opacity: 0 }}
-						animate={{ opacity: 1 }}
-						transition={{ delay: 0.3 }}
-					>
+					<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
 						<Heatmap userId={profile.id} />
 					</motion.div>
 				)}
@@ -508,10 +470,10 @@ export default function DashboardPage() {
 						<AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
 						<span className="text-tiny font-mono text-amber-400/80 uppercase tracking-widest font-bold">
 							{!profile.cf_handle && !profile.lc_handle
-								? "Link your Codeforces & LeetCode handles in Settings"
+								? 'Link your Codeforces & LeetCode handles in Settings'
 								: !profile.cf_handle
-									? "Link your Codeforces handle in Settings"
-									: "Link your LeetCode handle in Settings"}
+									? 'Link your Codeforces handle in Settings'
+									: 'Link your LeetCode handle in Settings'}
 						</span>
 					</div>
 				)}

@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
-import { generateRecommendations } from "@/lib/gamification/recommender";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
+import { NextResponse } from 'next/server';
+import { generateRecommendations } from '@/lib/gamification/recommender';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
 
 /**
  * GET /api/problems/recommend
@@ -14,7 +14,7 @@ export async function GET() {
 			data: { user },
 		} = await supabase.auth.getUser();
 		if (!user) {
-			return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+			return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 		}
 
 		const admin = createAdminClient();
@@ -22,9 +22,6 @@ export async function GET() {
 
 		return NextResponse.json({ recommendations });
 	} catch {
-		return NextResponse.json(
-			{ error: "Internal server error" },
-			{ status: 500 },
-		);
+		return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 	}
 }

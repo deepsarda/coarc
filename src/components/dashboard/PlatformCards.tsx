@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion';
 
-import { getCFRatingColor, getCFRatingLabel } from "@/lib/utils/constants";
-import type { Profile } from "@/types/gamification";
+import { getCFRatingColor, getCFRatingLabel } from '@/lib/utils/constants';
+import type { Profile } from '@/types/gamification';
 
 export interface LcStatsRow {
 	easy_solved: number;
@@ -25,11 +25,7 @@ interface PlatformCardsProps {
 	cfStats: CfStatsRow | null;
 }
 
-export default function PlatformCards({
-	profile,
-	lcStats,
-	cfStats,
-}: PlatformCardsProps) {
+export default function PlatformCards({ profile, lcStats, cfStats }: PlatformCardsProps) {
 	if (!profile?.cf_handle && !profile?.lc_handle) return null;
 
 	return (
@@ -46,34 +42,18 @@ export default function PlatformCards({
 						<span className="text-orange-400">::</span> LeetCode
 						{lcStats && (
 							<span className="ml-3 dash-sub normal-case">
-								synced {new Date(lcStats.synced_at).toLocaleDateString("en-IN")}
+								synced {new Date(lcStats.synced_at).toLocaleDateString('en-IN')}
 							</span>
 						)}
 					</p>
 					{lcStats ? (
 						<div className="space-y-3">
 							<div className="flex items-baseline gap-6">
-								<Stat
-									value={lcStats.easy_solved}
-									label="Easy"
-									color="text-emerald-400"
-								/>
-								<Stat
-									value={lcStats.medium_solved}
-									label="Med"
-									color="text-amber-400"
-								/>
-								<Stat
-									value={lcStats.hard_solved}
-									label="Hard"
-									color="text-red-400"
-								/>
+								<Stat value={lcStats.easy_solved} label="Easy" color="text-emerald-400" />
+								<Stat value={lcStats.medium_solved} label="Med" color="text-amber-400" />
+								<Stat value={lcStats.hard_solved} label="Hard" color="text-red-400" />
 								<div className="ml-auto">
-									<Stat
-										value={lcStats.total_solved}
-										label="Total"
-										color="text-neon-cyan"
-									/>
+									<Stat value={lcStats.total_solved} label="Total" color="text-neon-cyan" />
 								</div>
 							</div>
 							{lcStats.contest_rating && (
@@ -87,7 +67,7 @@ export default function PlatformCards({
 						</div>
 					) : (
 						<p className="text-text-muted font-mono text-sm">
-							Hit SYNC to load stats for{" "}
+							Hit SYNC to load stats for{' '}
 							<span className="text-orange-400">{profile.lc_handle}</span>
 						</p>
 					)}
@@ -104,8 +84,7 @@ export default function PlatformCards({
 					<p className="dash-heading mb-4">
 						<span className="text-cyan-400">::</span> Codeforces
 					</p>
-					{cfStats &&
-					(cfStats.latest_rating !== null || cfStats.submission_count > 0) ? (
+					{cfStats && (cfStats.latest_rating !== null || cfStats.submission_count > 0) ? (
 						<div className="space-y-3">
 							<div className="flex items-baseline gap-6">
 								<div>
@@ -119,7 +98,7 @@ export default function PlatformCards({
 													: undefined,
 											}}
 										>
-											{cfStats.latest_rating ?? "--"}
+											{cfStats.latest_rating ?? '--'}
 										</span>
 										{cfStats.latest_rating !== null && (
 											<span
@@ -135,18 +114,13 @@ export default function PlatformCards({
 									</div>
 								</div>
 								<div className="ml-auto">
-									<Stat
-										value={cfStats.submission_count}
-										label="AC"
-										color="text-text-primary"
-									/>
+									<Stat value={cfStats.submission_count} label="AC" color="text-text-primary" />
 								</div>
 							</div>
 						</div>
 					) : (
 						<p className="text-text-muted font-mono text-sm">
-							Hit SYNC to load stats for{" "}
-							<span className="text-cyan-400">{profile.cf_handle}</span>
+							Hit SYNC to load stats for <span className="text-cyan-400">{profile.cf_handle}</span>
 						</p>
 					)}
 				</motion.div>
@@ -155,15 +129,7 @@ export default function PlatformCards({
 	);
 }
 
-function Stat({
-	value,
-	label,
-	color,
-}: {
-	value: number;
-	label: string;
-	color: string;
-}) {
+function Stat({ value, label, color }: { value: number; label: string; color: string }) {
 	return (
 		<div>
 			<p

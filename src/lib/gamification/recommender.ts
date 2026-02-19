@@ -1,11 +1,11 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 export interface RecommendedProblem {
-	slot: "weak" | "practice" | "rusty" | "stretch";
+	slot: 'weak' | 'practice' | 'rusty' | 'stretch';
 	label: string;
 	reason: string;
 	topic: string;
-	platform: "cf" | "lc";
+	platform: 'cf' | 'lc';
 	problem: {
 		id: string;
 		name: string;
@@ -26,9 +26,9 @@ export async function generateRecommendations(
 	userId: string,
 ): Promise<RecommendedProblem[]> {
 	const { data: profile } = await admin
-		.from("profiles")
-		.select("cf_handle, lc_handle")
-		.eq("id", userId)
+		.from('profiles')
+		.select('cf_handle, lc_handle')
+		.eq('id', userId)
 		.single();
 
 	if (!profile) return [];
@@ -57,15 +57,13 @@ async function generateCfRecommendations(
 	userId: string,
 ): Promise<RecommendedProblem[]> {
 	const { data: userSubs } = await admin
-		.from("cf_submissions")
-		.select("problem_id, tags, verdict")
-		.eq("user_id", userId);
+		.from('cf_submissions')
+		.select('problem_id, tags, verdict')
+		.eq('user_id', userId);
 
 	if (!userSubs || userSubs.length === 0) return [];
 
-	const solvedSet = new Set(
-		userSubs.filter((s) => s.verdict === "OK").map((s) => s.problem_id),
-	);
+	const solvedSet = new Set(userSubs.filter((s) => s.verdict === 'OK').map((s) => s.problem_id));
 
 	// Topic analysis
 	const topicSolves = new Map<string, number>();
@@ -75,7 +73,7 @@ async function generateCfRecommendations(
 		const tags = (sub.tags as string[]) ?? [];
 		for (const tag of tags) {
 			topicAttempts.set(tag, (topicAttempts.get(tag) ?? 0) + 1);
-			if (sub.verdict === "OK") {
+			if (sub.verdict === 'OK') {
 				topicSolves.set(tag, (topicSolves.get(tag) ?? 0) + 1);
 			}
 		}
@@ -87,24 +85,18 @@ async function generateCfRecommendations(
 		topicSuccessRate.set(topic, attempts > 0 ? solves / attempts : 0);
 	}
 
-	const sortedTopics = [...topicSuccessRate.entries()].sort(
-		(a, b) => a[1] - b[1],
-	);
+	const sortedTopics = [...topicSuccessRate.entries()].sort((a, b) => a[1] - b[1]);
 
 	// Avg rating from solved
 	const { data: solvedProblems } = await admin
-		.from("cf_problems")
-		.select("rating")
-		.in("id", [...solvedSet].slice(0, 500))
-		.not("rating", "is", null);
+		.from('cf_problems')
+		.select('rating')
+		.in('id', [...solvedSet].slice(0, 500))
+		.not('rating', 'is', null);
 
-	const ratings = (solvedProblems ?? [])
-		.map((p) => p.rating as number)
-		.filter(Boolean);
+	const ratings = (solvedProblems ?? []).map((p) => p.rating as number).filter(Boolean);
 	const avgRating =
-		ratings.length > 0
-			? Math.round(ratings.reduce((a, b) => a + b, 0) / ratings.length)
-			: 1200;
+		ratings.length > 0 ? Math.round(ratings.reduce((a, b) => a + b, 0) / ratings.length) : 1200;
 
 	const recommendations: RecommendedProblem[] = [];
 
@@ -121,11 +113,11 @@ async function generateCfRecommendations(
 		if (problem) {
 			const cs = await countCfClassmatesSolves(admin, problem.id, userId);
 			recommendations.push({
-				slot: "weak",
-				label: "🔴 Weak Topic",
+				slot: 'weak',
+				label: '🔴 Weak Topic',
 				reason: `You've only solved ${Math.round(rate * 100)}% of your ${weakTopic} attempts`,
 				topic: weakTopic,
-				platform: "cf",
+				platform: 'cf',
 				problem,
 				classmates_solved: cs,
 			});
@@ -145,11 +137,11 @@ async function generateCfRecommendations(
 		if (problem) {
 			const cs = await countCfClassmatesSolves(admin, problem.id, userId);
 			recommendations.push({
-				slot: "practice",
-				label: "⚠️ Needs Practice",
+				slot: 'practice',
+				label: '⚠️ Needs Practice',
 				reason: `Your ${practiceTopic} success rate is ${Math.round(rate * 100)}%`,
 				topic: practiceTopic,
-				platform: "cf",
+				platform: 'cf',
 				problem,
 				classmates_solved: cs,
 			});
@@ -159,21 +151,15 @@ async function generateCfRecommendations(
 	// Slot 3: Rusty
 	if (sortedTopics.length > 2) {
 		const [rustyTopic] = sortedTopics[sortedTopics.length - 2];
-		const problem = await findCfProblem(
-			admin,
-			solvedSet,
-			rustyTopic,
-			avgRating - 200,
-			avgRating,
-		);
+		const problem = await findCfProblem(admin, solvedSet, rustyTopic, avgRating - 200, avgRating);
 		if (problem) {
 			const cs = await countCfClassmatesSolves(admin, problem.id, userId);
 			recommendations.push({
-				slot: "rusty",
-				label: "🧹 Rusty",
+				slot: 'rusty',
+				label: '🧹 Rusty',
 				reason: `Revisit ${rustyTopic} to keep your skills sharp`,
 				topic: rustyTopic,
-				platform: "cf",
+				platform: 'cf',
 				problem,
 				classmates_solved: cs,
 			});
@@ -193,11 +179,11 @@ async function generateCfRecommendations(
 		if (problem) {
 			const cs = await countCfClassmatesSolves(admin, problem.id, userId);
 			recommendations.push({
-				slot: "stretch",
-				label: "🎯 Stretch Goal",
+				slot: 'stretch',
+				label: '🎯 Stretch Goal',
 				reason: `Push your ceiling in ${strongestTopic}`,
 				topic: strongestTopic,
-				platform: "cf",
+				platform: 'cf',
 				problem,
 				classmates_solved: cs,
 			});
@@ -217,9 +203,9 @@ async function generateLcRecommendations(
 ): Promise<RecommendedProblem[]> {
 	// Get user's LC stats to understand their difficulty breakdown
 	const { data: lcStats } = await admin
-		.from("lc_stats")
-		.select("easy_solved, medium_solved, hard_solved, total_solved")
-		.eq("user_id", userId)
+		.from('lc_stats')
+		.select('easy_solved, medium_solved, hard_solved, total_solved')
+		.eq('user_id', userId)
 		.single();
 
 	if (!lcStats) return [];
@@ -227,15 +213,15 @@ async function generateLcRecommendations(
 	const totalSolved = lcStats.total_solved ?? 0;
 	if (totalSolved === 0) {
 		// Brand new, recommend an easy warmup
-		const easyProblem = await findLcProblem(admin, "Easy", null);
+		const easyProblem = await findLcProblem(admin, 'Easy', null);
 		if (!easyProblem) return [];
 		return [
 			{
-				slot: "weak",
-				label: "🟢 Get Started",
-				reason: "Solve your first LeetCode problem!",
-				topic: "any",
-				platform: "lc",
+				slot: 'weak',
+				label: '🟢 Get Started',
+				reason: 'Solve your first LeetCode problem!',
+				topic: 'any',
+				platform: 'lc',
 				problem: easyProblem,
 				classmates_solved: 0,
 			},
@@ -250,27 +236,27 @@ async function generateLcRecommendations(
 	// Slot 1: Weak difficulty, whichever they've solved least proportionally
 	if (lcStats.hard_solved === 0 && lcStats.medium_solved > 5) {
 		// Hasn't tried hard yet but has some medium experience
-		const problem = await findLcProblem(admin, "Hard", null);
+		const problem = await findLcProblem(admin, 'Hard', null);
 		if (problem) {
 			recommendations.push({
-				slot: "weak",
-				label: "🔴 Weak Area",
+				slot: 'weak',
+				label: '🔴 Weak Area',
 				reason: "You haven't solved any Hard problems yet!",
-				topic: "Hard",
-				platform: "lc",
+				topic: 'Hard',
+				platform: 'lc',
 				problem,
 				classmates_solved: 0,
 			});
 		}
 	} else if (medRate < 0.3) {
-		const problem = await findLcProblem(admin, "Medium", null);
+		const problem = await findLcProblem(admin, 'Medium', null);
 		if (problem) {
 			recommendations.push({
-				slot: "weak",
-				label: "🔴 Weak Area",
+				slot: 'weak',
+				label: '🔴 Weak Area',
 				reason: `Only ${Math.round(medRate * 100)}% of your solves are Medium`,
-				topic: "Medium",
-				platform: "lc",
+				topic: 'Medium',
+				platform: 'lc',
 				problem,
 				classmates_solved: 0,
 			});
@@ -278,57 +264,41 @@ async function generateLcRecommendations(
 	}
 
 	// Slot 2: Practice, popular topic in their weak difficulty
-	const practiceDifficulty = easyRate > 0.5 ? "Medium" : "Easy";
+	const practiceDifficulty = easyRate > 0.5 ? 'Medium' : 'Easy';
 	const popularTopics = [
-		"Array",
-		"String",
-		"Dynamic Programming",
-		"Tree",
-		"Graph",
-		"Binary Search",
+		'Array',
+		'String',
+		'Dynamic Programming',
+		'Tree',
+		'Graph',
+		'Binary Search',
 	];
-	const randomTopic =
-		popularTopics[Math.floor(Math.random() * popularTopics.length)];
-	const practiceProblem = await findLcProblem(
-		admin,
-		practiceDifficulty,
-		randomTopic,
-	);
+	const randomTopic = popularTopics[Math.floor(Math.random() * popularTopics.length)];
+	const practiceProblem = await findLcProblem(admin, practiceDifficulty, randomTopic);
 	if (practiceProblem) {
 		recommendations.push({
-			slot: "practice",
-			label: "⚠️ Practice",
+			slot: 'practice',
+			label: '⚠️ Practice',
 			reason: `Try a ${practiceDifficulty} ${randomTopic} problem`,
 			topic: randomTopic,
-			platform: "lc",
+			platform: 'lc',
 			problem: practiceProblem,
 			classmates_solved: 0,
 		});
 	}
 
 	// Slot 3: Stretch Goal
-	const stretchDifficulty = lcStats.hard_solved > 0 ? "Hard" : "Medium";
-	const stretchTopics = [
-		"Dynamic Programming",
-		"Graph",
-		"Trie",
-		"Segment Tree",
-		"Backtracking",
-	];
-	const stretchTopic =
-		stretchTopics[Math.floor(Math.random() * stretchTopics.length)];
-	const stretchProblem = await findLcProblem(
-		admin,
-		stretchDifficulty,
-		stretchTopic,
-	);
+	const stretchDifficulty = lcStats.hard_solved > 0 ? 'Hard' : 'Medium';
+	const stretchTopics = ['Dynamic Programming', 'Graph', 'Trie', 'Segment Tree', 'Backtracking'];
+	const stretchTopic = stretchTopics[Math.floor(Math.random() * stretchTopics.length)];
+	const stretchProblem = await findLcProblem(admin, stretchDifficulty, stretchTopic);
 	if (stretchProblem) {
 		recommendations.push({
-			slot: "stretch",
-			label: "🎯 Stretch Goal",
+			slot: 'stretch',
+			label: '🎯 Stretch Goal',
 			reason: `Push yourself with a ${stretchDifficulty} ${stretchTopic} problem`,
 			topic: stretchTopic,
-			platform: "lc",
+			platform: 'lc',
 			problem: stretchProblem,
 			classmates_solved: 0,
 		});
@@ -347,14 +317,14 @@ async function findCfProblem(
 	topic: string,
 	minRating: number,
 	maxRating: number,
-): Promise<RecommendedProblem["problem"] | null> {
+): Promise<RecommendedProblem['problem'] | null> {
 	const { data: problems } = await admin
-		.from("cf_problems")
-		.select("id, name, rating, tags, solved_count")
-		.contains("tags", [topic])
-		.gte("rating", minRating)
-		.lte("rating", maxRating)
-		.order("solved_count", { ascending: false, nullsFirst: false })
+		.from('cf_problems')
+		.select('id, name, rating, tags, solved_count')
+		.contains('tags', [topic])
+		.gte('rating', minRating)
+		.lte('rating', maxRating)
+		.order('solved_count', { ascending: false, nullsFirst: false })
 		.limit(50);
 
 	if (!problems) return null;
@@ -362,8 +332,8 @@ async function findCfProblem(
 	const unsolved = problems.find((p) => !solvedSet.has(p.id));
 	if (!unsolved) return null;
 
-	const contestId = unsolved.id.replace(/[A-Z]+.*/, "");
-	const index = unsolved.id.replace(/^\d+/, "");
+	const contestId = unsolved.id.replace(/[A-Z]+.*/, '');
+	const index = unsolved.id.replace(/^\d+/, '');
 
 	return {
 		id: unsolved.id,
@@ -379,16 +349,16 @@ async function findLcProblem(
 	admin: SupabaseClient,
 	difficulty: string,
 	topic: string | null,
-): Promise<RecommendedProblem["problem"] | null> {
+): Promise<RecommendedProblem['problem'] | null> {
 	let query = admin
-		.from("lc_problems")
-		.select("slug, title, difficulty, topics, total_accepted, url")
-		.eq("difficulty", difficulty)
-		.order("total_accepted", { ascending: false, nullsFirst: false })
+		.from('lc_problems')
+		.select('slug, title, difficulty, topics, total_accepted, url')
+		.eq('difficulty', difficulty)
+		.order('total_accepted', { ascending: false, nullsFirst: false })
 		.limit(100);
 
 	if (topic) {
-		query = query.contains("topics", [topic]);
+		query = query.contains('topics', [topic]);
 	}
 
 	const { data: problems } = await query;
@@ -413,11 +383,11 @@ async function countCfClassmatesSolves(
 	excludeUserId: string,
 ): Promise<number> {
 	const { count } = await admin
-		.from("cf_submissions")
-		.select("id", { count: "exact", head: true })
-		.eq("problem_id", problemId)
-		.eq("verdict", "OK")
-		.neq("user_id", excludeUserId);
+		.from('cf_submissions')
+		.select('id', { count: 'exact', head: true })
+		.eq('problem_id', problemId)
+		.eq('verdict', 'OK')
+		.neq('user_id', excludeUserId);
 
 	return count ?? 0;
 }

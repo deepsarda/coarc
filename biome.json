@@ -26,7 +26,8 @@
         "noUnusedVariables": "warn"
       },
       "suspicious": {
-        "noExplicitAny": "warn"
+        "noExplicitAny": "warn",
+        "noArrayIndexKey": "warn"
       },
       "style": {
         "noNonNullAssertion": "off",

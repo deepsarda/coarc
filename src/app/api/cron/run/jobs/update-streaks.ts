@@ -1,8 +1,5 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
-import {
-	processAllStreaks,
-	sendStreakWarnings,
-} from "@/lib/gamification/streaks";
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { processAllStreaks, sendStreakWarnings } from '@/lib/gamification/streaks';
 
 /**
  * Daily streak update: process streaks, send warnings.

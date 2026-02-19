@@ -1,13 +1,8 @@
-"use client";
+'use client';
 
-import {
-	AlertTriangle,
-	CheckCircle2,
-	GraduationCap,
-	ShieldAlert,
-} from "lucide-react";
-import type { ReactNode } from "react";
-import { useCallback, useEffect, useState } from "react";
+import { AlertTriangle, CheckCircle2, GraduationCap, ShieldAlert } from 'lucide-react';
+import type { ReactNode } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface AttendanceInsight {
 	course_id: number;
@@ -16,15 +11,13 @@ interface AttendanceInsight {
 	total: number;
 	percentage: number;
 	skippable: number;
-	risk_level: "safe" | "warning" | "danger";
+	risk_level: 'safe' | 'warning' | 'danger';
 	projected_semester_end: number;
 }
 
 function RiskIcon({ risk }: { risk: string }): ReactNode {
-	if (risk === "safe")
-		return <CheckCircle2 className="w-4 h-4 text-emerald-400" />;
-	if (risk === "warning")
-		return <AlertTriangle className="w-4 h-4 text-amber-400" />;
+	if (risk === 'safe') return <CheckCircle2 className="w-4 h-4 text-emerald-400" />;
+	if (risk === 'warning') return <AlertTriangle className="w-4 h-4 text-amber-400" />;
 	return <ShieldAlert className="w-4 h-4 text-red-400" />;
 }
 
@@ -33,7 +26,7 @@ export default function AttendanceCard() {
 
 	const fetchInsights = useCallback(async () => {
 		try {
-			const res = await fetch("/api/attendance/calculator");
+			const res = await fetch('/api/attendance/calculator');
 			if (!res.ok) return;
 			const data = await res.json();
 			if (data.insights) setInsights(data.insights);
@@ -50,39 +43,28 @@ export default function AttendanceCard() {
 
 	const avgPct =
 		insights.length > 0
-			? Math.round(
-					insights.reduce((a, i) => a + i.percentage, 0) / insights.length,
-				)
+			? Math.round(insights.reduce((a, i) => a + i.percentage, 0) / insights.length)
 			: 0;
 
 	const riskColor = (risk: string) =>
-		risk === "safe"
-			? "text-emerald-400"
-			: risk === "warning"
-				? "text-amber-400"
-				: "text-red-400";
+		risk === 'safe' ? 'text-emerald-400' : risk === 'warning' ? 'text-amber-400' : 'text-red-400';
 
 	const riskBorder = (risk: string) =>
-		risk === "safe"
-			? "border-l-emerald-400/30"
-			: risk === "warning"
-				? "border-l-amber-400/30"
-				: "border-l-red-400/30";
+		risk === 'safe'
+			? 'border-l-emerald-400/30'
+			: risk === 'warning'
+				? 'border-l-amber-400/30'
+				: 'border-l-red-400/30';
 
 	return (
 		<div>
 			<div className="flex items-center justify-between mb-4">
 				<h3 className="dash-heading">
-					<GraduationCap className="w-4 h-4 text-neon-cyan opacity-60" />{" "}
-					Attendance
+					<GraduationCap className="w-4 h-4 text-neon-cyan opacity-60" /> Attendance
 				</h3>
 				<span
 					className={`font-mono text-base font-black tabular-nums ${
-						avgPct >= 75
-							? "text-emerald-400"
-							: avgPct >= 60
-								? "text-amber-400"
-								: "text-red-400"
+						avgPct >= 75 ? 'text-emerald-400' : avgPct >= 60 ? 'text-amber-400' : 'text-red-400'
 					}`}
 				>
 					{avgPct}%

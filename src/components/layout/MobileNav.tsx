@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useAuthContext } from "@/components/providers/AuthProvider";
-import { MOBILE_NAV_ITEMS } from "@/lib/utils/navIcons";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useAuthContext } from '@/components/providers/AuthProvider';
+import { MOBILE_NAV_ITEMS } from '@/lib/utils/navIcons';
 
 export default function MobileNav() {
 	const pathname = usePathname();
@@ -15,16 +15,14 @@ export default function MobileNav() {
 				{MOBILE_NAV_ITEMS.map((item) => {
 					// Replace the profile link with the actual user profile
 					const href =
-						item.href === "/profile/me" && profile
-							? `/profile/${profile.id}`
-							: item.href;
-					const isActive = pathname === href || pathname.startsWith(href + "/");
+						item.href === '/profile/me' && profile ? `/profile/${profile.id}` : item.href;
+					const isActive = pathname === href || pathname.startsWith(href + '/');
 					return (
 						<Link
 							key={item.href}
 							href={href}
 							className={`flex flex-col items-center gap-0.5 px-3 py-1 min-w-[3.5rem] transition-colors ${
-								isActive ? "text-neon-cyan" : "text-text-muted"
+								isActive ? 'text-neon-cyan' : 'text-text-muted'
 							}`}
 						>
 							<span className="shrink-0">{item.icon}</span>

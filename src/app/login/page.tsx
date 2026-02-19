@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import { AnimatePresence, motion } from "framer-motion";
-import { Shield, Zap } from "lucide-react";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useId, useState } from "react";
-import { useAuthContext } from "@/components/providers/AuthProvider";
-import { ROLL } from "@/lib/config";
+import { AnimatePresence, motion } from 'framer-motion';
+import { Shield, Zap } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useId, useState } from 'react';
+import { useAuthContext } from '@/components/providers/AuthProvider';
+import { ROLL } from '@/lib/config';
 
 /* Floating grid crosses */
 const CROSSES = [
-	{ id: 0, x: "12%", y: "8%", size: 8, opacity: 0.05, delay: -2, duration: 9 },
+	{ id: 0, x: '12%', y: '8%', size: 8, opacity: 0.05, delay: -2, duration: 9 },
 	{
 		id: 1,
-		x: "75%",
-		y: "12%",
+		x: '75%',
+		y: '12%',
 		size: 12,
 		opacity: 0.06,
 		delay: -5,
@@ -22,8 +22,8 @@ const CROSSES = [
 	},
 	{
 		id: 2,
-		x: "33%",
-		y: "22%",
+		x: '33%',
+		y: '22%',
 		size: 10,
 		opacity: 0.04,
 		delay: -1,
@@ -31,8 +31,8 @@ const CROSSES = [
 	},
 	{
 		id: 3,
-		x: "88%",
-		y: "35%",
+		x: '88%',
+		y: '35%',
 		size: 7,
 		opacity: 0.05,
 		delay: -7,
@@ -40,8 +40,8 @@ const CROSSES = [
 	},
 	{
 		id: 4,
-		x: "20%",
-		y: "45%",
+		x: '20%',
+		y: '45%',
 		size: 9,
 		opacity: 0.04,
 		delay: -3,
@@ -49,28 +49,28 @@ const CROSSES = [
 	},
 	{
 		id: 5,
-		x: "60%",
-		y: "18%",
+		x: '60%',
+		y: '18%',
 		size: 11,
 		opacity: 0.06,
 		delay: -6,
 		duration: 7,
 	},
-	{ id: 6, x: "45%", y: "72%", size: 8, opacity: 0.05, delay: -4, duration: 9 },
+	{ id: 6, x: '45%', y: '72%', size: 8, opacity: 0.05, delay: -4, duration: 9 },
 	{
 		id: 7,
-		x: "80%",
-		y: "60%",
+		x: '80%',
+		y: '60%',
 		size: 10,
 		opacity: 0.04,
 		delay: 0,
 		duration: 11,
 	},
-	{ id: 8, x: "15%", y: "80%", size: 7, opacity: 0.06, delay: -2, duration: 8 },
+	{ id: 8, x: '15%', y: '80%', size: 7, opacity: 0.06, delay: -2, duration: 8 },
 	{
 		id: 9,
-		x: "55%",
-		y: "55%",
+		x: '55%',
+		y: '55%',
 		size: 9,
 		opacity: 0.05,
 		delay: -5,
@@ -78,8 +78,8 @@ const CROSSES = [
 	},
 	{
 		id: 10,
-		x: "70%",
-		y: "85%",
+		x: '70%',
+		y: '85%',
 		size: 12,
 		opacity: 0.04,
 		delay: -1,
@@ -87,8 +87,8 @@ const CROSSES = [
 	},
 	{
 		id: 11,
-		x: "28%",
-		y: "65%",
+		x: '28%',
+		y: '65%',
 		size: 8,
 		opacity: 0.06,
 		delay: -7,
@@ -96,8 +96,8 @@ const CROSSES = [
 	},
 	{
 		id: 12,
-		x: "92%",
-		y: "15%",
+		x: '92%',
+		y: '15%',
 		size: 10,
 		opacity: 0.05,
 		delay: -3,
@@ -105,8 +105,8 @@ const CROSSES = [
 	},
 	{
 		id: 13,
-		x: "40%",
-		y: "90%",
+		x: '40%',
+		y: '90%',
 		size: 7,
 		opacity: 0.04,
 		delay: -6,
@@ -114,8 +114,8 @@ const CROSSES = [
 	},
 	{
 		id: 14,
-		x: "65%",
-		y: "42%",
+		x: '65%',
+		y: '42%',
 		size: 11,
 		opacity: 0.05,
 		delay: -4,
@@ -123,8 +123,8 @@ const CROSSES = [
 	},
 	{
 		id: 15,
-		x: "10%",
-		y: "55%",
+		x: '10%',
+		y: '55%',
 		size: 9,
 		opacity: 0.06,
 		delay: 0,
@@ -132,8 +132,8 @@ const CROSSES = [
 	},
 	{
 		id: 16,
-		x: "50%",
-		y: "30%",
+		x: '50%',
+		y: '30%',
 		size: 8,
 		opacity: 0.04,
 		delay: -2,
@@ -141,8 +141,8 @@ const CROSSES = [
 	},
 	{
 		id: 17,
-		x: "85%",
-		y: "78%",
+		x: '85%',
+		y: '78%',
 		size: 10,
 		opacity: 0.05,
 		delay: -5,
@@ -154,13 +154,11 @@ function LoginForm() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const { user, hasProfile, loading: authLoading } = useAuthContext();
-	const [rollNumber, setRollNumber] = useState("");
-	const [email, setEmail] = useState("");
-	const [step, setStep] = useState<"input" | "confirm" | "sent">("input");
+	const [rollNumber, setRollNumber] = useState('');
+	const [email, setEmail] = useState('');
+	const [step, setStep] = useState<'input' | 'confirm' | 'sent'>('input');
 	const [error, setError] = useState(
-		searchParams.get("error") === "auth_failed"
-			? "Authentication failed. Try again."
-			: "",
+		searchParams.get('error') === 'auth_failed' ? 'Authentication failed. Try again.' : '',
 	);
 	const [loading, setLoading] = useState(false);
 	const rollId = useId();
@@ -168,9 +166,9 @@ function LoginForm() {
 	useEffect(() => {
 		if (!authLoading && user) {
 			if (hasProfile) {
-				router.replace("/dashboard");
+				router.replace('/dashboard');
 			} else {
-				router.replace("/setup");
+				router.replace('/setup');
 			}
 		}
 	}, [authLoading, user, hasProfile, router]);
@@ -178,35 +176,33 @@ function LoginForm() {
 	const handleSubmit = () => {
 		const roll = parseInt(rollNumber, 10);
 		if (!ROLL.isValid(roll)) {
-			setError(
-				`Enter a valid roll number (${String(ROLL.min).padStart(2, "0")}–${ROLL.max})`,
-			);
+			setError(`Enter a valid roll number (${String(ROLL.min).padStart(2, '0')}–${ROLL.max})`);
 			return;
 		}
-		setError("");
+		setError('');
 		setEmail(ROLL.toEmail(roll));
-		setStep("confirm");
+		setStep('confirm');
 	};
 
 	const handleSendLink = async () => {
 		setLoading(true);
-		setError("");
+		setError('');
 		try {
-			const res = await fetch("/api/auth/validate-roll", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
+			const res = await fetch('/api/auth/validate-roll', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ rollNumber }),
 			});
 			const data = await res.json();
 			if (!res.ok) {
 				setError(data.error);
-				setStep("input");
+				setStep('input');
 			} else {
-				setStep("sent");
+				setStep('sent');
 			}
 		} catch {
-			setError("Network error. Try again.");
-			setStep("input");
+			setError('Network error. Try again.');
+			setStep('input');
 		} finally {
 			setLoading(false);
 		}
@@ -222,7 +218,7 @@ function LoginForm() {
 			<div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-neon-magenta/5 rounded-full blur-[160px] pointer-events-none animate-drift-reverse" />
 			<div
 				className="absolute top-[40%] right-[20%] w-[300px] h-[300px] bg-neon-cyan/3 rounded-full blur-[120px] pointer-events-none animate-drift"
-				style={{ animationDelay: "-12s" }}
+				style={{ animationDelay: '-12s' }}
 			/>
 
 			{/* Floating crosses */}
@@ -243,7 +239,7 @@ function LoginForm() {
 					transition={{
 						duration: c.duration,
 						repeat: Infinity,
-						ease: "easeInOut",
+						ease: 'easeInOut',
 						delay: c.delay,
 					}}
 				>
@@ -301,7 +297,7 @@ function LoginForm() {
 
 					<div className="p-4 md:p-8 relative z-10">
 						<AnimatePresence mode="wait">
-							{step === "input" && (
+							{step === 'input' && (
 								<motion.div
 									key="input"
 									initial={{ opacity: 0, x: 20 }}
@@ -325,10 +321,10 @@ function LoginForm() {
 											placeholder="01"
 											value={rollNumber}
 											onChange={(e) => {
-												setRollNumber(e.target.value.replace(/\D/g, ""));
-												setError("");
+												setRollNumber(e.target.value.replace(/\D/g, ''));
+												setError('');
 											}}
-											onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+											onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
 											className="form-input text-center text-2xl md:text-3xl tracking-[0.3em] md:tracking-[0.4em] border-2 font-black"
 										/>
 									</div>
@@ -364,7 +360,7 @@ function LoginForm() {
 								</motion.div>
 							)}
 
-							{step === "confirm" && (
+							{step === 'confirm' && (
 								<motion.div
 									key="confirm"
 									initial={{ opacity: 0, x: 20 }}
@@ -384,7 +380,7 @@ function LoginForm() {
 									<div className="flex gap-4">
 										<button
 											type="button"
-											onClick={() => setStep("input")}
+											onClick={() => setStep('input')}
 											className="bg-zinc-900 border border-border-hard text-text-primary px-6 py-4 flex-1 font-mono text-small uppercase tracking-widest font-black hover:bg-zinc-800 transition-colors"
 										>
 											Back
@@ -395,13 +391,13 @@ function LoginForm() {
 											disabled={loading}
 											className="btn-neon px-6 py-4 flex-1 disabled:opacity-50 text-small tracking-widest"
 										>
-											{loading ? "SENDING..." : "SEND MAGIC LINK"}
+											{loading ? 'SENDING...' : 'SEND MAGIC LINK'}
 										</button>
 									</div>
 								</motion.div>
 							)}
 
-							{step === "sent" && (
+							{step === 'sent' && (
 								<motion.div
 									key="sent"
 									initial={{ opacity: 0, scale: 0.9 }}
@@ -419,8 +415,7 @@ function LoginForm() {
 											LINK SENT
 										</h2>
 										<p className="text-text-secondary font-mono text-sm leading-relaxed uppercase tracking-widest px-4">
-											Magic link sent to{" "}
-											<span className="text-neon-cyan font-black">{email}</span>
+											Magic link sent to <span className="text-neon-cyan font-black">{email}</span>
 										</p>
 									</div>
 									<div className="bg-zinc-950 p-4 border border-border-subtle space-y-2">
@@ -431,8 +426,8 @@ function LoginForm() {
 									<button
 										type="button"
 										onClick={() => {
-											setStep("input");
-											setRollNumber("");
+											setStep('input');
+											setRollNumber('');
 										}}
 										className="text-text-secondary hover:text-white font-mono text-small uppercase tracking-mega font-black transition-colors"
 									>

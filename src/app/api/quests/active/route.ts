@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
 
 /**
  * GET /api/quests/active
@@ -12,7 +12,7 @@ export async function GET() {
 			data: { user },
 		} = await supabase.auth.getUser();
 		if (!user) {
-			return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+			return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 		}
 
 		// Get current week start (Monday)
@@ -21,13 +21,13 @@ export async function GET() {
 		const monday = new Date(now);
 		monday.setDate(now.getDate() - ((dayOfWeek + 6) % 7));
 		monday.setHours(0, 0, 0, 0);
-		const weekStartStr = monday.toISOString().split("T")[0];
+		const weekStartStr = monday.toISOString().split('T')[0];
 
 		const { data: quests } = await supabase
-			.from("quests")
-			.select("*")
-			.eq("week_start", weekStartStr)
-			.order("id");
+			.from('quests')
+			.select('*')
+			.eq('week_start', weekStartStr)
+			.order('id');
 
 		if (!quests || quests.length === 0) {
 			return NextResponse.json({ quests: [], week_start: weekStartStr });
@@ -36,14 +36,12 @@ export async function GET() {
 		// Get user's progress on these quests
 		const questIds = quests.map((q) => q.id);
 		const { data: userQuests } = await supabase
-			.from("user_quests")
-			.select("*")
-			.eq("user_id", user.id)
-			.in("quest_id", questIds);
+			.from('user_quests')
+			.select('*')
+			.eq('user_id', user.id)
+			.in('quest_id', questIds);
 
-		const progressMap = new Map(
-			(userQuests ?? []).map((uq) => [uq.quest_id, uq]),
-		);
+		const progressMap = new Map((userQuests ?? []).map((uq) => [uq.quest_id, uq]));
 
 		const enriched = quests.map((q) => ({
 			...q,
@@ -63,9 +61,6 @@ export async function GET() {
 			all_completed: allCompleted,
 		});
 	} catch {
-		return NextResponse.json(
-			{ error: "Internal server error" },
-			{ status: 500 },
-		);
+		return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 	}
 }

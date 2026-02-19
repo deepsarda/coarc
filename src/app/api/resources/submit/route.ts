@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
-import { RATE_LIMITS } from "@/lib/utils/constants";
-import { checkRateLimit } from "@/lib/utils/ratelimit";
+import { NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
+import { RATE_LIMITS } from '@/lib/utils/constants';
+import { checkRateLimit } from '@/lib/utils/ratelimit';
 
 /**
  * POST /api/resources/submit
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
 			data: { user },
 		} = await supabase.auth.getUser();
 		if (!user) {
-			return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+			return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 		}
 
 		const admin = createAdminClient();
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
 		const rateCheck = await checkRateLimit(
 			admin,
 			user.id,
-			"resource_submission",
+			'resource_submission',
 			RATE_LIMITS.RESOURCE_SUBMISSION,
 		);
 
@@ -36,29 +36,21 @@ export async function POST(request: Request) {
 			);
 		}
 
-		const {
-			title,
-			url: resourceUrl,
-			description,
-			topic,
-		} = await request.json();
+		const { title, url: resourceUrl, description, topic } = await request.json();
 
 		if (!title || !resourceUrl || !topic) {
-			return NextResponse.json(
-				{ error: "title, url, and topic required" },
-				{ status: 400 },
-			);
+			return NextResponse.json({ error: 'title, url, and topic required' }, { status: 400 });
 		}
 
 		const { data: resource, error } = await admin
-			.from("resources")
+			.from('resources')
 			.insert({
 				title,
 				url: resourceUrl,
 				description: description ?? null,
 				topic,
 				submitted_by: user.id,
-				status: "pending",
+				status: 'pending',
 			})
 			.select()
 			.single();
@@ -73,9 +65,6 @@ export async function POST(request: Request) {
 			remaining: rateCheck.remaining - 1,
 		});
 	} catch {
-		return NextResponse.json(
-			{ error: "Internal server error" },
-			{ status: 500 },
-		);
+		return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 	}
 }

@@ -22,7 +22,7 @@ export function parseCSV(content: string): { front: string; back: string }[] {
 
 function parseCSVLine(line: string): string[] {
 	const fields: string[] = [];
-	let current = "";
+	let current = '';
 	let inQuotes = false;
 	let i = 0;
 
@@ -50,9 +50,9 @@ function parseCSVLine(line: string): string[] {
 				i++;
 				continue;
 			}
-			if (char === ",") {
+			if (char === ',') {
 				fields.push(current);
-				current = "";
+				current = '';
 				i++;
 				continue;
 			}

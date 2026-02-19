@@ -1,5 +1,5 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
-import { type PushPayload, sendPush } from "./push";
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { type PushPayload, sendPush } from './push';
 
 /**
  * Create an in-app notification and optionally send a web push.
@@ -14,7 +14,7 @@ export async function createNotification(
 	sendPushNotification = true,
 ) {
 	// Insert notification row
-	const { error } = await admin.from("notifications").insert({
+	const { error } = await admin.from('notifications').insert({
 		user_id: userId,
 		type,
 		title,
@@ -25,23 +25,23 @@ export async function createNotification(
 	});
 
 	if (error) {
-		console.error("[Notify] Insert failed:", error.message);
+		console.error('[Notify] Insert failed:', error.message);
 		return;
 	}
 
 	// Attempt web push
 	if (sendPushNotification) {
 		const { data: profile } = await admin
-			.from("profiles")
-			.select("push_subscription")
-			.eq("id", userId)
+			.from('profiles')
+			.select('push_subscription')
+			.eq('id', userId)
 			.single();
 
 		if (profile?.push_subscription) {
 			const payload: PushPayload = {
 				title,
 				body,
-				url: (data?.url as string) ?? "/notifications",
+				url: (data?.url as string) ?? '/notifications',
 				tag: type,
 			};
 
@@ -49,11 +49,11 @@ export async function createNotification(
 			if (sent) {
 				// Mark push_sent on the most recent notification
 				await admin
-					.from("notifications")
+					.from('notifications')
 					.update({ push_sent: true })
-					.eq("user_id", userId)
-					.eq("type", type)
-					.order("created_at", { ascending: false })
+					.eq('user_id', userId)
+					.eq('type', type)
+					.order('created_at', { ascending: false })
 					.limit(1);
 			}
 		}
@@ -70,9 +70,7 @@ export async function notifyAllUsers(
 	body: string,
 	data?: Record<string, unknown>,
 ) {
-	const { data: profiles } = await admin
-		.from("profiles")
-		.select("id, push_subscription");
+	const { data: profiles } = await admin.from('profiles').select('id, push_subscription');
 
 	if (!profiles) return;
 
@@ -87,7 +85,7 @@ export async function notifyAllUsers(
 		push_sent: false,
 	}));
 
-	await admin.from("notifications").insert(rows);
+	await admin.from('notifications').insert(rows);
 
 	// Send pushes in parallel (non-blocking)
 	const pushPromises = profiles
@@ -96,7 +94,7 @@ export async function notifyAllUsers(
 			sendPush(p.push_subscription, {
 				title,
 				body,
-				url: (data?.url as string) ?? "/notifications",
+				url: (data?.url as string) ?? '/notifications',
 				tag: type,
 			}).catch(() => {}),
 		);

@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
-import { RATE_LIMITS } from "@/lib/utils/constants";
-import { checkRateLimit } from "@/lib/utils/ratelimit";
+import { NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
+import { RATE_LIMITS } from '@/lib/utils/constants';
+import { checkRateLimit } from '@/lib/utils/ratelimit';
 
 /**
  * POST /api/attendance/mark
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
 			data: { user },
 		} = await supabase.auth.getUser();
 		if (!user) {
-			return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+			return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 		}
 
 		const admin = createAdminClient();
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
 		const rateCheck = await checkRateLimit(
 			admin,
 			user.id,
-			"attendance_marks",
+			'attendance_marks',
 			RATE_LIMITS.ATTENDANCE_MARKS,
 		);
 
@@ -40,18 +40,18 @@ export async function POST(request: Request) {
 
 		if (!course_id || !date || slot === undefined || !status) {
 			return NextResponse.json(
-				{ error: "course_id, date, slot, status required" },
+				{ error: 'course_id, date, slot, status required' },
 				{ status: 400 },
 			);
 		}
 
-		if (!["attended", "bunked"].includes(status)) {
-			return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+		if (!['attended', 'bunked'].includes(status)) {
+			return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
 		}
 
 		// Upsert: allows updating if already marked
 		const { data: record, error } = await admin
-			.from("attendance_records")
+			.from('attendance_records')
 			.upsert(
 				{
 					user_id: user.id,
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
 					slot,
 					status,
 				},
-				{ onConflict: "user_id,course_id,date,slot" },
+				{ onConflict: 'user_id,course_id,date,slot' },
 			)
 			.select()
 			.single();
@@ -75,9 +75,6 @@ export async function POST(request: Request) {
 			remaining: rateCheck.remaining - 1,
 		});
 	} catch {
-		return NextResponse.json(
-			{ error: "Internal server error" },
-			{ status: 500 },
-		);
+		return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 	}
 }

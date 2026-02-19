@@ -1,7 +1,7 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
-import { checkAndAwardBadges } from "@/lib/gamification/badges";
-import { updateUserStreak } from "@/lib/gamification/streaks";
-import { syncUserStats } from "@/lib/services/sync";
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { checkAndAwardBadges } from '@/lib/gamification/badges';
+import { updateUserStreak } from '@/lib/gamification/streaks';
+import { syncUserStats } from '@/lib/services/sync';
 
 /**
  * Sync LeetCode data for all users with lc_handle set.
@@ -10,9 +10,9 @@ import { syncUserStats } from "@/lib/services/sync";
  */
 export async function syncAllLc(admin: SupabaseClient) {
 	const { data: users } = await admin
-		.from("profiles")
-		.select("id, cf_handle, lc_handle")
-		.not("lc_handle", "is", null);
+		.from('profiles')
+		.select('id, cf_handle, lc_handle')
+		.not('lc_handle', 'is', null);
 
 	if (!users || users.length === 0) return { synced: 0 };
 
@@ -36,9 +36,7 @@ export async function syncAllLc(admin: SupabaseClient) {
 				errors.push(`${user.lc_handle}: ${result.lc.error}`);
 			}
 		} catch (err) {
-			errors.push(
-				`${user.lc_handle}: ${err instanceof Error ? err.message : "Unknown"}`,
-			);
+			errors.push(`${user.lc_handle}: ${err instanceof Error ? err.message : 'Unknown'}`);
 		}
 
 		// Rate-limit: 2s between users
@@ -63,8 +61,8 @@ export async function syncAllLc(admin: SupabaseClient) {
 async function backfillMissingLcProblems(admin: SupabaseClient) {
 	// Get distinct slugs from submissions
 	const { data: submissionSlugs } = await admin
-		.from("lc_submissions")
-		.select("problem_slug")
+		.from('lc_submissions')
+		.select('problem_slug')
 		.limit(1000);
 
 	if (!submissionSlugs || submissionSlugs.length === 0) return 0;
@@ -73,9 +71,9 @@ async function backfillMissingLcProblems(admin: SupabaseClient) {
 
 	// Check which ones are already cached
 	const { data: existingProblems } = await admin
-		.from("lc_problems")
-		.select("slug")
-		.in("slug", allSlugs);
+		.from('lc_problems')
+		.select('slug')
+		.in('slug', allSlugs);
 
 	const existingSet = new Set((existingProblems ?? []).map((p) => p.slug));
 	const missingSlugs = allSlugs.filter((s) => !existingSet.has(s));
@@ -99,12 +97,12 @@ async function backfillMissingLcProblems(admin: SupabaseClient) {
 				}
 			`;
 
-			const res = await fetch("https://leetcode.com/graphql", {
-				method: "POST",
+			const res = await fetch('https://leetcode.com/graphql', {
+				method: 'POST',
 				headers: {
-					"Content-Type": "application/json",
-					Referer: "https://leetcode.com",
-					Origin: "https://leetcode.com",
+					'Content-Type': 'application/json',
+					Referer: 'https://leetcode.com',
+					Origin: 'https://leetcode.com',
 				},
 				body: JSON.stringify({
 					query,
@@ -118,7 +116,7 @@ async function backfillMissingLcProblems(admin: SupabaseClient) {
 			const q = data.data?.question;
 			if (!q) continue;
 
-			await admin.from("lc_problems").upsert(
+			await admin.from('lc_problems').upsert(
 				{
 					slug: q.titleSlug,
 					title: q.title,
@@ -127,7 +125,7 @@ async function backfillMissingLcProblems(admin: SupabaseClient) {
 					likes: q.likes ?? null,
 					url: `https://leetcode.com/problems/${q.titleSlug}/`,
 				},
-				{ onConflict: "slug" },
+				{ onConflict: 'slug' },
 			);
 
 			fetched++;

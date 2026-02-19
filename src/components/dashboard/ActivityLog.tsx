@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import { Radio, Satellite } from "lucide-react";
+import { motion } from 'framer-motion';
+import { Radio, Satellite } from 'lucide-react';
 
 export interface ActivityItem {
 	id: string;
-	platform: "cf" | "lc";
+	platform: 'cf' | 'lc';
 	title: string;
 	subtitle: string;
 	timestamp: string;
@@ -18,10 +18,7 @@ interface ActivityLogProps {
 
 const MAX_VISIBLE = 30;
 
-export default function ActivityLog({
-	activity,
-	hasPlatforms,
-}: ActivityLogProps) {
+export default function ActivityLog({ activity, hasPlatforms }: ActivityLogProps) {
 	const shown = activity.slice(0, MAX_VISIBLE);
 
 	return (
@@ -31,9 +28,7 @@ export default function ActivityLog({
 				<h3 className="dash-heading">
 					<span className="text-neon-cyan">::</span> Activity_Log
 				</h3>
-				{activity.length > 0 && (
-					<span className="dash-sub">{activity.length} entries</span>
-				)}
+				{activity.length > 0 && <span className="dash-sub">{activity.length} entries</span>}
 			</div>
 
 			{/* Items with strict height */}
@@ -53,10 +48,10 @@ export default function ActivityLog({
 						>
 							<span
 								className={`font-mono text-[11px] font-black shrink-0 w-6 text-center ${
-									item.platform === "lc" ? "text-orange-400" : "text-cyan-400"
+									item.platform === 'lc' ? 'text-orange-400' : 'text-cyan-400'
 								}`}
 							>
-								{item.platform === "lc" ? "LC" : "CF"}
+								{item.platform === 'lc' ? 'LC' : 'CF'}
 							</span>
 							<div className="flex-1 min-w-0">
 								<p className="text-text-primary font-mono text-sm font-bold truncate group-hover/row:text-neon-cyan transition-colors duration-200">
@@ -75,16 +70,10 @@ export default function ActivityLog({
 			) : (
 				<div className="flex flex-col items-center justify-center py-16 text-center space-y-3">
 					<div className="opacity-15">
-						{hasPlatforms ? (
-							<Radio className="w-10 h-10" />
-						) : (
-							<Satellite className="w-10 h-10" />
-						)}
+						{hasPlatforms ? <Radio className="w-10 h-10" /> : <Satellite className="w-10 h-10" />}
 					</div>
 					<p className="dash-heading">
-						{hasPlatforms
-							? "Hit SYNC to load activity"
-							: "Link a platform handle"}
+						{hasPlatforms ? 'Hit SYNC to load activity' : 'Link a platform handle'}
 					</p>
 				</div>
 			)}
@@ -100,9 +89,9 @@ function formatTimeAgo(timestamp: string): string {
 	const diffHours = Math.floor(diffMs / 3_600_000);
 	const diffDays = Math.floor(diffMs / 86_400_000);
 
-	if (diffMins < 1) return "now";
+	if (diffMins < 1) return 'now';
 	if (diffMins < 60) return `${diffMins}m`;
 	if (diffHours < 24) return `${diffHours}h`;
 	if (diffDays < 30) return `${diffDays}d`;
-	return new Date(timestamp).toLocaleDateString("en-IN");
+	return new Date(timestamp).toLocaleDateString('en-IN');
 }

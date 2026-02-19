@@ -1,4 +1,4 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 /**
  * Check if a user has exceeded their daily rate limit for an action.
@@ -8,11 +8,11 @@ export async function checkRateLimit(
 	admin: SupabaseClient,
 	userId: string,
 	action:
-		| "share_problem"
-		| "send_duel"
-		| "resource_submission"
-		| "attendance_marks"
-		| "problem_reactions",
+		| 'share_problem'
+		| 'send_duel'
+		| 'resource_submission'
+		| 'attendance_marks'
+		| 'problem_reactions',
 	limit: number,
 ): Promise<{ allowed: boolean; remaining: number; used: number }> {
 	const todayStart = new Date();
@@ -21,49 +21,49 @@ export async function checkRateLimit(
 	let count = 0;
 
 	switch (action) {
-		case "share_problem": {
+		case 'share_problem': {
 			const { count: c } = await admin
-				.from("shared_problems")
-				.select("id", { count: "exact", head: true })
-				.eq("user_id", userId)
-				.eq("source", "manual")
-				.gte("created_at", todayStart.toISOString());
+				.from('shared_problems')
+				.select('id', { count: 'exact', head: true })
+				.eq('user_id', userId)
+				.eq('source', 'manual')
+				.gte('created_at', todayStart.toISOString());
 			count = c ?? 0;
 			break;
 		}
-		case "send_duel": {
+		case 'send_duel': {
 			const { count: c } = await admin
-				.from("duels")
-				.select("id", { count: "exact", head: true })
-				.eq("challenger_id", userId)
-				.gte("created_at", todayStart.toISOString());
+				.from('duels')
+				.select('id', { count: 'exact', head: true })
+				.eq('challenger_id', userId)
+				.gte('created_at', todayStart.toISOString());
 			count = c ?? 0;
 			break;
 		}
-		case "resource_submission": {
+		case 'resource_submission': {
 			const { count: c } = await admin
-				.from("resources")
-				.select("id", { count: "exact", head: true })
-				.eq("submitted_by", userId)
-				.gte("created_at", todayStart.toISOString());
+				.from('resources')
+				.select('id', { count: 'exact', head: true })
+				.eq('submitted_by', userId)
+				.gte('created_at', todayStart.toISOString());
 			count = c ?? 0;
 			break;
 		}
-		case "attendance_marks": {
+		case 'attendance_marks': {
 			const { count: c } = await admin
-				.from("attendance_records")
-				.select("id", { count: "exact", head: true })
-				.eq("user_id", userId)
-				.gte("created_at", todayStart.toISOString());
+				.from('attendance_records')
+				.select('id', { count: 'exact', head: true })
+				.eq('user_id', userId)
+				.gte('created_at', todayStart.toISOString());
 			count = c ?? 0;
 			break;
 		}
-		case "problem_reactions": {
+		case 'problem_reactions': {
 			const { count: c } = await admin
-				.from("problem_reactions")
-				.select("id", { count: "exact", head: true })
-				.eq("user_id", userId)
-				.gte("created_at", todayStart.toISOString());
+				.from('problem_reactions')
+				.select('id', { count: 'exact', head: true })
+				.eq('user_id', userId)
+				.gte('created_at', todayStart.toISOString());
 			count = c ?? 0;
 			break;
 		}

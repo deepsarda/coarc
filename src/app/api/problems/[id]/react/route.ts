@@ -12,7 +12,7 @@ export async function POST(
 	try {
 		const { id } = await params;
 		const problemId = parseInt(id, 10);
-		if (isNaN(problemId)) {
+		if (Number.isNaN(problemId)) {
 			return NextResponse.json(
 				{ error: "Invalid problem ID" },
 				{ status: 400 },

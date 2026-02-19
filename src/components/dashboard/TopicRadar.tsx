@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import { Radar } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { motion } from 'framer-motion';
+import { Radar } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
 
 // Radar-style topic breakdown using pure CSS
 // Data from: cf_submissions.tags + lc_submissions joined with lc_problems.topics
@@ -20,46 +20,46 @@ interface TopicEntry {
 
 // Standard topic color map
 const TOPIC_COLORS: Record<string, string> = {
-	dp: "#00f0ff",
-	"dynamic programming": "#00f0ff",
-	graphs: "#f97316",
-	graph: "#f97316",
-	trees: "#22c55e",
-	tree: "#22c55e",
-	greedy: "#eab308",
-	"binary search": "#a855f7",
-	sorting: "#ec4899",
-	math: "#06b6d4",
-	implementation: "#64748b",
-	strings: "#f43f5e",
-	string: "#f43f5e",
-	"two pointers": "#8b5cf6",
-	"dfs and similar": "#f97316",
-	"brute force": "#78716c",
-	"data structures": "#3b82f6",
-	"constructive algorithms": "#14b8a6",
-	"number theory": "#06b6d4",
-	combinatorics: "#d946ef",
-	geometry: "#fb923c",
-	bitmasks: "#7c3aed",
-	array: "#3b82f6",
-	"hash table": "#8b5cf6",
-	stack: "#ef4444",
-	heap: "#f59e0b",
-	"sliding window": "#10b981",
-	backtracking: "#e11d48",
-	"linked list": "#6366f1",
-	matrix: "#0ea5e9",
-	"bit manipulation": "#7c3aed",
-	"divide and conquer": "#d97706",
-	"union find": "#0891b2",
-	trie: "#059669",
-	simulation: "#78716c",
+	dp: '#00f0ff',
+	'dynamic programming': '#00f0ff',
+	graphs: '#f97316',
+	graph: '#f97316',
+	trees: '#22c55e',
+	tree: '#22c55e',
+	greedy: '#eab308',
+	'binary search': '#a855f7',
+	sorting: '#ec4899',
+	math: '#06b6d4',
+	implementation: '#64748b',
+	strings: '#f43f5e',
+	string: '#f43f5e',
+	'two pointers': '#8b5cf6',
+	'dfs and similar': '#f97316',
+	'brute force': '#78716c',
+	'data structures': '#3b82f6',
+	'constructive algorithms': '#14b8a6',
+	'number theory': '#06b6d4',
+	combinatorics: '#d946ef',
+	geometry: '#fb923c',
+	bitmasks: '#7c3aed',
+	array: '#3b82f6',
+	'hash table': '#8b5cf6',
+	stack: '#ef4444',
+	heap: '#f59e0b',
+	'sliding window': '#10b981',
+	backtracking: '#e11d48',
+	'linked list': '#6366f1',
+	matrix: '#0ea5e9',
+	'bit manipulation': '#7c3aed',
+	'divide and conquer': '#d97706',
+	'union find': '#0891b2',
+	trie: '#059669',
+	simulation: '#78716c',
 };
 
 function getTopicColor(topic: string): string {
 	const key = topic.toLowerCase();
-	return TOPIC_COLORS[key] ?? "#6b7280";
+	return TOPIC_COLORS[key] ?? '#6b7280';
 }
 
 export default function TopicRadar({ userId }: TopicRadarProps) {
@@ -71,9 +71,9 @@ export default function TopicRadar({ userId }: TopicRadarProps) {
 
 		// CF submissions
 		const { data: cfSubs } = await supabase
-			.from("cf_submissions")
-			.select("tags")
-			.eq("user_id", userId);
+			.from('cf_submissions')
+			.select('tags')
+			.eq('user_id', userId);
 
 		if (cfSubs) {
 			for (const s of cfSubs) {
@@ -89,17 +89,17 @@ export default function TopicRadar({ userId }: TopicRadarProps) {
 
 		// LC submission, we need to cross-reference with lc_problems for topics
 		const { data: lcSubs } = await supabase
-			.from("lc_submissions")
-			.select("problem_slug")
-			.eq("user_id", userId);
+			.from('lc_submissions')
+			.select('problem_slug')
+			.eq('user_id', userId);
 
 		if (lcSubs && lcSubs.length > 0) {
 			const slugs = [...new Set(lcSubs.map((s) => s.problem_slug))];
 
 			const { data: problems } = await supabase
-				.from("lc_problems")
-				.select("slug, topics")
-				.in("slug", slugs.slice(0, 500));
+				.from('lc_problems')
+				.select('slug, topics')
+				.in('slug', slugs.slice(0, 500));
 
 			if (problems) {
 				for (const p of problems) {
@@ -115,9 +115,7 @@ export default function TopicRadar({ userId }: TopicRadarProps) {
 		}
 
 		// Build sorted array
-		const sorted = [...topicMap.entries()]
-			.sort((a, b) => b[1] - a[1])
-			.slice(0, 12); // Top 12 topics
+		const sorted = [...topicMap.entries()].sort((a, b) => b[1] - a[1]).slice(0, 12); // Top 12 topics
 
 		const maxVal = Math.max(1, sorted[0]?.[1] ?? 1);
 		const entries: TopicEntry[] = sorted.map(([topic, count]) => ({
@@ -169,10 +167,7 @@ export default function TopicRadar({ userId }: TopicRadarProps) {
 								<span className="font-mono text-xs uppercase tracking-widest font-bold text-text-muted group-hover:text-text-primary transition-colors truncate max-w-[60%]">
 									{t.topic}
 								</span>
-								<span
-									className="font-mono text-xs font-black tabular-nums"
-									style={{ color }}
-								>
+								<span className="font-mono text-xs font-black tabular-nums" style={{ color }}>
 									{t.count}
 								</span>
 							</div>

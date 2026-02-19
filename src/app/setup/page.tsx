@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { AnimatePresence, motion } from "framer-motion";
-import { useRouter } from "next/navigation";
-import { useEffect, useId, useMemo, useState } from "react";
-import { useAuthContext } from "@/components/providers/AuthProvider";
-import { extractCfHandle, extractLcHandle } from "@/lib/utils/handles";
+import { AnimatePresence, motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+import { useEffect, useId, useMemo, useState } from 'react';
+import { useAuthContext } from '@/components/providers/AuthProvider';
+import { extractCfHandle, extractLcHandle } from '@/lib/utils/handles';
 
 interface SetupRewards {
 	xp: { amount: number; reason: string }[];
@@ -14,23 +14,18 @@ interface SetupRewards {
 
 export default function SetupPage() {
 	const router = useRouter();
-	const {
-		user,
-		hasProfile,
-		loading: authLoading,
-		refetchProfile,
-	} = useAuthContext();
-	const [displayName, setDisplayName] = useState("");
-	const [cfHandle, setCfHandle] = useState("");
-	const [lcHandle, setLcHandle] = useState("");
+	const { user, hasProfile, loading: authLoading, refetchProfile } = useAuthContext();
+	const [displayName, setDisplayName] = useState('');
+	const [cfHandle, setCfHandle] = useState('');
+	const [lcHandle, setLcHandle] = useState('');
 	const [errors, setErrors] = useState<Record<string, string>>({});
 	const [loading, setLoading] = useState(false);
 
 	// Extract handles from URLs for preview
 	const extractedCf = useMemo(() => extractCfHandle(cfHandle), [cfHandle]);
 	const extractedLc = useMemo(() => extractLcHandle(lcHandle), [lcHandle]);
-	const cfIsUrl = cfHandle.includes("codeforces.com");
-	const lcIsUrl = lcHandle.includes("leetcode.com");
+	const cfIsUrl = cfHandle.includes('codeforces.com');
+	const lcIsUrl = lcHandle.includes('leetcode.com');
 
 	const [rewards, setRewards] = useState<SetupRewards | null>(null);
 
@@ -41,30 +36,30 @@ export default function SetupPage() {
 	// If user already has a profile, redirect to dashboard
 	useEffect(() => {
 		if (!authLoading && hasProfile) {
-			router.replace("/dashboard");
+			router.replace('/dashboard');
 		}
 	}, [authLoading, hasProfile, router]);
 
 	// If not authenticated, redirect to login
 	useEffect(() => {
 		if (!authLoading && !user) {
-			router.replace("/login");
+			router.replace('/login');
 		}
 	}, [authLoading, user, router]);
 
 	const handleSubmit = async () => {
 		if (!displayName.trim()) {
-			setErrors({ name: "Required" });
+			setErrors({ name: 'Required' });
 			return;
 		}
 
 		// Client-side: check that pasted URLs actually parse to a handle
 		if (cfHandle.trim() && !extractedCf) {
-			setErrors({ cf: "Could not extract handle from input" });
+			setErrors({ cf: 'Could not extract handle from input' });
 			return;
 		}
 		if (lcHandle.trim() && !extractedLc) {
-			setErrors({ lc: "Could not extract handle from input" });
+			setErrors({ lc: 'Could not extract handle from input' });
 			return;
 		}
 
@@ -72,15 +67,15 @@ export default function SetupPage() {
 		setErrors({});
 
 		if (!user) {
-			setErrors({ name: "Session expired. Please log in again." });
+			setErrors({ name: 'Session expired. Please log in again.' });
 			setLoading(false);
 			return;
 		}
 
 		try {
-			const res = await fetch("/api/auth/setup", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
+			const res = await fetch('/api/auth/setup', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					displayName: displayName.trim(),
 					cfHandle: cfHandle.trim() || null,
@@ -91,8 +86,8 @@ export default function SetupPage() {
 			const data = await res.json();
 
 			if (!res.ok) {
-				const errorField = data.field || "name";
-				setErrors({ [errorField]: data.error || "Setup failed" });
+				const errorField = data.field || 'name';
+				setErrors({ [errorField]: data.error || 'Setup failed' });
 				setLoading(false);
 				return;
 			}
@@ -103,7 +98,7 @@ export default function SetupPage() {
 			// Refetch profile so AuthContext is aware
 			await refetchProfile();
 		} catch {
-			setErrors({ name: "Network error. Try again." });
+			setErrors({ name: 'Network error. Try again.' });
 			setLoading(false);
 		}
 	};
@@ -133,36 +128,36 @@ export default function SetupPage() {
 				<div className="absolute top-[15%] left-[10%] w-1 h-1 bg-neon-cyan/20 animate-float" />
 				<div
 					className="absolute top-[25%] right-[20%] w-0.5 h-0.5 bg-neon-cyan/15 animate-float"
-					style={{ animationDelay: "-1.5s" }}
+					style={{ animationDelay: '-1.5s' }}
 				/>
 				<div
 					className="absolute bottom-[30%] left-[25%] w-1 h-1 bg-neon-magenta/15 animate-float"
-					style={{ animationDelay: "-2s" }}
+					style={{ animationDelay: '-2s' }}
 				/>
 				<div
 					className="absolute top-[60%] right-[15%] w-0.5 h-0.5 bg-neon-cyan/20 animate-float"
-					style={{ animationDelay: "-0.8s" }}
+					style={{ animationDelay: '-0.8s' }}
 				/>
 				<div
 					className="absolute bottom-[15%] left-[60%] w-1 h-1 bg-neon-green/10 animate-float"
-					style={{ animationDelay: "-2.5s" }}
+					style={{ animationDelay: '-2.5s' }}
 				/>
 				{/* Small + symbols */}
 				<span
 					className="absolute top-[20%] right-[30%] text-neon-cyan/10 font-mono text-xs animate-float"
-					style={{ animationDelay: "-1s" }}
+					style={{ animationDelay: '-1s' }}
 				>
 					+
 				</span>
 				<span
 					className="absolute bottom-[25%] left-[15%] text-neon-cyan/10 font-mono text-xs animate-float"
-					style={{ animationDelay: "-3s" }}
+					style={{ animationDelay: '-3s' }}
 				>
 					+
 				</span>
 				<span
 					className="absolute top-[70%] right-[40%] text-neon-magenta/8 font-mono text-xs animate-float"
-					style={{ animationDelay: "-2.2s" }}
+					style={{ animationDelay: '-2.2s' }}
 				>
 					+
 				</span>
@@ -206,7 +201,7 @@ export default function SetupPage() {
 									animate={{ scale: 1 }}
 									transition={{
 										delay: 0.2,
-										type: "spring",
+										type: 'spring',
 										stiffness: 200,
 										damping: 15,
 									}}
@@ -237,9 +232,7 @@ export default function SetupPage() {
 									className="space-y-4"
 								>
 									<div className="bg-zinc-950 border border-neon-cyan/20 p-6 space-y-4">
-										<p className="scifi-label text-tiny tracking-widest">
-											:: REWARDS RECEIVED
-										</p>
+										<p className="scifi-label text-tiny tracking-widest">:: REWARDS RECEIVED</p>
 
 										{rewards.xp.map((xpItem, i) => (
 											<motion.div
@@ -265,7 +258,7 @@ export default function SetupPage() {
 											<motion.span
 												initial={{ scale: 0.5, opacity: 0 }}
 												animate={{ scale: 1, opacity: 1 }}
-												transition={{ delay: 0.8, type: "spring" }}
+												transition={{ delay: 0.8, type: 'spring' }}
 												className="text-neon-cyan font-mono font-black text-2xl tabular-nums"
 											>
 												+{rewards.totalXP} XP
@@ -274,13 +267,13 @@ export default function SetupPage() {
 									</div>
 
 									{/* Genesis Badge */}
-									{rewards.badges.includes("genesis") && (
+									{rewards.badges.includes('genesis') && (
 										<motion.div
 											initial={{ opacity: 0, scale: 0.8 }}
 											animate={{ opacity: 1, scale: 1 }}
 											transition={{
 												delay: 1.0,
-												type: "spring",
+												type: 'spring',
 												stiffness: 150,
 											}}
 											className="bg-zinc-950 border-2 border-neon-green/30 p-6 relative overflow-hidden"
@@ -303,8 +296,7 @@ export default function SetupPage() {
 														GENESIS BADGE EARNED
 													</p>
 													<p className="text-text-secondary font-mono text-small mt-1">
-														One of the first to join CO.ARC, forever on your
-														profile
+														One of the first to join CO.ARC, forever on your profile
 													</p>
 												</div>
 											</div>
@@ -320,7 +312,7 @@ export default function SetupPage() {
 								>
 									<button
 										type="button"
-										onClick={() => router.push("/dashboard")}
+										onClick={() => router.push('/dashboard')}
 										className="btn-neon w-full py-5 text-sm tracking-[0.2em]"
 									>
 										ENTER THE ARC →
@@ -358,9 +350,7 @@ export default function SetupPage() {
 							<div className="terminal-bar px-6 py-4">
 								<div className="flex items-center gap-3">
 									<div className="w-2.5 h-2.5 bg-neon-cyan rounded-none animate-pulse" />
-									<p className="scifi-label tracking-widest">
-										SET UP YOUR PROFILE
-									</p>
+									<p className="scifi-label tracking-widest">SET UP YOUR PROFILE</p>
 								</div>
 							</div>
 
@@ -465,7 +455,7 @@ export default function SetupPage() {
 										disabled={loading || !displayName.trim()}
 										className="btn-neon w-full py-5 text-sm tracking-[0.2em] disabled:grayscale disabled:opacity-30"
 									>
-										{loading ? "SETTING UP..." : "COMPLETE SETUP →"}
+										{loading ? 'SETTING UP...' : 'COMPLETE SETUP →'}
 									</button>
 								</div>
 

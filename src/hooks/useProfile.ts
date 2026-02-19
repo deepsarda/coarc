@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
-import type { Profile } from "@/types/gamification";
-import { useAuth } from "./useAuth";
+import { useCallback, useEffect, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import type { Profile } from '@/types/gamification';
+import { useAuth } from './useAuth';
 
 export function useProfile() {
 	const { user, loading: authLoading } = useAuth();
@@ -20,9 +20,9 @@ export function useProfile() {
 
 		try {
 			const { data, error } = await supabase
-				.from("profiles")
-				.select("*")
-				.eq("id", user.id)
+				.from('profiles')
+				.select('*')
+				.eq('id', user.id)
 				.single();
 
 			if (error || !data) {

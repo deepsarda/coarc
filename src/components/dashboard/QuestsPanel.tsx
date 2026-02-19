@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import { CheckSquare2, Crosshair, Square } from "lucide-react";
+import { motion } from 'framer-motion';
+import { CheckSquare2, Crosshair, Square } from 'lucide-react';
 
 export interface QuestItem {
 	id: string;
@@ -24,8 +24,7 @@ export default function QuestsPanel({ quests }: QuestsPanelProps) {
 		<div>
 			<div className="flex items-center justify-between mb-4">
 				<h3 className="dash-heading">
-					<Crosshair className="w-4 h-4 text-neon-cyan opacity-50" /> Weekly
-					Quests
+					<Crosshair className="w-4 h-4 text-neon-cyan opacity-50" /> Weekly Quests
 				</h3>
 				<span className="dash-sub">
 					{completed}/{quests.length}
@@ -38,8 +37,8 @@ export default function QuestsPanel({ quests }: QuestsPanelProps) {
 							key={q.id}
 							className={`flex items-start gap-3 p-3 border-l-2 transition-colors ${
 								q.completed
-									? "border-l-emerald-400/40 bg-emerald-400/3"
-									: "border-l-border-subtle dash-row-hover"
+									? 'border-l-emerald-400/40 bg-emerald-400/3'
+									: 'border-l-border-subtle dash-row-hover'
 							}`}
 						>
 							{q.completed ? (
@@ -50,7 +49,7 @@ export default function QuestsPanel({ quests }: QuestsPanelProps) {
 							<div className="flex-1 min-w-0">
 								<div className="flex items-center justify-between gap-2">
 									<span
-										className={`font-mono text-xs uppercase tracking-widest font-black truncate ${q.completed ? "text-emerald-400/70 line-through" : "text-text-primary"}`}
+										className={`font-mono text-xs uppercase tracking-widest font-black truncate ${q.completed ? 'text-emerald-400/70 line-through' : 'text-text-primary'}`}
 									>
 										{q.title}
 									</span>
@@ -80,9 +79,7 @@ export default function QuestsPanel({ quests }: QuestsPanelProps) {
 					))}
 				</div>
 			) : (
-				<p className="text-text-dim text-sm font-mono pl-6">
-					No quests this week yet.
-				</p>
+				<p className="text-text-dim text-sm font-mono pl-6">No quests this week yet.</p>
 			)}
 		</div>
 	);

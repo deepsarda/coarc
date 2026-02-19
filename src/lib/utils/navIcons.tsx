@@ -19,57 +19,50 @@ import {
 	Trophy,
 	User,
 	Users,
-} from "lucide-react";
-import type { ReactNode } from "react";
-import type { NavItem } from "@/lib/utils/constants";
-import {
-	ADMIN_NAV_ITEMS_RAW,
-	MOBILE_NAV_ITEMS_RAW,
-	NAV_ITEMS_RAW,
-} from "@/lib/utils/constants";
+} from 'lucide-react';
+import type { ReactNode } from 'react';
+import type { NavItem } from '@/lib/utils/constants';
+import { ADMIN_NAV_ITEMS_RAW, MOBILE_NAV_ITEMS_RAW, NAV_ITEMS_RAW } from '@/lib/utils/constants';
 
-const SIZE = "w-[18px] h-[18px]";
-const SIZE_MOBILE = "w-5 h-5";
+const SIZE = 'w-[18px] h-[18px]';
+const SIZE_MOBILE = 'w-5 h-5';
 
 /** href → Lucide icon */
 const NAV_ICON_MAP: Record<string, ReactNode> = {
-	"/dashboard": <LayoutDashboard className={SIZE} />,
-	"/leaderboard": <Trophy className={SIZE} />,
-	"/problems": <Code className={SIZE} />,
-	"/problems/daily": <CalendarDays className={SIZE} />,
-	"/duels": <Swords className={SIZE} />,
-	"/boss": <Skull className={SIZE} />,
-	"/quests": <Crosshair className={SIZE} />,
-	"/attendance": <CalendarCheck className={SIZE} />,
-	"/flashcards": <Layers className={SIZE} />,
-	"/resources": <BookOpen className={SIZE} />,
-	"/announcements": <Megaphone className={SIZE} />,
-	"/hall-of-fame": <Crown className={SIZE} />,
-	"/profile/me": <User className={SIZE} />,
+	'/dashboard': <LayoutDashboard className={SIZE} />,
+	'/leaderboard': <Trophy className={SIZE} />,
+	'/problems': <Code className={SIZE} />,
+	'/problems/daily': <CalendarDays className={SIZE} />,
+	'/duels': <Swords className={SIZE} />,
+	'/boss': <Skull className={SIZE} />,
+	'/quests': <Crosshair className={SIZE} />,
+	'/attendance': <CalendarCheck className={SIZE} />,
+	'/flashcards': <Layers className={SIZE} />,
+	'/resources': <BookOpen className={SIZE} />,
+	'/announcements': <Megaphone className={SIZE} />,
+	'/hall-of-fame': <Crown className={SIZE} />,
+	'/profile/me': <User className={SIZE} />,
 	// admin
-	"/admin": <Settings className={SIZE} />,
-	"/admin/users": <Users className={SIZE} />,
-	"/admin/courses": <BookOpen className={SIZE} />,
-	"/admin/daily": <CalendarDays className={SIZE} />,
-	"/admin/boss": <Skull className={SIZE} />,
-	"/admin/quests": <ScrollText className={SIZE} />,
-	"/admin/flashcards": <Layers className={SIZE} />,
-	"/admin/resources": <BookOpen className={SIZE} />,
-	"/admin/announcements": <Megaphone className={SIZE} />,
+	'/admin': <Settings className={SIZE} />,
+	'/admin/users': <Users className={SIZE} />,
+	'/admin/courses': <BookOpen className={SIZE} />,
+	'/admin/daily': <CalendarDays className={SIZE} />,
+	'/admin/boss': <Skull className={SIZE} />,
+	'/admin/quests': <ScrollText className={SIZE} />,
+	'/admin/flashcards': <Layers className={SIZE} />,
+	'/admin/resources': <BookOpen className={SIZE} />,
+	'/admin/announcements': <Megaphone className={SIZE} />,
 };
 
 const MOBILE_ICON_MAP: Record<string, ReactNode> = {
-	"/dashboard": <LayoutDashboard className={SIZE_MOBILE} />,
-	"/leaderboard": <Trophy className={SIZE_MOBILE} />,
-	"/problems": <Code className={SIZE_MOBILE} />,
-	"/duels": <Swords className={SIZE_MOBILE} />,
-	"/profile/me": <User className={SIZE_MOBILE} />,
+	'/dashboard': <LayoutDashboard className={SIZE_MOBILE} />,
+	'/leaderboard': <Trophy className={SIZE_MOBILE} />,
+	'/problems': <Code className={SIZE_MOBILE} />,
+	'/duels': <Swords className={SIZE_MOBILE} />,
+	'/profile/me': <User className={SIZE_MOBILE} />,
 };
 
-function attach(
-	raw: Omit<NavItem, "icon">[],
-	map: Record<string, ReactNode>,
-): NavItem[] {
+function attach(raw: Omit<NavItem, 'icon'>[], map: Record<string, ReactNode>): NavItem[] {
 	return raw.map((r) => ({
 		...r,
 		icon: map[r.href] ?? <Code className={SIZE} />,

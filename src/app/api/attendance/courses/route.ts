@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
+import { NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
 
 /**
  * GET /api/attendance/courses
@@ -16,21 +16,18 @@ export async function GET() {
 			data: { user },
 		} = await supabase.auth.getUser();
 		if (!user) {
-			return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+			return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 		}
 
 		const { data: courses } = await supabase
-			.from("courses")
-			.select("*")
-			.eq("is_active", true)
-			.order("name");
+			.from('courses')
+			.select('*')
+			.eq('is_active', true)
+			.order('name');
 
 		return NextResponse.json({ courses: courses ?? [] });
 	} catch {
-		return NextResponse.json(
-			{ error: "Internal server error" },
-			{ status: 500 },
-		);
+		return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 	}
 }
 
@@ -41,32 +38,28 @@ export async function POST(request: Request) {
 			data: { user },
 		} = await supabase.auth.getUser();
 		if (!user) {
-			return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+			return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 		}
 
 		const admin = createAdminClient();
 
 		const { data: profile } = await admin
-			.from("profiles")
-			.select("is_admin")
-			.eq("id", user.id)
+			.from('profiles')
+			.select('is_admin')
+			.eq('id', user.id)
 			.single();
 
 		if (!profile?.is_admin) {
-			return NextResponse.json({ error: "Admin only" }, { status: 403 });
+			return NextResponse.json({ error: 'Admin only' }, { status: 403 });
 		}
 
-		const { name, code, color, classes_per_week, semester_end } =
-			await request.json();
+		const { name, code, color, classes_per_week, semester_end } = await request.json();
 		if (!name || !color) {
-			return NextResponse.json(
-				{ error: "name and color required" },
-				{ status: 400 },
-			);
+			return NextResponse.json({ error: 'name and color required' }, { status: 400 });
 		}
 
 		const { data: course, error } = await admin
-			.from("courses")
+			.from('courses')
 			.insert({
 				name,
 				code: code ?? null,
@@ -84,9 +77,6 @@ export async function POST(request: Request) {
 
 		return NextResponse.json({ success: true, course });
 	} catch {
-		return NextResponse.json(
-			{ error: "Internal server error" },
-			{ status: 500 },
-		);
+		return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 	}
 }

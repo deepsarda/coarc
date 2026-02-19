@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useAuthContext } from "@/components/providers/AuthProvider";
-import { getLevelForXP } from "@/lib/utils/constants";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useAuthContext } from '@/components/providers/AuthProvider';
+import { getLevelForXP } from '@/lib/utils/constants';
 
 export default function Navbar() {
 	const { user, profile, loading, signOut } = useAuthContext();
@@ -11,7 +11,7 @@ export default function Navbar() {
 	const pathname = usePathname();
 
 	// Don't show navbar on specific pages
-	if (["/login", "/setup"].includes(pathname)) return null;
+	if (['/login', '/setup'].includes(pathname)) return null;
 
 	const levelInfo = profile ? getLevelForXP(profile.xp) : null;
 

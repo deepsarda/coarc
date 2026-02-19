@@ -1,4 +1,4 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 /**
  * Auto-generate weekly quests if admin hasn't curated ones for this week.
@@ -11,22 +11,17 @@ export async function runGenerateQuests(admin: SupabaseClient) {
 	const monday = new Date(now);
 	monday.setDate(now.getDate() - ((dayOfWeek + 6) % 7));
 	monday.setHours(0, 0, 0, 0);
-	const weekStartStr = monday.toISOString().split("T")[0];
+	const weekStartStr = monday.toISOString().split('T')[0];
 
 	// Check if quests already exist for this week
-	const { data: existing } = await admin
-		.from("quests")
-		.select("id")
-		.eq("week_start", weekStartStr);
+	const { data: existing } = await admin.from('quests').select('id').eq('week_start', weekStartStr);
 
 	if (existing && existing.length > 0) {
-		return { skipped: true, reason: "Quests already exist for this week" };
+		return { skipped: true, reason: 'Quests already exist for this week' };
 	}
 
 	// Analyze class-wide topic weaknesses
-	const { data: allSubs } = await admin
-		.from("cf_submissions")
-		.select("tags, verdict");
+	const { data: allSubs } = await admin.from('cf_submissions').select('tags, verdict');
 
 	const topicSolves = new Map<string, number>();
 	const topicAttempts = new Map<string, number>();
@@ -35,7 +30,7 @@ export async function runGenerateQuests(admin: SupabaseClient) {
 		const tags = (sub.tags as string[]) ?? [];
 		for (const tag of tags) {
 			topicAttempts.set(tag, (topicAttempts.get(tag) ?? 0) + 1);
-			if (sub.verdict === "OK") {
+			if (sub.verdict === 'OK') {
 				topicSolves.set(tag, (topicSolves.get(tag) ?? 0) + 1);
 			}
 		}
@@ -65,9 +60,9 @@ export async function runGenerateQuests(admin: SupabaseClient) {
 		quests.push({
 			title: `${capitalize(weakest.topic)} Practice`,
 			description: `Solve 3 ${weakest.topic} problems this week`,
-			quest_type: "topic",
+			quest_type: 'topic',
 			condition: {
-				type: "solve_topic",
+				type: 'solve_topic',
 				topic: weakest.topic,
 				count: 3,
 			},
@@ -77,11 +72,11 @@ export async function runGenerateQuests(admin: SupabaseClient) {
 
 	// Quest 2: Difficulty quest
 	quests.push({
-		title: "Level Up Challenge",
-		description: "Solve a problem rated 1400+ on Codeforces",
-		quest_type: "difficulty",
+		title: 'Level Up Challenge',
+		description: 'Solve a problem rated 1400+ on Codeforces',
+		quest_type: 'difficulty',
 		condition: {
-			type: "solve_rating",
+			type: 'solve_rating',
 			min_rating: 1400,
 			count: 1,
 		},
@@ -90,11 +85,11 @@ export async function runGenerateQuests(admin: SupabaseClient) {
 
 	// Quest 3: Social quest
 	quests.push({
-		title: "Knowledge Sharing",
-		description: "Share a problem with your classmates",
-		quest_type: "social",
+		title: 'Knowledge Sharing',
+		description: 'Share a problem with your classmates',
+		quest_type: 'social',
 		condition: {
-			type: "share_problem",
+			type: 'share_problem',
 			count: 1,
 		},
 		xp_reward: 50,
@@ -107,16 +102,16 @@ export async function runGenerateQuests(admin: SupabaseClient) {
 		is_admin_curated: false,
 	}));
 
-	await admin.from("quests").insert(questRows);
+	await admin.from('quests').insert(questRows);
 
 	// Create user_quests entries for all users
 	const { data: insertedQuests } = await admin
-		.from("quests")
-		.select("id")
-		.eq("week_start", weekStartStr);
+		.from('quests')
+		.select('id')
+		.eq('week_start', weekStartStr);
 
 	if (insertedQuests) {
-		const { data: allUsers } = await admin.from("profiles").select("id");
+		const { data: allUsers } = await admin.from('profiles').select('id');
 		if (allUsers) {
 			const userQuestRows = allUsers.flatMap((user) =>
 				insertedQuests.map((quest) => ({
@@ -126,8 +121,8 @@ export async function runGenerateQuests(admin: SupabaseClient) {
 					completed: false,
 				})),
 			);
-			await admin.from("user_quests").upsert(userQuestRows, {
-				onConflict: "user_id,quest_id",
+			await admin.from('user_quests').upsert(userQuestRows, {
+				onConflict: 'user_id,quest_id',
 			});
 		}
 	}

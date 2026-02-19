@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
 
 /**
  * GET /api/boss/archive
@@ -12,16 +12,16 @@ export async function GET() {
 			data: { user },
 		} = await supabase.auth.getUser();
 		if (!user) {
-			return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+			return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 		}
 
 		const now = new Date().toISOString();
 
 		const { data: bosses } = await supabase
-			.from("boss_battles")
-			.select("*")
-			.lt("ends_at", now)
-			.order("ends_at", { ascending: false });
+			.from('boss_battles')
+			.select('*')
+			.lt('ends_at', now)
+			.order('ends_at', { ascending: false });
 
 		if (!bosses) {
 			return NextResponse.json({ bosses: [] });
@@ -31,15 +31,15 @@ export async function GET() {
 		const enriched = await Promise.all(
 			bosses.map(async (boss) => {
 				const { count } = await supabase
-					.from("boss_battle_solves")
-					.select("id", { count: "exact", head: true })
-					.eq("boss_battle_id", boss.id);
+					.from('boss_battle_solves')
+					.select('id', { count: 'exact', head: true })
+					.eq('boss_battle_id', boss.id);
 
 				const { data: userSolve } = await supabase
-					.from("boss_battle_solves")
-					.select("solve_rank, solved_at")
-					.eq("boss_battle_id", boss.id)
-					.eq("user_id", user.id)
+					.from('boss_battle_solves')
+					.select('solve_rank, solved_at')
+					.eq('boss_battle_id', boss.id)
+					.eq('user_id', user.id)
 					.single();
 
 				return {
@@ -53,9 +53,6 @@ export async function GET() {
 
 		return NextResponse.json({ bosses: enriched });
 	} catch {
-		return NextResponse.json(
-			{ error: "Internal server error" },
-			{ status: 500 },
-		);
+		return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 	}
 }

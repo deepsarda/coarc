@@ -1,4 +1,4 @@
-import { LeetCode } from "leetcode-query";
+import { LeetCode } from 'leetcode-query';
 
 const lc = new LeetCode();
 
@@ -32,18 +32,15 @@ export async function fetchLcStats(handle: string): Promise<LcUserStats> {
 	}
 
 	const acStats = user.submitStats?.acSubmissionNum ?? [];
-	const getCount = (diff: string) =>
-		acStats.find((s) => s.difficulty === diff)?.count ?? 0;
+	const getCount = (diff: string) => acStats.find((s) => s.difficulty === diff)?.count ?? 0;
 
-	const easy = getCount("Easy");
-	const medium = getCount("Medium");
-	const hard = getCount("Hard");
+	const easy = getCount('Easy');
+	const medium = getCount('Medium');
+	const hard = getCount('Hard');
 
 	let calendar: Record<string, number> | null = null;
 	try {
-		calendar = user.submissionCalendar
-			? JSON.parse(user.submissionCalendar)
-			: null;
+		calendar = user.submissionCalendar ? JSON.parse(user.submissionCalendar) : null;
 	} catch {
 		calendar = null;
 	}
@@ -84,7 +81,7 @@ export async function fetchLcRecentSubmissions(
 	return submissions.map((s) => ({
 		problemSlug: s.titleSlug,
 		problemTitle: s.title,
-		difficulty: "Unknown", // Not available in recent_submissions, filled by stats
+		difficulty: 'Unknown', // Not available in recent_submissions, filled by stats
 		submittedAt: new Date(Number(s.timestamp) * 1000),
 		status: s.statusDisplay,
 	}));

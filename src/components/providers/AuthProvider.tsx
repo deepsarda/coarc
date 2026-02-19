@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import type { Session, User } from "@supabase/supabase-js";
+import type { Session, User } from '@supabase/supabase-js';
 import {
 	createContext,
 	type ReactNode,
@@ -9,9 +9,9 @@ import {
 	useEffect,
 	useMemo,
 	useState,
-} from "react";
-import { createClient } from "@/lib/supabase/client";
-import type { Profile } from "@/types/gamification";
+} from 'react';
+import { createClient } from '@/lib/supabase/client';
+import type { Profile } from '@/types/gamification';
 
 interface AuthContextValue {
 	session: Session | null;
@@ -45,11 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const fetchProfile = useCallback(
 		async (userId: string) => {
 			try {
-				const { data } = await supabase
-					.from("profiles")
-					.select("*")
-					.eq("id", userId)
-					.single();
+				const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();
 
 				setProfile((data as Profile) ?? null);
 			} catch {
@@ -91,7 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const signOut = useCallback(async () => {
 		await supabase.auth.signOut();
 		setProfile(null);
-		window.location.href = "/";
+		window.location.href = '/';
 	}, [supabase]);
 
 	const refetchProfile = useCallback(async () => {
@@ -120,7 +116,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuthContext() {
 	const ctx = useContext(AuthContext);
 	if (!ctx) {
-		throw new Error("useAuthContext must be used within AuthProvider");
+		throw new Error('useAuthContext must be used within AuthProvider');
 	}
 	return ctx;
 }

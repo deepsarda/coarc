@@ -1,15 +1,11 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
 /**
  * Animated counter hook, counts from 0 to `end` over `duration` ms.
  */
-export function useAnimatedCounter(
-	end: number,
-	duration = 1200,
-	delay = 0,
-): number {
+export function useAnimatedCounter(end: number, duration = 1200, delay = 0): number {
 	const [value, setValue] = useState(0);
 	const rafRef = useRef<number>(0);
 

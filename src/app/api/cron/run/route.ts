@@ -1,14 +1,14 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
-import { NextResponse } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { runCheckDuels } from "./jobs/check-duels";
-import { runComputeRankings } from "./jobs/compute-rankings";
-import { runGenerateDaily } from "./jobs/generate-daily";
-import { runGenerateQuests } from "./jobs/generate-quests";
-import { syncAllCf } from "./jobs/sync-cf";
-import { syncAllLc } from "./jobs/sync-lc";
-import { runUpdateStreaks } from "./jobs/update-streaks";
-import { runWeeklyDigest } from "./jobs/weekly-digest";
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { runCheckDuels } from './jobs/check-duels';
+import { runComputeRankings } from './jobs/compute-rankings';
+import { runGenerateDaily } from './jobs/generate-daily';
+import { runGenerateQuests } from './jobs/generate-quests';
+import { syncAllCf } from './jobs/sync-cf';
+import { syncAllLc } from './jobs/sync-lc';
+import { runUpdateStreaks } from './jobs/update-streaks';
+import { runWeeklyDigest } from './jobs/weekly-digest';
 
 const CRON_SECRET = process.env.CRON_SECRET;
 
@@ -22,9 +22,9 @@ async function shouldRunJob(
 	minIntervalHours: number,
 ): Promise<boolean> {
 	const { data } = await admin
-		.from("cron_runs")
-		.select("last_run_at")
-		.eq("job_name", jobName)
+		.from('cron_runs')
+		.select('last_run_at')
+		.eq('job_name', jobName)
 		.single();
 
 	if (!data) return true;
@@ -37,27 +37,23 @@ async function shouldRunJob(
 /**
  * Record that a job ran successfully.
  */
-async function recordJobRun(
-	admin: SupabaseClient,
-	jobName: string,
-	result: unknown,
-) {
-	await admin.from("cron_runs").upsert(
+async function recordJobRun(admin: SupabaseClient, jobName: string, result: unknown) {
+	await admin.from('cron_runs').upsert(
 		{
 			job_name: jobName,
 			last_run_at: new Date().toISOString(),
 			result: result as Record<string, unknown>,
 		},
-		{ onConflict: "job_name" },
+		{ onConflict: 'job_name' },
 	);
 }
 
 // Jobs that should only run once per interval (hours)
 const JOB_INTERVALS: Record<string, number> = {
-	"generate-daily": 23,
-	"generate-quests": 23,
-	"weekly-digest": 144, // 6 days
-	"compute-rankings": 23,
+	'generate-daily': 23,
+	'generate-quests': 23,
+	'weekly-digest': 144, // 6 days
+	'compute-rankings': 23,
 };
 
 /**
@@ -68,9 +64,9 @@ const JOB_INTERVALS: Record<string, number> = {
  */
 export async function POST(request: Request) {
 	// Auth check
-	const authHeader = request.headers.get("authorization");
+	const authHeader = request.headers.get('authorization');
 	if (CRON_SECRET && authHeader !== `Bearer ${CRON_SECRET}`) {
-		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 	}
 
 	const body = await request.json().catch(() => ({}));
@@ -80,14 +76,14 @@ export async function POST(request: Request) {
 	const results: Record<string, unknown> = {};
 
 	const allJobs: Record<string, () => Promise<unknown>> = {
-		"sync-cf": () => syncAllCf(admin),
-		"sync-lc": () => syncAllLc(admin),
-		"update-streaks": () => runUpdateStreaks(admin),
-		"generate-daily": () => runGenerateDaily(admin),
-		"generate-quests": () => runGenerateQuests(admin),
-		"weekly-digest": () => runWeeklyDigest(admin),
-		"check-duels": () => runCheckDuels(admin),
-		"compute-rankings": () => runComputeRankings(admin),
+		'sync-cf': () => syncAllCf(admin),
+		'sync-lc': () => syncAllLc(admin),
+		'update-streaks': () => runUpdateStreaks(admin),
+		'generate-daily': () => runGenerateDaily(admin),
+		'generate-quests': () => runGenerateQuests(admin),
+		'weekly-digest': () => runWeeklyDigest(admin),
+		'check-duels': () => runCheckDuels(admin),
+		'compute-rankings': () => runComputeRankings(admin),
 	};
 
 	const jobsToRun = requestedJobs
@@ -103,7 +99,7 @@ export async function POST(request: Request) {
 				if (!shouldRun) {
 					results[jobName] = {
 						skipped: true,
-						reason: "Too soon since last run",
+						reason: 'Too soon since last run',
 					};
 					continue;
 				}
@@ -126,7 +122,7 @@ export async function POST(request: Request) {
 		} catch (err) {
 			results[jobName] = {
 				success: false,
-				error: err instanceof Error ? err.message : "Unknown error",
+				error: err instanceof Error ? err.message : 'Unknown error',
 			};
 		}
 	}
@@ -141,9 +137,9 @@ export async function POST(request: Request) {
 // Also support GET for simple cron triggers
 export async function GET(request: Request) {
 	const url = new URL(request.url);
-	const secret = url.searchParams.get("secret");
+	const secret = url.searchParams.get('secret');
 	if (CRON_SECRET && secret !== CRON_SECRET) {
-		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 	}
 
 	const admin = createAdminClient();
@@ -151,10 +147,10 @@ export async function GET(request: Request) {
 
 	// Frequent jobs only on GET, these are safe to run on every ping
 	const jobs = [
-		["sync-cf", () => syncAllCf(admin)],
-		["sync-lc", () => syncAllLc(admin)],
-		["update-streaks", () => runUpdateStreaks(admin)],
-		["check-duels", () => runCheckDuels(admin)],
+		['sync-cf', () => syncAllCf(admin)],
+		['sync-lc', () => syncAllLc(admin)],
+		['update-streaks', () => runUpdateStreaks(admin)],
+		['check-duels', () => runCheckDuels(admin)],
 	] as const;
 
 	for (const [name, fn] of jobs) {
@@ -169,7 +165,7 @@ export async function GET(request: Request) {
 		} catch (err) {
 			results[name] = {
 				success: false,
-				error: err instanceof Error ? err.message : "Unknown error",
+				error: err instanceof Error ? err.message : 'Unknown error',
 			};
 		}
 	}

@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import Link from "next/link";
-import { useState } from "react";
-import EncryptedText from "@/components/ui/EncryptedText";
+import { motion } from 'framer-motion';
+import Link from 'next/link';
+import { useState } from 'react';
+import EncryptedText from '@/components/ui/EncryptedText';
 
 const MOCK_LEADERBOARD = [
-	{ rank: 1, name: "AN DJANANN A", xp: "12400", rating: "2100", streak: "12" },
-	{ rank: 2, name: "ANNANANANA", xp: "11200", rating: "1950", streak: "08" },
-	{ rank: 3, name: "ANAJA AJAJ", xp: "9800", rating: "1820", streak: "05" },
-	{ rank: 4, name: "ANANANANA", xp: "8500", rating: "1740", streak: "15" },
-	{ rank: 5, name: "ANANANA AJAA", xp: "7200", rating: "1680", streak: "02" },
+	{ rank: 1, name: 'AN DJANANN A', xp: '12400', rating: '2100', streak: '12' },
+	{ rank: 2, name: 'ANNANANANA', xp: '11200', rating: '1950', streak: '08' },
+	{ rank: 3, name: 'ANAJA AJAJ', xp: '9800', rating: '1820', streak: '05' },
+	{ rank: 4, name: 'ANANANANA', xp: '8500', rating: '1740', streak: '15' },
+	{ rank: 5, name: 'ANANANA AJAA', xp: '7200', rating: '1680', streak: '02' },
 ];
 
-const RANK_MEDAL: Record<number, string> = { 1: "🥇", 2: "🥈", 3: "🥉" };
+const RANK_MEDAL: Record<number, string> = { 1: '🥇', 2: '🥈', 3: '🥉' };
 
 export default function BlurredLeaderboard() {
 	const [isHovered, setIsHovered] = useState(false);
@@ -22,7 +22,7 @@ export default function BlurredLeaderboard() {
 		<motion.div
 			initial={{ opacity: 0, y: 20 }}
 			whileInView={{ opacity: 1, y: 0 }}
-			viewport={{ once: true, margin: "-50px" }}
+			viewport={{ once: true, margin: '-50px' }}
 			transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
 			className="card-brutal scifi-window p-0 overflow-hidden relative group"
 			onMouseEnter={() => setIsHovered(true)}
@@ -64,9 +64,7 @@ export default function BlurredLeaderboard() {
 						<thead>
 							<tr className="text-text-primary font-mono text-small uppercase tracking-widest border-b border-border-hard bg-zinc-900/50">
 								<th className="text-left px-6 py-4 w-12 font-black">#</th>
-								<th className="text-left px-6 py-4 font-black text-neon-cyan">
-									Ranked_Node
-								</th>
+								<th className="text-left px-6 py-4 font-black text-neon-cyan">Ranked_Node</th>
 								<th className="text-right px-6 py-4 font-black">Score</th>
 								<th className="text-right px-6 py-4 font-black">Rating</th>
 								<th className="text-right px-6 py-4 font-black">Streak</th>
@@ -74,10 +72,7 @@ export default function BlurredLeaderboard() {
 						</thead>
 						<tbody className="divide-y divide-border-subtle">
 							{MOCK_LEADERBOARD.map((row) => (
-								<tr
-									key={row.rank}
-									className="transition-colors hover:bg-neon-cyan/[0.03]"
-								>
+								<tr key={row.rank} className="transition-colors hover:bg-neon-cyan/[0.03]">
 									<td className="px-3 md:px-6 py-4 md:py-5 font-mono text-neon-cyan text-xs font-black">
 										{RANK_MEDAL[row.rank] ?? `0${row.rank}`}
 									</td>
@@ -109,10 +104,7 @@ export default function BlurredLeaderboard() {
 						<p className="text-white font-mono text-sm mb-8 uppercase tracking-epic font-black drop-shadow-[0_0_10px_rgba(255,b255,b255,0.3)]">
 							Sign in to view your rank
 						</p>
-						<Link
-							href="/login"
-							className="btn-neon px-12 py-4 text-xs tracking-mega"
-						>
+						<Link href="/login" className="btn-neon px-12 py-4 text-xs tracking-mega">
 							Login to the Arc →
 						</Link>
 					</motion.div>

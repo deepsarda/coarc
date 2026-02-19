@@ -1,4 +1,4 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 export interface AttendanceSummary {
 	course_id: number;
@@ -13,7 +13,7 @@ export interface AttendanceSummary {
 	percentage: number;
 	skippable: number;
 	classes_needed: number;
-	risk_level: "safe" | "warning" | "danger";
+	risk_level: 'safe' | 'warning' | 'danger';
 	projected_end: number;
 	safe_to_skip_today: boolean;
 }
@@ -29,29 +29,26 @@ export async function computeAttendanceInsights(
 	userId: string,
 ): Promise<AttendanceSummary[]> {
 	const { data: courses } = await admin
-		.from("courses")
-		.select("id, name, code, color, classes_per_week, semester_end")
-		.eq("is_active", true)
-		.order("name");
+		.from('courses')
+		.select('id, name, code, color, classes_per_week, semester_end')
+		.eq('is_active', true)
+		.order('name');
 
 	if (!courses || courses.length === 0) return [];
 
 	const { data: records } = await admin
-		.from("attendance_records")
-		.select("course_id, status")
-		.eq("user_id", userId);
+		.from('attendance_records')
+		.select('course_id, status')
+		.eq('user_id', userId);
 
-	const recordsByCourse = new Map<
-		number,
-		{ attended: number; bunked: number }
-	>();
+	const recordsByCourse = new Map<number, { attended: number; bunked: number }>();
 
 	for (const r of records ?? []) {
 		const existing = recordsByCourse.get(r.course_id) ?? {
 			attended: 0,
 			bunked: 0,
 		};
-		if (r.status === "attended") {
+		if (r.status === 'attended') {
 			existing.attended++;
 		} else {
 			existing.bunked++;
@@ -74,28 +71,22 @@ export async function computeAttendanceInsights(
 			total > 0
 				? Math.max(
 						0,
-						Math.floor(
-							(stats.attended - REQUIRED_PERCENTAGE * total) /
-								REQUIRED_PERCENTAGE,
-						),
+						Math.floor((stats.attended - REQUIRED_PERCENTAGE * total) / REQUIRED_PERCENTAGE),
 					)
 				: 0;
 
 		// Classes needed to recover
 		const classesNeeded =
 			percentage < REQUIRED_PERCENTAGE && total > 0
-				? Math.ceil(
-						(REQUIRED_PERCENTAGE * total - stats.attended) /
-							(1 - REQUIRED_PERCENTAGE),
-					)
+				? Math.ceil((REQUIRED_PERCENTAGE * total - stats.attended) / (1 - REQUIRED_PERCENTAGE))
 				: 0;
 
 		// Risk level
-		let riskLevel: "safe" | "warning" | "danger" = "safe";
+		let riskLevel: 'safe' | 'warning' | 'danger' = 'safe';
 		if (percentage < REQUIRED_PERCENTAGE) {
-			riskLevel = "danger";
+			riskLevel = 'danger';
 		} else if (percentage < 0.8) {
-			riskLevel = "warning";
+			riskLevel = 'warning';
 		}
 
 		// Compute remaining classes dynamically from course settings
@@ -116,8 +107,7 @@ export async function computeAttendanceInsights(
 
 		const projectedAttend = stats.attended + remainingClasses * percentage;
 		const projectedTotal = total + remainingClasses;
-		const projectedEnd =
-			projectedTotal > 0 ? projectedAttend / projectedTotal : 1;
+		const projectedEnd = projectedTotal > 0 ? projectedAttend / projectedTotal : 1;
 
 		// Safe to skip today?
 		const afterSkip = total + 1 > 0 ? stats.attended / (total + 1) : 0;

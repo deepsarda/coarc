@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
 
 /**
  * GET /api/boss/active
@@ -12,33 +12,33 @@ export async function GET() {
 			data: { user },
 		} = await supabase.auth.getUser();
 		if (!user) {
-			return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+			return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 		}
 
 		const now = new Date().toISOString();
 
 		const { data: boss } = await supabase
-			.from("boss_battles")
-			.select("*")
-			.lte("starts_at", now)
-			.gte("ends_at", now)
-			.order("starts_at", { ascending: false })
+			.from('boss_battles')
+			.select('*')
+			.lte('starts_at', now)
+			.gte('ends_at', now)
+			.order('starts_at', { ascending: false })
 			.limit(1)
 			.single();
 
 		if (!boss) {
 			return NextResponse.json({
 				boss: null,
-				message: "No active boss battle",
+				message: 'No active boss battle',
 			});
 		}
 
 		// Get solves with user info
 		const { data: solves, count: solvesCount } = await supabase
-			.from("boss_battle_solves")
-			.select("*, profiles:user_id(display_name)", { count: "exact" })
-			.eq("boss_battle_id", boss.id)
-			.order("solved_at", { ascending: true });
+			.from('boss_battle_solves')
+			.select('*, profiles:user_id(display_name)', { count: 'exact' })
+			.eq('boss_battle_id', boss.id)
+			.order('solved_at', { ascending: true });
 
 		// Check if current user solved
 		const userSolve = (solves ?? []).find((s) => s.user_id === user.id);
@@ -59,9 +59,6 @@ export async function GET() {
 			user_solve_rank: userSolve?.solve_rank ?? null,
 		});
 	} catch {
-		return NextResponse.json(
-			{ error: "Internal server error" },
-			{ status: 500 },
-		);
+		return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 	}
 }

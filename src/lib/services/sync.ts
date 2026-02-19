@@ -1,13 +1,10 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from '@supabase/supabase-js';
 import {
 	fetchCfRatingHistory,
 	fetchCfSubmissions,
 	fetchCfUserInfo,
-} from "@/lib/services/codeforces";
-import {
-	fetchLcRecentSubmissions,
-	fetchLcStats,
-} from "@/lib/services/leetcode";
+} from '@/lib/services/codeforces';
+import { fetchLcRecentSubmissions, fetchLcStats } from '@/lib/services/leetcode';
 
 export interface SyncResult {
 	cf: {
@@ -47,19 +44,19 @@ export async function syncUserStats(
 
 	// Process CF result
 	if (!cfHandle) {
-		result.cf = { success: true, error: "No handle linked" };
-	} else if (cfResult.status === "fulfilled" && cfResult.value) {
+		result.cf = { success: true, error: 'No handle linked' };
+	} else if (cfResult.status === 'fulfilled' && cfResult.value) {
 		result.cf = cfResult.value;
-	} else if (cfResult.status === "rejected") {
+	} else if (cfResult.status === 'rejected') {
 		result.cf = { success: false, error: String(cfResult.reason) };
 	}
 
 	// Process LC result
 	if (!lcHandle) {
-		result.lc = { success: true, error: "No handle linked" };
-	} else if (lcResult.status === "fulfilled" && lcResult.value) {
+		result.lc = { success: true, error: 'No handle linked' };
+	} else if (lcResult.status === 'fulfilled' && lcResult.value) {
 		result.lc = lcResult.value;
-	} else if (lcResult.status === "rejected") {
+	} else if (lcResult.status === 'rejected') {
 		result.lc = { success: false, error: String(lcResult.reason) };
 	}
 
@@ -72,7 +69,7 @@ async function syncCfData(
 	admin: SupabaseClient,
 	userId: string,
 	handle: string,
-): Promise<SyncResult["cf"]> {
+): Promise<SyncResult['cf']> {
 	try {
 		// Fetch all data concurrently
 		const [userInfo, ratings, submissions] = await Promise.all([
@@ -94,13 +91,11 @@ async function syncCfData(
 				timestamp: r.timestamp.toISOString(),
 			}));
 
-			await admin
-				.from("cf_ratings")
-				.upsert(ratingsData, { onConflict: "user_id,contest_id" });
+			await admin.from('cf_ratings').upsert(ratingsData, { onConflict: 'user_id,contest_id' });
 		}
 
 		// Upsert submissions (only accepted ones for tracking)
-		const acceptedSubs = submissions.filter((s) => s.verdict === "OK");
+		const acceptedSubs = submissions.filter((s) => s.verdict === 'OK');
 		if (acceptedSubs.length > 0) {
 			const subsData = acceptedSubs.map((s) => ({
 				user_id: userId,
@@ -114,9 +109,7 @@ async function syncCfData(
 				submitted_at: s.submittedAt.toISOString(),
 			}));
 
-			await admin
-				.from("cf_submissions")
-				.upsert(subsData, { onConflict: "cf_submission_id" });
+			await admin.from('cf_submissions').upsert(subsData, { onConflict: 'cf_submission_id' });
 		}
 
 		// Upsert unique problems
@@ -143,18 +136,16 @@ async function syncCfData(
 				tags: p.tags,
 			}));
 
-			await admin
-				.from("cf_problems")
-				.upsert(problemsData, { onConflict: "id" });
+			await admin.from('cf_problems').upsert(problemsData, { onConflict: 'id' });
 		}
 
 		// Update profile with latest rating info
 		const latestRating = userInfo.rating;
 		if (latestRating !== null) {
 			await admin
-				.from("profiles")
+				.from('profiles')
 				.update({ updated_at: new Date().toISOString() })
-				.eq("id", userId);
+				.eq('id', userId);
 		}
 
 		return {
@@ -166,7 +157,7 @@ async function syncCfData(
 		console.error(`CF sync failed for user ${userId}:`, err);
 		return {
 			success: false,
-			error: err instanceof Error ? err.message : "Unknown CF sync error",
+			error: err instanceof Error ? err.message : 'Unknown CF sync error',
 		};
 	}
 }
@@ -177,7 +168,7 @@ async function syncLcData(
 	admin: SupabaseClient,
 	userId: string,
 	handle: string,
-): Promise<SyncResult["lc"]> {
+): Promise<SyncResult['lc']> {
 	try {
 		// Fetch stats and recent submissions concurrently
 		const [stats, recentSubs] = await Promise.all([
@@ -198,16 +189,16 @@ async function syncLcData(
 			synced_at: new Date().toISOString(),
 		};
 
-		await admin.from("lc_stats").upsert(statsData, { onConflict: "user_id" });
+		await admin.from('lc_stats').upsert(statsData, { onConflict: 'user_id' });
 
 		// Upsert recent submissions, enriching with difficulty from lc_problems cache
 		if (recentSubs.length > 0) {
 			// Look up difficulty from lc_problems cache
 			const slugs = [...new Set(recentSubs.map((s) => s.problemSlug))];
 			const { data: cachedProblems } = await admin
-				.from("lc_problems")
-				.select("slug, difficulty")
-				.in("slug", slugs);
+				.from('lc_problems')
+				.select('slug, difficulty')
+				.in('slug', slugs);
 
 			const difficultyMap = new Map<string, string>();
 			for (const p of cachedProblems ?? []) {
@@ -223,8 +214,8 @@ async function syncLcData(
 				status: s.status,
 			}));
 
-			await admin.from("lc_submissions").upsert(subsData, {
-				onConflict: "user_id,problem_slug,submitted_at",
+			await admin.from('lc_submissions').upsert(subsData, {
+				onConflict: 'user_id,problem_slug,submitted_at',
 			});
 		}
 
@@ -237,7 +228,7 @@ async function syncLcData(
 		console.error(`LC sync failed for user ${userId}:`, err);
 		return {
 			success: false,
-			error: err instanceof Error ? err.message : "Unknown LC sync error",
+			error: err instanceof Error ? err.message : 'Unknown LC sync error',
 		};
 	}
 }

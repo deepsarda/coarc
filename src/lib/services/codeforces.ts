@@ -1,4 +1,4 @@
-const CF_API = "https://codeforces.com/api";
+const CF_API = 'https://codeforces.com/api';
 const TIMEOUT_MS = 10_000;
 
 export interface CfUserInfo {
@@ -33,17 +33,16 @@ export interface CfSubmission {
  * Fetch user info from Codeforces.
  */
 export async function fetchCfUserInfo(handle: string): Promise<CfUserInfo> {
-	const res = await fetch(
-		`${CF_API}/user.info?handles=${encodeURIComponent(handle)}`,
-		{ signal: AbortSignal.timeout(TIMEOUT_MS) },
-	);
+	const res = await fetch(`${CF_API}/user.info?handles=${encodeURIComponent(handle)}`, {
+		signal: AbortSignal.timeout(TIMEOUT_MS),
+	});
 
 	if (!res.ok) {
 		throw new Error(`Codeforces API returned ${res.status}`);
 	}
 
 	const data = await res.json();
-	if (data.status !== "OK" || !data.result?.[0]) {
+	if (data.status !== 'OK' || !data.result?.[0]) {
 		throw new Error(`Codeforces user "${handle}" not found`);
 	}
 
@@ -60,20 +59,17 @@ export async function fetchCfUserInfo(handle: string): Promise<CfUserInfo> {
 /**
  * Fetch rating history from Codeforces.
  */
-export async function fetchCfRatingHistory(
-	handle: string,
-): Promise<CfRatingChange[]> {
-	const res = await fetch(
-		`${CF_API}/user.rating?handle=${encodeURIComponent(handle)}`,
-		{ signal: AbortSignal.timeout(TIMEOUT_MS) },
-	);
+export async function fetchCfRatingHistory(handle: string): Promise<CfRatingChange[]> {
+	const res = await fetch(`${CF_API}/user.rating?handle=${encodeURIComponent(handle)}`, {
+		signal: AbortSignal.timeout(TIMEOUT_MS),
+	});
 
 	if (!res.ok) {
 		throw new Error(`Codeforces API returned ${res.status}`);
 	}
 
 	const data = await res.json();
-	if (data.status !== "OK") {
+	if (data.status !== 'OK') {
 		throw new Error(`Failed to fetch CF ratings for "${handle}"`);
 	}
 
@@ -99,10 +95,7 @@ export async function fetchCfRatingHistory(
 /**
  * Fetch recent submissions from Codeforces (last `count` submissions).
  */
-export async function fetchCfSubmissions(
-	handle: string,
-	count = 100,
-): Promise<CfSubmission[]> {
+export async function fetchCfSubmissions(handle: string, count = 100): Promise<CfSubmission[]> {
 	const res = await fetch(
 		`${CF_API}/user.status?handle=${encodeURIComponent(handle)}&from=1&count=${count}`,
 		{ signal: AbortSignal.timeout(TIMEOUT_MS) },
@@ -113,7 +106,7 @@ export async function fetchCfSubmissions(
 	}
 
 	const data = await res.json();
-	if (data.status !== "OK") {
+	if (data.status !== 'OK') {
 		throw new Error(`Failed to fetch CF submissions for "${handle}"`);
 	}
 

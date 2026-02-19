@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import Link from "next/link";
-import { INSTITUTION } from "@/lib/config";
+import { motion } from 'framer-motion';
+import Link from 'next/link';
+import { INSTITUTION } from '@/lib/config';
 
 /* Orbiting particle data */
 const PARTICLES = [
@@ -13,7 +13,7 @@ const PARTICLES = [
 		duration: 14,
 		delay: -3,
 		opacity: 0.25,
-		color: "#ff00aa",
+		color: '#ff00aa',
 	},
 	{
 		id: 1,
@@ -22,7 +22,7 @@ const PARTICLES = [
 		duration: 18,
 		delay: -8,
 		opacity: 0.35,
-		color: "#00f0ff",
+		color: '#00f0ff',
 	},
 	{
 		id: 2,
@@ -31,7 +31,7 @@ const PARTICLES = [
 		duration: 22,
 		delay: -15,
 		opacity: 0.2,
-		color: "#00f0ff",
+		color: '#00f0ff',
 	},
 	{
 		id: 3,
@@ -40,7 +40,7 @@ const PARTICLES = [
 		duration: 16,
 		delay: -1,
 		opacity: 0.3,
-		color: "#ff00aa",
+		color: '#ff00aa',
 	},
 	{
 		id: 4,
@@ -49,7 +49,7 @@ const PARTICLES = [
 		duration: 25,
 		delay: -12,
 		opacity: 0.4,
-		color: "#00f0ff",
+		color: '#00f0ff',
 	},
 	{
 		id: 5,
@@ -58,7 +58,7 @@ const PARTICLES = [
 		duration: 20,
 		delay: -6,
 		opacity: 0.2,
-		color: "#00f0ff",
+		color: '#00f0ff',
 	},
 	{
 		id: 6,
@@ -67,7 +67,7 @@ const PARTICLES = [
 		duration: 15,
 		delay: -18,
 		opacity: 0.35,
-		color: "#ff00aa",
+		color: '#ff00aa',
 	},
 	{
 		id: 7,
@@ -76,7 +76,7 @@ const PARTICLES = [
 		duration: 28,
 		delay: -9,
 		opacity: 0.25,
-		color: "#00f0ff",
+		color: '#00f0ff',
 	},
 	{
 		id: 8,
@@ -85,7 +85,7 @@ const PARTICLES = [
 		duration: 13,
 		delay: -4,
 		opacity: 0.3,
-		color: "#00f0ff",
+		color: '#00f0ff',
 	},
 	{
 		id: 9,
@@ -94,7 +94,7 @@ const PARTICLES = [
 		duration: 19,
 		delay: -14,
 		opacity: 0.4,
-		color: "#ff00aa",
+		color: '#ff00aa',
 	},
 	{
 		id: 10,
@@ -103,7 +103,7 @@ const PARTICLES = [
 		duration: 24,
 		delay: -7,
 		opacity: 0.2,
-		color: "#00f0ff",
+		color: '#00f0ff',
 	},
 	{
 		id: 11,
@@ -112,18 +112,11 @@ const PARTICLES = [
 		duration: 17,
 		delay: -11,
 		opacity: 0.3,
-		color: "#00f0ff",
+		color: '#00f0ff',
 	},
 ];
 
-const TAGS = [
-	"DUELS",
-	"ATTENDANCE",
-	"FLASHCARDS",
-	"STREAKS",
-	"LEADERBOARDS",
-	"RESOURCES",
-];
+const TAGS = ['DUELS', 'ATTENDANCE', 'FLASHCARDS', 'STREAKS', 'LEADERBOARDS', 'RESOURCES'];
 
 export default function HeroSection() {
 	return (
@@ -166,7 +159,7 @@ export default function HeroSection() {
 						transition={{
 							duration: p.duration,
 							repeat: Infinity,
-							ease: "linear",
+							ease: 'linear',
 							delay: p.delay,
 						}}
 					/>
@@ -200,11 +193,8 @@ export default function HeroSection() {
 
 				{/* Tagline */}
 				<p className="text-text-secondary text-base sm:text-xl max-w-xl mx-auto font-body mb-10 leading-relaxed">
-					Code. Track. Compete.{" "}
-					<span className="text-neon-cyan font-semibold">
-						Everything in one place
-					</span>{" "}
-					for{" "}
+					Code. Track. Compete.{' '}
+					<span className="text-neon-cyan font-semibold">Everything in one place</span> for{' '}
 					<span className="text-neon-cyan font-bold underline decoration-neon-cyan/40 underline-offset-4 decoration-2">
 						{INSTITUTION.label}
 					</span>
@@ -252,8 +242,8 @@ export default function HeroSection() {
 				</span>
 				<div className="w-[2px] h-12 sm:h-16 bg-gradient-to-b from-border-hard via-neon-cyan/40 to-transparent relative">
 					<motion.div
-						animate={{ top: ["0%", "100%", "0%"] }}
-						transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+						animate={{ top: ['0%', '100%', '0%'] }}
+						transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
 						className="absolute left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-neon-cyan rounded-full shadow-[0_0_12px_rgba(0,240,255,0.8)]"
 					/>
 				</div>

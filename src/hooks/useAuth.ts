@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useAuthContext } from "@/components/providers/AuthProvider";
+import { useAuthContext } from '@/components/providers/AuthProvider';
 
 /**
  * Convenience hook that re-exports key values from AuthContext.

@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import { CheckCircle2, Clock, ExternalLink, Tag, Zap } from "lucide-react";
+import { motion } from 'framer-motion';
+import { CheckCircle2, Clock, ExternalLink, Tag, Zap } from 'lucide-react';
 
 interface DailyProblemData {
 	id: string;
@@ -48,9 +48,7 @@ export default function DailyProblem({ daily, countdown }: DailyProblemProps) {
 								) : (
 									<span className="dash-heading text-text-muted">Unsolved</span>
 								)}
-								{daily.problem_rating && (
-									<span className="dash-sub">R:{daily.problem_rating}</span>
-								)}
+								{daily.problem_rating && <span className="dash-sub">R:{daily.problem_rating}</span>}
 							</div>
 							<h4 className="text-text-primary font-mono text-lg md:text-xl font-black uppercase tracking-tight">
 								{daily.problem_name}

@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 /**
  * Public stats endpoint returns user count and genesis badge slots remaining.
@@ -10,11 +10,11 @@ export async function GET() {
 		const admin = createAdminClient();
 
 		const [profilesResult, genesisResult] = await Promise.all([
-			admin.from("profiles").select("id", { count: "exact", head: true }),
+			admin.from('profiles').select('id', { count: 'exact', head: true }),
 			admin
-				.from("user_badges")
-				.select("id", { count: "exact", head: true })
-				.eq("badge_id", "genesis"),
+				.from('user_badges')
+				.select('id', { count: 'exact', head: true })
+				.eq('badge_id', 'genesis'),
 		]);
 
 		const userCount = profilesResult.count ?? 0;
@@ -28,7 +28,7 @@ export async function GET() {
 			genesisLimit,
 		});
 	} catch (err) {
-		console.error("Stats error:", err);
+		console.error('Stats error:', err);
 		return NextResponse.json(
 			{
 				userCount: 0,
