@@ -21,7 +21,7 @@ export default function MobileNav() {
 						// Replace the profile link with the actual user profile
 						const href =
 							item.href === '/profile/me' && profile ? `/profile/${profile.id}` : item.href;
-						const isActive = pathname === href || pathname.startsWith(href + '/');
+						const isActive = pathname === href || pathname.startsWith(`${href}/`);
 						return (
 							<Link
 								key={item.href}
