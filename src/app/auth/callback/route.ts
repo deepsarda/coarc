@@ -22,15 +22,17 @@ export async function GET(request: Request) {
 					.eq('id', user.id)
 					.single();
 
-				// First-time user → setup page
+				// First-time user, setup page
 				if (!profile) {
 					return NextResponse.redirect(`${origin}/setup`);
 				}
 			}
 			return NextResponse.redirect(`${origin}${next}`);
 		}
+
+		console.error('Error exchanging code for session:', error.message);
 	}
 
-	// Auth error → redirect to login with error
+	// Auth error, redirect to login with error
 	return NextResponse.redirect(`${origin}/login?error=auth_failed`);
 }
