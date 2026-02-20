@@ -3,10 +3,12 @@ import { checkAndAwardBadges } from '@/lib/gamification/badges';
 import { updateUserStreak } from '@/lib/gamification/streaks';
 import { syncUserStats } from '@/lib/services/sync';
 
+const BATCH_SIZE = 3; // Sync 3 users in parallel per batch
+const BATCH_DELAY = 2000; // 2s between batches (LC is stricter)
+
 /**
  * Sync LeetCode data for all users with lc_handle set.
  * After syncing, backfills any missing problems in lc_problems cache.
- * 2s delay between users to avoid rate-limiting.
  */
 export async function syncAllLc(admin: SupabaseClient) {
 	const { data: users } = await admin
@@ -16,31 +18,56 @@ export async function syncAllLc(admin: SupabaseClient) {
 
 	if (!users || users.length === 0) return { synced: 0 };
 
+	// Shuffle users so rate-limits affect evenly across runs
+	for (let i = users.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[users[i], users[j]] = [users[j], users[i]];
+	}
+
 	let synced = 0;
 	const errors: string[] = [];
 
-	for (const user of users) {
-		try {
-			const result = await syncUserStats(
-				admin,
-				user.id,
-				null, // don't sync CF in this job
-				user.lc_handle,
-			);
+	// Process in batches of BATCH_SIZE
+	for (let b = 0; b < users.length; b += BATCH_SIZE) {
+		const batch = users.slice(b, b + BATCH_SIZE);
 
-			if (result.lc.success) {
-				synced++;
-				await updateUserStreak(admin, user.id);
-				await checkAndAwardBadges(admin, user.id);
-			} else if (result.lc.error) {
-				errors.push(`${user.lc_handle}: ${result.lc.error}`);
+		const results = await Promise.allSettled(
+			batch.map(async (user) => {
+				try {
+					const result = await syncUserStats(
+						admin,
+						user.id,
+						null, // don't sync CF in this job
+						user.lc_handle,
+					);
+
+					if (result.lc.success) {
+						await updateUserStreak(admin, user.id);
+						await checkAndAwardBadges(admin, user.id);
+						return { success: true, handle: user.lc_handle };
+					}
+					return { success: false, handle: user.lc_handle, error: result.lc.error };
+				} catch (err) {
+					return {
+						success: false,
+						handle: user.lc_handle,
+						error: err instanceof Error ? err.message : 'Unknown',
+					};
+				}
+			}),
+		);
+
+		for (const r of results) {
+			if (r.status === 'fulfilled') {
+				if (r.value.success) synced++;
+				else if (r.value.error) errors.push(`${r.value.handle}: ${r.value.error}`);
 			}
-		} catch (err) {
-			errors.push(`${user.lc_handle}: ${err instanceof Error ? err.message : 'Unknown'}`);
 		}
 
-		// Rate-limit: 2s between users
-		await new Promise((resolve) => setTimeout(resolve, 2000));
+		// Delay between batches (skip after last batch)
+		if (b + BATCH_SIZE < users.length) {
+			await new Promise((resolve) => setTimeout(resolve, BATCH_DELAY));
+		}
 	}
 
 	// Backfill missing LC problems from submissions
@@ -49,6 +76,7 @@ export async function syncAllLc(admin: SupabaseClient) {
 	return {
 		synced,
 		total: users.length,
+		batch_size: BATCH_SIZE,
 		backfilled,
 		errors: errors.slice(0, 10),
 	};

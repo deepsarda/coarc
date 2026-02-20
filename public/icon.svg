@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a2332"/>
+      <stop offset="100%" stop-color="#0f1923"/>
+    </linearGradient>
+    <linearGradient id="w1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8ba4bd"/>
+      <stop offset="100%" stop-color="#d4dfe9"/>
+    </linearGradient>
+    <linearGradient id="w2" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0%" stop-color="#6b89a8"/>
+      <stop offset="100%" stop-color="#b8cad9"/>
+    </linearGradient>
+    <linearGradient id="w3" x1="0.2" y1="0" x2="0.8" y2="1">
+      <stop offset="0%" stop-color="#9db5ca"/>
+      <stop offset="100%" stop-color="#e8eff5"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <!-- Wave 1: large sweep from bottom-left -->
+  <path d="M-20,420 Q80,280 200,300 Q320,320 360,200 Q400,80 520,100 L520,520 L-20,520Z" fill="url(#w1)" opacity="0.35"/>
+  <!-- Wave 2: mid arc -->
+  <path d="M-20,460 Q100,340 220,360 Q340,380 400,260 Q440,180 520,200 L520,520 L-20,520Z" fill="url(#w2)" opacity="0.5"/>
+  <!-- Wave 3: foreground crest -->
+  <path d="M-20,500 Q120,380 240,400 Q360,420 420,320 Q460,260 520,280 L520,520 L-20,520Z" fill="url(#w3)" opacity="0.6"/>
+  <!-- Accent arc: upper decorative curve -->
+  <path d="M100,200 Q180,80 300,140 Q380,180 440,120" fill="none" stroke="url(#w3)" stroke-width="18" stroke-linecap="round" opacity="0.4"/>
+  <path d="M60,260 Q160,120 300,190 Q400,240 480,160" fill="none" stroke="url(#w1)" stroke-width="12" stroke-linecap="round" opacity="0.25"/>
+</svg>

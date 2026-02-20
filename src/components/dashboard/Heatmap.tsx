@@ -28,7 +28,7 @@ export default function Heatmap({ userId }: HeatmapProps) {
 	const fetch = useCallback(async () => {
 		const dayMap = new Map<string, number>();
 
-		// 1. LC submission calendar
+		// LC submission calendar
 		const { data: lcStats } = await supabase
 			.from('lc_stats')
 			.select('submission_calendar')
@@ -43,7 +43,7 @@ export default function Heatmap({ userId }: HeatmapProps) {
 			}
 		}
 
-		// 2. CF submissions
+		// CF submissions
 		const oneYearAgo = new Date();
 		oneYearAgo.setDate(oneYearAgo.getDate() - DAYS);
 
@@ -61,7 +61,7 @@ export default function Heatmap({ userId }: HeatmapProps) {
 			}
 		}
 
-		// 3. Also count LC submissions directly (in case submission_calendar is incomplete)
+		// Also count LC submissions directly (in case submission_calendar is incomplete)
 		const { data: lcSubs } = await supabase
 			.from('lc_submissions')
 			.select('submitted_at')

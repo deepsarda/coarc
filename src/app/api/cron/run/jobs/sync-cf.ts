@@ -3,10 +3,12 @@ import { checkAndAwardBadges } from '@/lib/gamification/badges';
 import { updateUserStreak } from '@/lib/gamification/streaks';
 import { syncUserStats } from '@/lib/services/sync';
 
+const BATCH_SIZE = 3; // Sync 3 users in parallel per batch
+const BATCH_DELAY = 1500; // 1.5s between batches
+
 /**
  * Sync Codeforces data for all users with cf_handle set.
  * After syncing, backfills any missing problems in cf_problems cache.
- * 1s delay between users to avoid rate-limiting.
  */
 export async function syncAllCf(admin: SupabaseClient) {
 	const { data: users } = await admin
@@ -16,32 +18,56 @@ export async function syncAllCf(admin: SupabaseClient) {
 
 	if (!users || users.length === 0) return { synced: 0 };
 
+	// Shuffle users so rate-limits affect evenly across runs
+	for (let i = users.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[users[i], users[j]] = [users[j], users[i]];
+	}
+
 	let synced = 0;
 	const errors: string[] = [];
 
-	for (const user of users) {
-		try {
-			const result = await syncUserStats(
-				admin,
-				user.id,
-				user.cf_handle,
-				null, // don't sync LC in this job
-			);
+	// Process in batches of BATCH_SIZE
+	for (let b = 0; b < users.length; b += BATCH_SIZE) {
+		const batch = users.slice(b, b + BATCH_SIZE);
 
-			if (result.cf.success) {
-				synced++;
-				// Update streak and check badges
-				await updateUserStreak(admin, user.id);
-				await checkAndAwardBadges(admin, user.id);
-			} else if (result.cf.error) {
-				errors.push(`${user.cf_handle}: ${result.cf.error}`);
+		const results = await Promise.allSettled(
+			batch.map(async (user) => {
+				try {
+					const result = await syncUserStats(
+						admin,
+						user.id,
+						user.cf_handle,
+						null, // don't sync LC in this job
+					);
+
+					if (result.cf.success) {
+						await updateUserStreak(admin, user.id);
+						await checkAndAwardBadges(admin, user.id);
+						return { success: true, handle: user.cf_handle };
+					}
+					return { success: false, handle: user.cf_handle, error: result.cf.error };
+				} catch (err) {
+					return {
+						success: false,
+						handle: user.cf_handle,
+						error: err instanceof Error ? err.message : 'Unknown',
+					};
+				}
+			}),
+		);
+
+		for (const r of results) {
+			if (r.status === 'fulfilled') {
+				if (r.value.success) synced++;
+				else if (r.value.error) errors.push(`${r.value.handle}: ${r.value.error}`);
 			}
-		} catch (err) {
-			errors.push(`${user.cf_handle}: ${err instanceof Error ? err.message : 'Unknown'}`);
 		}
 
-		// Rate-limit: 1s between users
-		await new Promise((resolve) => setTimeout(resolve, 1000));
+		// Delay between batches (skip after last batch)
+		if (b + BATCH_SIZE < users.length) {
+			await new Promise((resolve) => setTimeout(resolve, BATCH_DELAY));
+		}
 	}
 
 	// Backfill missing CF problems from submissions
@@ -50,6 +76,7 @@ export async function syncAllCf(admin: SupabaseClient) {
 	return {
 		synced,
 		total: users.length,
+		batch_size: BATCH_SIZE,
 		backfilled,
 		errors: errors.slice(0, 10),
 	};

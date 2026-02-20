@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { JetBrains_Mono, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import AppShell from '@/components/layout/AppShell';
+import { NotificationPrompt } from '@/components/notifications/NotificationPrompt';
 import { AuthProvider } from '@/components/providers/AuthProvider';
 import { ToastProvider } from '@/components/ui/Toast';
 import { SITE } from '@/lib/config';
@@ -21,13 +22,23 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
 	title: `${SITE.name} • ${SITE.tagline}`,
 	description: SITE.description,
-	icons: { icon: '/favicon.ico' },
+	icons: {
+		icon: '/icon-192.png',
+		apple: '/icon-192.png',
+	},
+	manifest: '/manifest.json',
+	appleWebApp: {
+		capable: true,
+		statusBarStyle: 'black-translucent',
+		title: SITE.name,
+	},
 };
 
 export const viewport = {
 	width: 'device-width',
 	initialScale: 1,
 	maximumScale: 5,
+	themeColor: '#0a0e17',
 };
 
 export default function RootLayout({
@@ -43,6 +54,7 @@ export default function RootLayout({
 				<ToastProvider>
 					<AuthProvider>
 						<AppShell>{children}</AppShell>
+						<NotificationPrompt />
 					</AuthProvider>
 				</ToastProvider>
 			</body>
