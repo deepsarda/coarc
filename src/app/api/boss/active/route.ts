@@ -27,7 +27,7 @@ export async function GET() {
 			.single();
 
 		if (!boss) {
-			// No active boss — check for upcoming battles
+			// No active boss so let's check for upcoming battles
 			const { data: upcoming } = await supabase
 				.from('boss_battles')
 				.select('id, title, difficulty_label, starts_at, ends_at, problem_url')

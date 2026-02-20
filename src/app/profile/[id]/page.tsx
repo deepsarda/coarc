@@ -466,14 +466,11 @@ export default function ProfilePage() {
 								return (
 									<div
 										key={badge.id}
-										className={`relative p-3 border text-center transition-all ${
+										className={`relative p-3 border text-center transition-all group/badge cursor-default ${
 											earned
-												? 'border-neon-cyan/30 bg-neon-cyan/5'
-												: 'border-border-hard/40 bg-surface/30 opacity-40'
+												? 'border-neon-cyan/30 bg-neon-cyan/5 hover:border-neon-cyan/60'
+												: 'border-border-hard/40 bg-surface/30 opacity-40 hover:opacity-60'
 										}`}
-										title={
-											earned ? `${badge.name}: ${badge.description}` : `🔒 ${badge.description}`
-										}
 									>
 										<div className="text-2xl mb-1.5">
 											{earned ? (
@@ -494,6 +491,28 @@ export default function ProfilePage() {
 													month: 'short',
 												})}
 											</p>
+										)}
+
+										{/* Tooltip – only for earned badges */}
+										{earned && earnedBadge && (
+											<div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 px-3 py-2 bg-elevated border border-border-hard shadow-lg opacity-0 invisible group-hover/badge:opacity-100 group-hover/badge:visible transition-all duration-150 pointer-events-none z-30">
+												<p className="font-mono text-tiny font-black text-text-primary mb-0.5">
+													{badge.icon} {badge.name}
+												</p>
+												<p className="font-mono text-[10px] text-text-secondary leading-relaxed">
+													{badge.description}
+												</p>
+												<p className="font-mono text-[9px] text-neon-green mt-1 font-bold">
+													✓ Earned{' '}
+													{new Date(earnedBadge.earned_at).toLocaleDateString('en-IN', {
+														day: 'numeric',
+														month: 'short',
+														year: 'numeric',
+													})}
+												</p>
+												{/* Arrow */}
+												<div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[5px] border-t-border-hard" />
+											</div>
 										)}
 									</div>
 								);

@@ -50,25 +50,30 @@ function getDiffColor(label: string | null) {
 	return DIFF_COLORS[(label ?? '').toLowerCase()] ?? 'neon-cyan';
 }
 
-function useCountdown(endsAt: string) {
+function useCountdown(targetDate: string) {
 	const [timeLeft, setTimeLeft] = useState('');
 
 	useEffect(() => {
 		function update() {
-			const diff = new Date(endsAt).getTime() - Date.now();
+			const diff = new Date(targetDate).getTime() - Date.now();
 			if (diff <= 0) {
-				setTimeLeft('Expired');
+				setTimeLeft('Now');
 				return;
 			}
-			const h = Math.floor(diff / 3600000);
+			const d = Math.floor(diff / 86400000);
+			const h = Math.floor((diff % 86400000) / 3600000);
 			const m = Math.floor((diff % 3600000) / 60000);
 			const s = Math.floor((diff % 60000) / 1000);
-			setTimeLeft(`${h}h ${m}m ${s}s`);
+			if (d > 0) {
+				setTimeLeft(`${d}d ${h}h ${m}m`);
+			} else {
+				setTimeLeft(`${h}h ${m}m ${s}s`);
+			}
 		}
 		update();
 		const id = setInterval(update, 1000);
 		return () => clearInterval(id);
-	}, [endsAt]);
+	}, [targetDate]);
 
 	return timeLeft;
 }
@@ -193,44 +198,9 @@ export default function BossPage() {
 						<Clock className="w-4 h-4 text-neon-orange opacity-60" /> Upcoming Battles
 					</h3>
 					<div className="space-y-2">
-						{upcoming.map((boss) => {
-							const color = getDiffColor(boss.difficulty_label);
-							const startsIn = new Date(boss.starts_at).getTime() - Date.now();
-							const daysLeft = Math.ceil(startsIn / 86400000);
-							return (
-								<div
-									key={boss.id}
-									className={`border-l-2 border-l-${color}/40 pl-4 py-3 bg-elevated/20`}
-								>
-									<div className="flex items-center gap-2 mb-0.5">
-										<Skull className={`w-4 h-4 text-${color} opacity-60`} />
-										<span className="font-heading font-black text-text-primary text-sm">
-											{boss.title}
-										</span>
-										{boss.difficulty_label && (
-											<span
-												className={`px-1.5 py-0.5 font-mono text-micro uppercase tracking-widest font-bold border border-${color}/30 text-${color} bg-${color}/5`}
-											>
-												{boss.difficulty_label}
-											</span>
-										)}
-									</div>
-									<div className="flex items-center gap-3 mt-1">
-										<span className="font-mono text-tiny text-neon-orange font-bold">
-											{daysLeft > 0 ? `Starts in ${daysLeft}d` : 'Starting soon'}
-										</span>
-										<span className="font-mono text-tiny text-text-dim">
-											{new Date(boss.starts_at).toLocaleDateString('en-US', {
-												month: 'short',
-												day: 'numeric',
-												hour: '2-digit',
-												minute: '2-digit',
-											})}
-										</span>
-									</div>
-								</div>
-							);
-						})}
+						{upcoming.map((boss) => (
+							<UpcomingBossRow key={boss.id} boss={boss} />
+						))}
 					</div>
 				</motion.div>
 			) : (
@@ -242,7 +212,7 @@ export default function BossPage() {
 					<Skull className="w-12 h-12 text-text-dim mx-auto mb-4" />
 					<p className="text-text-muted font-mono text-sm">No active boss battle</p>
 					<p className="text-text-dim font-mono text-tiny mt-1">
-						Stay alert — the next boss could appear any time
+						Stay alert! The next boss could appear any time
 					</p>
 				</motion.div>
 			)}
@@ -389,5 +359,51 @@ function ActiveBossSection({
 				</>
 			)}
 		</motion.div>
+	);
+}
+
+function UpcomingBossRow({
+	boss,
+}: {
+	boss: {
+		id: number;
+		title: string;
+		difficulty_label: string | null;
+		starts_at: string;
+		ends_at: string;
+		problem_url: string;
+	};
+}) {
+	const color = getDiffColor(boss.difficulty_label);
+	const countdown = useCountdown(boss.starts_at);
+
+	return (
+		<div className={`border-l-2 border-l-${color}/40 pl-4 py-3 bg-elevated/20`}>
+			<div className="flex items-center gap-2 mb-0.5">
+				<Skull className={`w-4 h-4 text-${color} opacity-60`} />
+				<span className="font-heading font-black text-text-primary text-sm">{boss.title}</span>
+				{boss.difficulty_label && (
+					<span
+						className={`px-1.5 py-0.5 font-mono text-micro uppercase tracking-widest font-bold border border-${color}/30 text-${color} bg-${color}/5`}
+					>
+						{boss.difficulty_label}
+					</span>
+				)}
+			</div>
+			<div className="flex items-center gap-3 mt-1">
+				<span className="font-mono text-tiny text-neon-orange font-bold flex items-center gap-1">
+					<Clock className="w-3 h-3" />
+					{countdown === 'Now' ? 'Starting now!' : `Starts in ${countdown}`}
+				</span>
+				<span className="font-mono text-tiny text-text-dim">
+					{new Date(boss.starts_at).toLocaleDateString('en-US', {
+						month: 'short',
+						day: 'numeric',
+						hour: '2-digit',
+						minute: '2-digit',
+					})}
+				</span>
+			</div>
+		</div>
 	);
 }
