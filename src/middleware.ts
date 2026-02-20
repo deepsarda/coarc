@@ -53,9 +53,28 @@ export async function middleware(request: NextRequest) {
 	);
 
 	// Refresh session (important: must call getUser, not getSession)
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+	let user = null;
+	try {
+		const { data } = await supabase.auth.getUser();
+		user = data.user;
+	} catch (err) {
+		// Handle invalid/expired refresh tokens gracefully
+		const authErr = err as { code?: string; __isAuthError?: boolean };
+		if (authErr.__isAuthError && authErr.code === 'refresh_token_not_found') {
+			// Clear auth cookies and redirect to login
+			const url = request.nextUrl.clone();
+			url.pathname = '/login';
+			const response = NextResponse.redirect(url);
+			// Clear Supabase auth cookies
+			for (const cookie of request.cookies.getAll()) {
+				if (cookie.name.startsWith('sb-')) {
+					response.cookies.delete(cookie.name);
+				}
+			}
+			return response;
+		}
+		// For other auth errors, continue as unauthenticated
+	}
 
 	const pathname = request.nextUrl.pathname;
 

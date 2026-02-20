@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { CalendarCheck, Check, ChevronLeft, ChevronRight, Minus, Plus, X } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { AttendanceRecord, Course } from './types';
-import { dateStr, todayStr } from './types';
+import { DAYS, dateStr, todayStr } from './types';
 
 interface MarkTabProps {
 	courses: Course[];
@@ -14,9 +14,28 @@ interface MarkTabProps {
 	onRefresh: () => Promise<void>;
 }
 
+/** Get day-of-week (0=Sun…6=Sat) from a YYYY-MM-DD string */
+function getDow(dateString: string): number {
+	const [y, m, d] = dateString.split('-').map(Number);
+	return new Date(y, m - 1, d).getDay();
+}
+
+/** Pretty-print a schedule: {"1":2,"3":1,"5":2} → "Mon×2, Wed, Fri×2" */
+function formatSchedule(schedule: Record<string, number>): string {
+	return Object.entries(schedule)
+		.sort(([a], [b]) => Number(a) - Number(b))
+		.map(([dow, slots]) => {
+			const day = DAYS[Number(dow)];
+			return slots > 1 ? `${day}×${slots}` : day;
+		})
+		.join(', ');
+}
+
 export function MarkTab({ courses, records, selectedDate, onDateChange, onRefresh }: MarkTabProps) {
 	const [saving, setSaving] = useState<string | null>(null);
 	const [courseSlots, setCourseSlots] = useState<Record<number, number>>({});
+
+	const selectedDow = getDow(selectedDate);
 
 	/* Records map for selected date */
 	const dayRecords = useMemo(() => {
@@ -27,15 +46,36 @@ export function MarkTab({ courses, records, selectedDate, onDateChange, onRefres
 		return map;
 	}, [records, selectedDate]);
 
+	/* Check which courses have ANY prior attendance records (for auto-bunk) */
+	const coursesWithHistory = useMemo(() => {
+		const set = new Set<number>();
+		for (const r of records) set.add(r.course_id);
+		return set;
+	}, [records]);
+
 	useEffect(() => {
 		const slots: Record<number, number> = {};
-		for (const r of records) {
-			if (r.date === selectedDate) {
-				slots[r.course_id] = Math.max(slots[r.course_id] ?? 1, r.slot);
+		for (const course of courses) {
+			// Check if there are existing records for this date
+			let maxSlotFromRecords = 0;
+			for (const r of records) {
+				if (r.date === selectedDate && r.course_id === course.id) {
+					maxSlotFromRecords = Math.max(maxSlotFromRecords, r.slot);
+				}
+			}
+
+			if (maxSlotFromRecords > 0) {
+				// If there are existing records, use those
+				slots[course.id] = maxSlotFromRecords;
+			} else {
+				// Use schedule-based default slot count for this day
+				const schedule = course.schedule ?? { '1': 1, '2': 1, '3': 1, '4': 1, '5': 1 };
+				const scheduledSlots = schedule[String(selectedDow)] ?? 0;
+				slots[course.id] = scheduledSlots;
 			}
 		}
 		setCourseSlots(slots);
-	}, [records, selectedDate]);
+	}, [records, selectedDate, courses, selectedDow]);
 
 	/* Mark or clear attendance */
 	const markAttendance = useCallback(
@@ -82,23 +122,29 @@ export function MarkTab({ courses, records, selectedDate, onDateChange, onRefres
 		setSaving('bulk');
 		try {
 			await Promise.all(
-				courses.map((course) => {
-					const maxSlot = courseSlots[course.id] ?? 1;
-					return Promise.all(
-						Array.from({ length: maxSlot }, (_, i) =>
-							fetch('/api/attendance/mark', {
-								method: 'POST',
-								headers: { 'Content-Type': 'application/json' },
-								body: JSON.stringify({
-									course_id: course.id,
-									date: selectedDate,
-									slot: i + 1,
-									status,
+				courses
+					.filter((course) => {
+						// Only bulk-mark courses that have class today (or have existing slots)
+						const maxSlot = courseSlots[course.id] ?? 0;
+						return maxSlot > 0;
+					})
+					.map((course) => {
+						const maxSlot = courseSlots[course.id] ?? 1;
+						return Promise.all(
+							Array.from({ length: maxSlot }, (_, i) =>
+								fetch('/api/attendance/mark', {
+									method: 'POST',
+									headers: { 'Content-Type': 'application/json' },
+									body: JSON.stringify({
+										course_id: course.id,
+										date: selectedDate,
+										slot: i + 1,
+										status,
+									}),
 								}),
-							}),
-						),
-					);
-				}),
+							),
+						);
+					}),
 			);
 			await onRefresh();
 		} catch {
@@ -109,13 +155,13 @@ export function MarkTab({ courses, records, selectedDate, onDateChange, onRefres
 	};
 
 	const addSlot = (courseId: number) => {
-		const current = courseSlots[courseId] ?? 1;
+		const current = courseSlots[courseId] ?? 0;
 		setCourseSlots({ ...courseSlots, [courseId]: current + 1 });
 	};
 
 	const removeSlot = (courseId: number) => {
 		const current = courseSlots[courseId] ?? 1;
-		if (current <= 1) return;
+		if (current <= 0) return;
 		setCourseSlots({ ...courseSlots, [courseId]: current - 1 });
 	};
 
@@ -195,10 +241,19 @@ export function MarkTab({ courses, records, selectedDate, onDateChange, onRefres
 			) : (
 				<div className="space-y-3">
 					{courses.map((course) => {
-						const maxSlot = courseSlots[course.id] ?? 1;
+						const maxSlot = courseSlots[course.id] ?? 0;
+						const schedule = course.schedule ?? { '1': 1, '2': 1, '3': 1, '4': 1, '5': 1 };
+						const hasClassToday = (schedule[String(selectedDow)] ?? 0) > 0;
+						const hasHistory = coursesWithHistory.has(course.id);
+						// Auto-bunk: if user has history for this course but no records today
+						const hasTodayRecords = Array.from(dayRecords.keys()).some((k) =>
+							k.startsWith(`${course.id}-`),
+						);
+						const shouldAutoBunk = hasHistory && !hasTodayRecords && hasClassToday;
+
 						return (
 							<div key={course.id} className="border border-border-hard p-4">
-								<div className="flex items-center gap-2 mb-3">
+								<div className="flex items-center gap-2 mb-1">
 									<div
 										className="w-3 h-3 rounded-full shrink-0"
 										style={{ backgroundColor: course.color }}
@@ -211,59 +266,91 @@ export function MarkTab({ courses, records, selectedDate, onDateChange, onRefres
 									)}
 								</div>
 
-								{Array.from({ length: maxSlot }, (_, i) => {
-									const slot = i + 1;
-									const key = `${course.id}-${slot}`;
-									const status = dayRecords.get(key);
-									const isSaving = saving === key;
-									return (
-										<div key={slot} className="flex items-center gap-2 mb-2 last:mb-0">
-											{maxSlot > 1 && (
-												<span className="font-mono text-tiny text-text-muted w-16 shrink-0">
-													Slot {slot}
-												</span>
-											)}
-											<button
-												type="button"
-												onClick={() => markAttendance(course.id, slot, 'attended')}
-												disabled={isSaving}
-												className={`flex items-center gap-1 px-3 py-1.5 font-mono text-tiny font-bold border transition-all ${status === 'attended' ? 'bg-neon-green/15 border-neon-green/40 text-neon-green' : 'border-border-hard text-text-muted hover:text-neon-green hover:border-neon-green/30'}`}
-											>
-												<Check className="w-3 h-3" /> Attended
-											</button>
-											<button
-												type="button"
-												onClick={() => markAttendance(course.id, slot, 'bunked')}
-												disabled={isSaving}
-												className={`flex items-center gap-1 px-3 py-1.5 font-mono text-tiny font-bold border transition-all ${status === 'bunked' ? 'bg-neon-red/15 border-neon-red/40 text-neon-red' : 'border-border-hard text-text-muted hover:text-neon-red hover:border-neon-red/30'}`}
-											>
-												<X className="w-3 h-3" /> Bunked
-											</button>
-											{isSaving && (
-												<div className="w-3 h-3 border border-neon-green/20 border-t-neon-green animate-spin rounded-full" />
-											)}
-										</div>
-									);
-								})}
+								{/* Schedule info */}
+								<p className="font-mono text-[10px] text-text-muted mb-3 ml-5">
+									{formatSchedule(schedule)}
+								</p>
 
-								<div className="flex gap-2 mt-2">
-									<button
-										type="button"
-										onClick={() => addSlot(course.id)}
-										className="flex items-center gap-1 font-mono text-tiny text-text-muted hover:text-neon-green transition-colors"
-									>
-										<Plus className="w-3 h-3" /> Add slot
-									</button>
-									{(courseSlots[course.id] ?? 1) > 1 && (
+								{/* No class today + no existing records = show "+ Slot" only */}
+								{!hasClassToday && maxSlot === 0 ? (
+									<div className="flex items-center gap-2">
+										<span className="font-mono text-tiny text-text-muted italic">
+											No class today
+										</span>
 										<button
 											type="button"
-											onClick={() => removeSlot(course.id)}
-											className="flex items-center gap-1 font-mono text-tiny text-text-muted hover:text-neon-red transition-colors"
+											onClick={() => addSlot(course.id)}
+											className="flex items-center gap-1 font-mono text-tiny text-text-muted hover:text-neon-green transition-colors"
 										>
-											<Minus className="w-3 h-3" /> Remove slot
+											<Plus className="w-3 h-3" /> Add slot
 										</button>
-									)}
-								</div>
+									</div>
+								) : (
+									<>
+										{/* Auto-bunk indicator */}
+										{shouldAutoBunk && (
+											<p className="font-mono text-[10px] text-neon-red/70 mb-2 ml-5">
+												⚠ Auto-defaulting to bunked (unmarked)
+											</p>
+										)}
+
+										{Array.from({ length: maxSlot }, (_, i) => {
+											const slot = i + 1;
+											const key = `${course.id}-${slot}`;
+											const status = dayRecords.get(key);
+											const isSaving = saving === key;
+											// If auto-bunk and no status set yet, visually highlight bunked
+											const effectiveDefault = shouldAutoBunk && !status ? 'bunked' : undefined;
+											return (
+												<div key={slot} className="flex items-center gap-2 mb-2 last:mb-0">
+													{maxSlot > 1 && (
+														<span className="font-mono text-tiny text-text-muted w-16 shrink-0">
+															Slot {slot}
+														</span>
+													)}
+													<button
+														type="button"
+														onClick={() => markAttendance(course.id, slot, 'attended')}
+														disabled={isSaving}
+														className={`flex items-center gap-1 px-3 py-1.5 font-mono text-tiny font-bold border transition-all ${status === 'attended' ? 'bg-neon-green/15 border-neon-green/40 text-neon-green' : 'border-border-hard text-text-muted hover:text-neon-green hover:border-neon-green/30'}`}
+													>
+														<Check className="w-3 h-3" /> Attended
+													</button>
+													<button
+														type="button"
+														onClick={() => markAttendance(course.id, slot, 'bunked')}
+														disabled={isSaving}
+														className={`flex items-center gap-1 px-3 py-1.5 font-mono text-tiny font-bold border transition-all ${status === 'bunked' || effectiveDefault === 'bunked' ? 'bg-neon-red/15 border-neon-red/40 text-neon-red' : 'border-border-hard text-text-muted hover:text-neon-red hover:border-neon-red/30'}`}
+													>
+														<X className="w-3 h-3" /> Bunked
+													</button>
+													{isSaving && (
+														<div className="w-3 h-3 border border-neon-green/20 border-t-neon-green animate-spin rounded-full" />
+													)}
+												</div>
+											);
+										})}
+
+										<div className="flex gap-2 mt-2">
+											<button
+												type="button"
+												onClick={() => addSlot(course.id)}
+												className="flex items-center gap-1 font-mono text-tiny text-text-muted hover:text-neon-green transition-colors"
+											>
+												<Plus className="w-3 h-3" /> Add slot
+											</button>
+											{(courseSlots[course.id] ?? 0) > (hasClassToday ? 1 : 0) && (
+												<button
+													type="button"
+													onClick={() => removeSlot(course.id)}
+													className="flex items-center gap-1 font-mono text-tiny text-text-muted hover:text-neon-red transition-colors"
+												>
+													<Minus className="w-3 h-3" /> Remove slot
+												</button>
+											)}
+										</div>
+									</>
+								)}
 							</div>
 						);
 					})}

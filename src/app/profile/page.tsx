@@ -82,7 +82,7 @@ export default function ProfileSearchPage() {
 				className="border-l-2 border-neon-cyan pl-6 mb-8"
 			>
 				<h1 className="font-heading text-2xl md:text-3xl font-black text-text-primary uppercase tracking-tighter">
-					<span className="text-neon-cyan">::</span> Find Players
+					<span className="text-neon-cyan">::</span> Find Users
 				</h1>
 				<p className="text-text-muted text-tiny font-mono mt-1 uppercase tracking-widest font-bold">
 					Search by name, handle, or roll number
@@ -101,7 +101,7 @@ export default function ProfileSearchPage() {
 					type="text"
 					value={query}
 					onChange={(e) => setQuery(e.target.value)}
-					placeholder="Search players..."
+					placeholder="Search users..."
 					className="form-input w-full pl-10"
 					autoFocus
 				/>
@@ -178,17 +178,19 @@ export default function ProfileSearchPage() {
 										</div>
 										<div className="min-w-0 flex-1">
 											<p
-												className={`font-mono text-sm font-bold truncate ${isMe ? 'text-neon-cyan' : 'text-text-primary'}`}
+												className={`font-mono text-sm font-bold ${isMe ? 'text-neon-cyan' : 'text-text-primary'}`}
 											>
 												{user.display_name}
 											</p>
 											<p className="font-mono text-tiny text-text-muted">
 												Roll #{String(user.roll_number).padStart(2, '0')} · Lv.{levelInfo.level}
 											</p>
-										</div>
-										<div className="text-tiny font-mono text-text-muted shrink-0">
-											{user.cf_handle && <span className="mr-2">CF:{user.cf_handle}</span>}
-											{user.lc_handle && <span>LC:{user.lc_handle}</span>}
+											{(user.cf_handle || user.lc_handle) && (
+												<p className="font-mono text-tiny text-text-dim mt-0.5">
+													{user.cf_handle && <span className="mr-2">CF:{user.cf_handle}</span>}
+													{user.lc_handle && <span>LC:{user.lc_handle}</span>}
+												</p>
+											)}
 										</div>
 									</Link>
 								</motion.div>
@@ -199,7 +201,7 @@ export default function ProfileSearchPage() {
 					<div className="py-16 text-center">
 						<User className="w-8 h-8 text-text-muted/20 mx-auto mb-3" />
 						<p className="font-mono text-sm text-text-muted">
-							No players found for &ldquo;{query}&rdquo;
+							No users found for &ldquo;{query}&rdquo;
 						</p>
 					</div>
 				)}

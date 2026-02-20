@@ -1,17 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import {
-	Check,
-	ChevronDown,
-	ChevronUp,
-	Palette,
-	Pencil,
-	Plus,
-	Settings,
-	Trash2,
-	X,
-} from 'lucide-react';
+import { Check, ChevronUp, Palette, Pencil, Plus, Settings, Trash2, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 
 /* Types */
@@ -23,6 +13,7 @@ interface Course {
 	is_active: boolean;
 	classes_per_week: number;
 	semester_end: string | null;
+	schedule: Record<string, number> | null;
 }
 
 interface CourseForm {
@@ -31,6 +22,7 @@ interface CourseForm {
 	color: string;
 	classes_per_week: number;
 	semester_end: string;
+	schedule: Record<string, number>;
 }
 
 const PRESET_COLORS = [
@@ -48,13 +40,37 @@ const PRESET_COLORS = [
 	'#8b5cf6',
 ];
 
+const DAY_LABELS = [
+	{ key: '1', label: 'Mon' },
+	{ key: '2', label: 'Tue' },
+	{ key: '3', label: 'Wed' },
+	{ key: '4', label: 'Thu' },
+	{ key: '5', label: 'Fri' },
+	{ key: '6', label: 'Sat' },
+];
+
+const DEFAULT_SCHEDULE: Record<string, number> = { '1': 1, '2': 1, '3': 1, '4': 1, '5': 1 };
+
 const DEFAULT_FORM: CourseForm = {
 	name: '',
 	code: '',
 	color: '#00f0ff',
 	classes_per_week: 3,
 	semester_end: '',
+	schedule: { ...DEFAULT_SCHEDULE },
 };
+
+/** Pretty-print schedule */
+function formatSchedule(schedule: Record<string, number>): string {
+	const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+	return Object.entries(schedule)
+		.sort(([a], [b]) => Number(a) - Number(b))
+		.map(([dow, slots]) => {
+			const day = dayNames[Number(dow)];
+			return slots > 1 ? `${day}×${slots}` : day;
+		})
+		.join(', ');
+}
 
 export default function AdminCoursesPage() {
 	const [courses, setCourses] = useState<Course[]>([]);
@@ -101,6 +117,7 @@ export default function AdminCoursesPage() {
 					color: form.color,
 					classes_per_week: form.classes_per_week,
 					semester_end: form.semester_end || null,
+					schedule: form.schedule,
 				}),
 			});
 			if (!res.ok) {
@@ -136,6 +153,7 @@ export default function AdminCoursesPage() {
 			color: course.color,
 			classes_per_week: course.classes_per_week ?? 3,
 			semester_end: course.semester_end ?? '',
+			schedule: course.schedule ?? { ...DEFAULT_SCHEDULE },
 		});
 	};
 
@@ -152,6 +170,7 @@ export default function AdminCoursesPage() {
 					color: editForm.color,
 					classes_per_week: editForm.classes_per_week,
 					semester_end: editForm.semester_end || null,
+					schedule: editForm.schedule,
 				}),
 			});
 			if (res.ok) {
@@ -263,9 +282,9 @@ export default function AdminCoursesPage() {
 									{course.code && (
 										<span className="font-mono text-tiny text-text-muted ml-2">{course.code}</span>
 									)}
-									<div className="flex gap-3 mt-0.5">
+									<div className="flex flex-col gap-0.5 mt-0.5">
 										<span className="font-mono text-tiny text-text-muted">
-											{course.classes_per_week ?? 3}/wk
+											{formatSchedule(course.schedule ?? DEFAULT_SCHEDULE)}
 										</span>
 										{course.semester_end && (
 											<span className="font-mono text-tiny text-text-muted">
@@ -343,6 +362,26 @@ function CourseFormFields({
 	form: CourseForm;
 	setForm: (f: CourseForm) => void;
 }) {
+	const toggleDay = (day: string) => {
+		const newSchedule = { ...form.schedule };
+		if (day in newSchedule) {
+			delete newSchedule[day];
+		} else {
+			newSchedule[day] = 1;
+		}
+		setForm({ ...form, schedule: newSchedule });
+	};
+
+	const setDaySlots = (day: string, slots: number) => {
+		const newSchedule = { ...form.schedule };
+		if (slots <= 0) {
+			delete newSchedule[day];
+		} else {
+			newSchedule[day] = slots;
+		}
+		setForm({ ...form, schedule: newSchedule });
+	};
+
 	return (
 		<div className="space-y-4">
 			<div>
@@ -372,29 +411,69 @@ function CourseFormFields({
 				</div>
 				<div>
 					<span className="font-mono text-tiny text-text-muted uppercase tracking-widest font-bold mb-1 block">
-						Classes/Week
+						Semester End Date
 					</span>
 					<input
-						type="number"
-						min={1}
-						max={20}
-						value={form.classes_per_week}
-						onChange={(e) => setForm({ ...form, classes_per_week: Number(e.target.value) })}
+						type="date"
+						value={form.semester_end}
+						onChange={(e) => setForm({ ...form, semester_end: e.target.value })}
 						className="form-input w-full text-sm font-mono"
 					/>
 				</div>
 			</div>
+
+			{/* Schedule: Day checkboxes + per-day slot counts */}
 			<div>
-				<span className="font-mono text-tiny text-text-muted uppercase tracking-widest font-bold mb-1 block">
-					Semester End Date
+				<span className="font-mono text-tiny text-text-muted uppercase tracking-widest font-bold mb-2 block">
+					Schedule (Days & Slots)
 				</span>
-				<input
-					type="date"
-					value={form.semester_end}
-					onChange={(e) => setForm({ ...form, semester_end: e.target.value })}
-					className="form-input w-full text-sm font-mono"
-				/>
+				<div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+					{DAY_LABELS.map((d) => {
+						const active = d.key in form.schedule;
+						const slots = form.schedule[d.key] ?? 0;
+						return (
+							<div key={d.key} className="text-center">
+								<button
+									type="button"
+									onClick={() => toggleDay(d.key)}
+									className={`w-full py-1.5 font-mono text-tiny font-bold border transition-all ${
+										active
+											? 'border-neon-cyan/40 bg-neon-cyan/10 text-neon-cyan'
+											: 'border-border-hard text-text-muted hover:border-text-muted'
+									}`}
+								>
+									{d.label}
+								</button>
+								{active && (
+									<div className="flex items-center justify-center gap-1 mt-1">
+										<button
+											type="button"
+											onClick={() => setDaySlots(d.key, Math.max(1, slots - 1))}
+											className="text-text-muted hover:text-text-primary text-xs px-1"
+										>
+											−
+										</button>
+										<span className="font-mono text-tiny text-text-secondary font-bold tabular-nums min-w-4 text-center">
+											{slots}
+										</span>
+										<button
+											type="button"
+											onClick={() => setDaySlots(d.key, slots + 1)}
+											className="text-text-muted hover:text-text-primary text-xs px-1"
+										>
+											+
+										</button>
+									</div>
+								)}
+							</div>
+						);
+					})}
+				</div>
+				<p className="font-mono text-[10px] text-text-dim mt-1.5">
+					Click a day to toggle. Use − / + to set slots per day.
+				</p>
 			</div>
+
 			<div>
 				<span className="font-mono text-tiny text-text-muted uppercase tracking-widest font-bold mb-1 block">
 					Color

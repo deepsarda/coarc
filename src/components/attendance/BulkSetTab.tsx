@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { Course } from './types';
 
 export function BulkSetTab({
@@ -11,35 +11,47 @@ export function BulkSetTab({
 	courses: Course[];
 	onDone: () => Promise<void>;
 }) {
-	const [semStart, setSemStart] = useState('');
+	const [semStart, setSemStart] = useState('2026-01-06');
 	const [bulkData, setBulkData] = useState<Record<number, { attended: number; total: number }>>({});
 	const [saving, setSaving] = useState(false);
-	const [mode, setMode] = useState<'manual' | 'predict'>('manual');
+	const [mode, setMode] = useState<'manual' | 'predict'>('predict');
+	const [predicted, setPredicted] = useState(false);
 
 	useEffect(() => {
 		const data: Record<number, { attended: number; total: number }> = {};
 		for (const c of courses) data[c.id] = { attended: 0, total: 0 };
 		setBulkData(data);
+		setPredicted(false);
 	}, [courses]);
 
-	const predictClasses = () => {
+	const predictClasses = useCallback(() => {
 		if (!semStart) return;
 		const [sy, sm, sd] = semStart.split('-').map(Number);
 		const start = new Date(sy, sm - 1, sd);
 		const now = new Date();
-		const msPerDay = 1000 * 60 * 60 * 24;
-		const daysElapsed = Math.floor((now.getTime() - start.getTime()) / msPerDay);
-		const weeksElapsed = Math.max(0, Math.floor(daysElapsed / 7));
-		const partialDays = daysElapsed % 7;
-		const updated = { ...bulkData };
+		const updated: Record<number, { attended: number; total: number }> = {};
 		for (const c of courses) {
-			const cpw = c.classes_per_week ?? 3;
-			const partialClasses = Math.min(partialDays, cpw);
-			const totalClasses = weeksElapsed * cpw + partialClasses;
+			const schedule = c.schedule ?? { '1': 1, '2': 1, '3': 1, '4': 1, '5': 1 };
+			let totalClasses = 0;
+			const cursor = new Date(start);
+			while (cursor <= now) {
+				const dow = String(cursor.getDay());
+				const slots = schedule[dow] ?? 0;
+				totalClasses += slots;
+				cursor.setDate(cursor.getDate() + 1);
+			}
 			updated[c.id] = { attended: totalClasses, total: totalClasses };
 		}
 		setBulkData(updated);
-	};
+	}, [semStart, courses]);
+
+	// Auto-predict on first load when courses are available
+	useEffect(() => {
+		if (courses.length > 0 && !predicted && semStart) {
+			setPredicted(true);
+			predictClasses();
+		}
+	}, [courses, predicted, semStart, predictClasses]);
 
 	const saveBulk = async () => {
 		setSaving(true);
@@ -73,7 +85,7 @@ export function BulkSetTab({
 		<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
 			<div className="border border-border-hard p-4">
 				<p className="font-mono text-sm text-text-secondary mb-3">
-					Set your attendance in bulk — enter total classes and how many you attended for each
+					Set your attendance in bulk! Enter total classes and how many you attended for each
 					course.
 				</p>
 
@@ -171,7 +183,7 @@ export function BulkSetTab({
 								<span
 									className={`font-mono text-sm font-black tabular-nums ${data.total > 0 && data.attended / data.total >= 0.76 ? 'text-neon-green' : data.total > 0 ? 'text-neon-red' : 'text-text-muted'}`}
 								>
-									{data.total > 0 ? `${Math.round((data.attended / data.total) * 100)}%` : '—'}
+									{data.total > 0 ? `${Math.round((data.attended / data.total) * 100)}%` : '--'}
 								</span>
 							</div>
 						</div>

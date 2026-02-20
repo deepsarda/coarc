@@ -26,6 +26,17 @@ export async function POST(request: Request) {
 
 		const admin = createAdminClient();
 
+		// Fetch course schedules from DB
+		const courseIds = [...new Set(records.map((r: { course_id: number }) => r.course_id))];
+		const { data: courses } = await admin
+			.from('courses')
+			.select('id, schedule')
+			.in('id', courseIds);
+		const scheduleMap = new Map<number, Record<string, number>>();
+		for (const c of courses ?? []) {
+			scheduleMap.set(c.id, c.schedule ?? { '1': 1, '2': 1, '3': 1, '4': 1, '5': 1 });
+		}
+
 		// Calculate the date range for spreading records
 		let startDate: Date;
 		if (start_date) {
@@ -53,36 +64,43 @@ export async function POST(request: Request) {
 			if (!course_id || total <= 0) continue;
 
 			const actualAttended = Math.min(attended, total);
+			const schedule = scheduleMap.get(course_id) ?? { '1': 1, '2': 1, '3': 1, '4': 1, '5': 1 };
 
-			// Spread classes evenly across available weekdays from startDate to today
-			const availableDays: string[] = [];
+			// Spread classes across matching schedule days from startDate to today
+			// Each entry is { date, slots } where slots = number of slots on that day
+			const availableDays: { date: string; slots: number }[] = [];
 			const cursor = new Date(startDate);
 			while (cursor <= today) {
-				const dow = cursor.getDay();
-				// Skip Sundays (0)
-				if (dow !== 0) {
+				const dow = String(cursor.getDay());
+				const slotsForDay = schedule[dow];
+				if (slotsForDay && slotsForDay > 0) {
 					const ds = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}-${String(cursor.getDate()).padStart(2, '0')}`;
-					availableDays.push(ds);
+					availableDays.push({ date: ds, slots: slotsForDay });
 				}
 				cursor.setDate(cursor.getDate() + 1);
 			}
 
 			if (availableDays.length === 0) continue;
 
-			// Evenly distribute 'total' classes across available days using proportional indices
-			const n = availableDays.length;
-			const classCount = Math.min(total, n); // Can't place more than available days
-			for (let i = 0; i < classCount; i++) {
-				// Pick evenly-spaced indices: 0, n/total, 2n/total, ...
-				const dayIdx = Math.round((i * (n - 1)) / (classCount - 1 || 1));
-				const status = i < actualAttended ? 'attended' : 'bunked';
-				upsertRows.push({
-					user_id: user.id,
-					course_id,
-					date: availableDays[dayIdx],
-					slot: 1,
-					status,
-				});
+			// Count total available slot-instances
+			const totalSlotInstances = availableDays.reduce((sum, d) => sum + d.slots, 0);
+			const classCount = Math.min(total, totalSlotInstances);
+
+			// Distribute classes evenly across available slot-instances
+			let placed = 0;
+			for (const day of availableDays) {
+				if (placed >= classCount) break;
+				for (let s = 1; s <= day.slots && placed < classCount; s++) {
+					const status = placed < actualAttended ? 'attended' : 'bunked';
+					upsertRows.push({
+						user_id: user.id,
+						course_id,
+						date: day.date,
+						slot: s,
+						status,
+					});
+					placed++;
+				}
 			}
 		}
 

@@ -352,7 +352,7 @@ export default function LeaderboardPage() {
 													>
 														{row.display_name.charAt(0).toUpperCase()}
 													</div>
-													<div className="min-w-0">
+													<div className="min-w-0 flex-1">
 														<p
 															className={`font-mono text-sm font-bold truncate ${isMe ? 'text-neon-cyan' : 'text-text-primary'}`}
 														>
@@ -363,14 +363,14 @@ export default function LeaderboardPage() {
 																</span>
 															)}
 														</p>
-														<p className="font-mono text-tiny text-text-muted">
+														<p className="font-mono text-tiny text-text-muted hidden sm:block">
 															Lv.{levelInfo.level} {levelInfo.title}
 														</p>
 													</div>
 												</div>
 
-												{/* Metric */}
-												<div className="w-48 flex justify-end shrink-0">
+												{/* Metric - responsive width */}
+												<div className="w-20 sm:w-48 flex justify-end shrink-0">
 													<MetricCell board={board} row={row} />
 												</div>
 											</Link>
@@ -416,7 +416,7 @@ export default function LeaderboardPage() {
 											</p>
 										</div>
 									</div>
-									<div className="w-48 flex justify-end shrink-0">
+									<div className="w-20 sm:w-48 flex justify-end shrink-0">
 										<MetricCell board={board} row={data.my_entry} />
 									</div>
 								</Link>

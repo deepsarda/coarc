@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Calendar, CalendarCheck, Grid3x3, ShieldCheck, Upload } from 'lucide-react';
+import { Bell, BellOff, Calendar, CalendarCheck, Grid3x3, ShieldCheck, Upload } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { AttendanceHeatmap } from '@/components/attendance/AttendanceHeatmap';
 import { BulkSetTab } from '@/components/attendance/BulkSetTab';
@@ -10,10 +10,12 @@ import { MarkTab } from '@/components/attendance/MarkTab';
 import { SkipCalcTab } from '@/components/attendance/SkipCalcTab';
 import type { AttendanceRecord, AttendanceSummary, Course } from '@/components/attendance/types';
 import { todayStr } from '@/components/attendance/types';
+import { useAuthContext } from '@/components/providers/AuthProvider';
 
 /* Page */
 
 export default function AttendancePage() {
+	const { profile } = useAuthContext();
 	const [courses, setCourses] = useState<Course[]>([]);
 	const [records, setRecords] = useState<AttendanceRecord[]>([]);
 	const [insights, setInsights] = useState<AttendanceSummary[]>([]);
@@ -22,6 +24,32 @@ export default function AttendancePage() {
 	const [calMonth, setCalMonth] = useState(new Date().getMonth());
 	const [calYear, setCalYear] = useState(new Date().getFullYear());
 	const [tab, setTab] = useState<'mark' | 'calendar' | 'skip' | 'heatmap' | 'bulk'>('mark');
+	const [reminderOn, setReminderOn] = useState(false);
+	const [togglingReminder, setTogglingReminder] = useState(false);
+
+	/* Load initial reminder state from profile */
+	useEffect(() => {
+		if (profile && 'attendance_reminder' in profile) {
+			setReminderOn(!!(profile as Record<string, unknown>).attendance_reminder);
+		}
+	}, [profile]);
+
+	const toggleReminder = async () => {
+		setTogglingReminder(true);
+		const newValue = !reminderOn;
+		try {
+			const res = await fetch('/api/users/profile', {
+				method: 'PUT',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ attendance_reminder: newValue }),
+			});
+			if (res.ok) setReminderOn(newValue);
+		} catch {
+			/* silent */
+		} finally {
+			setTogglingReminder(false);
+		}
+	};
 
 	/* Fetch data */
 	const fromDate = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-01`;
@@ -101,6 +129,21 @@ export default function AttendancePage() {
 				<p className="text-text-muted text-tiny font-mono mt-1 uppercase tracking-widest font-bold">
 					Track · Calculate · Never drop below 76%
 				</p>
+				{/* 6pm Reminder Toggle */}
+				<button
+					type="button"
+					onClick={toggleReminder}
+					disabled={togglingReminder}
+					title={reminderOn ? 'Disable 6pm reminder' : 'Enable 6pm reminder'}
+					className={`flex items-center gap-1.5 mt-2 px-3 py-1.5 font-mono text-tiny font-bold border transition-all disabled:opacity-50 ${
+						reminderOn
+							? 'border-neon-green/40 text-neon-green bg-neon-green/10'
+							: 'border-border-hard text-text-muted hover:text-text-secondary'
+					}`}
+				>
+					{reminderOn ? <Bell className="w-3 h-3" /> : <BellOff className="w-3 h-3" />}
+					{reminderOn ? '6pm Reminder ON' : '6pm Reminder'}
+				</button>
 			</motion.header>
 
 			{/* TABS */}

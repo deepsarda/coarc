@@ -53,7 +53,7 @@ export async function POST(request: Request) {
 			return NextResponse.json({ error: 'Admin only' }, { status: 403 });
 		}
 
-		const { name, code, color, classes_per_week, semester_end } = await request.json();
+		const { name, code, color, classes_per_week, semester_end, schedule } = await request.json();
 		if (!name || !color) {
 			return NextResponse.json({ error: 'name and color required' }, { status: 400 });
 		}
@@ -66,6 +66,7 @@ export async function POST(request: Request) {
 				color,
 				classes_per_week: classes_per_week ?? 3,
 				semester_end: semester_end ?? null,
+				schedule: schedule ?? { '1': 1, '2': 1, '3': 1, '4': 1, '5': 1 },
 				created_by: user.id,
 			})
 			.select()

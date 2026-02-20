@@ -133,8 +133,8 @@ export const ADMIN_NAV_ITEMS_RAW: Omit<NavItem, 'icon'>[] = [
 export const MOBILE_NAV_ITEMS_RAW: Omit<NavItem, 'icon'>[] = [
 	{ label: 'Home', href: '/dashboard' },
 	{ label: 'Leaderboard', href: '/leaderboard' },
-	{ label: 'Problems', href: '/problems' },
-	{ label: 'Duels', href: '/duels' },
+	{ label: 'Attendance', href: '/attendance' },
+	{ label: 'Flashcards', href: '/flashcards' },
 	{ label: 'Me', href: '/profile/me' },
 ];
 

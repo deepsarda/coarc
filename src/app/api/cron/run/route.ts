@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { runAttendanceReminder } from './jobs/attendance-reminder';
 import { runCheckDuels } from './jobs/check-duels';
 import { runComputeRankings } from './jobs/compute-rankings';
 import { runGenerateDaily } from './jobs/generate-daily';
@@ -84,6 +85,7 @@ export async function POST(request: Request) {
 		'weekly-digest': () => runWeeklyDigest(admin),
 		'check-duels': () => runCheckDuels(admin),
 		'compute-rankings': () => runComputeRankings(admin),
+		'attendance-reminder': () => runAttendanceReminder(admin),
 	};
 
 	const jobsToRun = requestedJobs
@@ -151,6 +153,7 @@ export async function GET(request: Request) {
 		['sync-lc', () => syncAllLc(admin)],
 		['update-streaks', () => runUpdateStreaks(admin)],
 		['check-duels', () => runCheckDuels(admin)],
+		['attendance-reminder', () => runAttendanceReminder(admin)],
 	] as const;
 
 	for (const [name, fn] of jobs) {

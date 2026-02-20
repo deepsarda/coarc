@@ -244,7 +244,7 @@ export default function ProfilePage() {
 						<h1 className="font-heading text-2xl md:text-3xl font-black text-text-primary uppercase tracking-tighter">
 							{profileData.display_name}
 						</h1>
-						<div className="flex flex-wrap items-center gap-3 mt-1.5">
+						<div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5">
 							<span className="font-mono text-tiny text-text-muted uppercase tracking-widest font-bold">
 								ROLL #{String(profileData.roll_number).padStart(2, '0')}
 							</span>

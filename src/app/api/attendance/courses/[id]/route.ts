@@ -31,7 +31,15 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 		}
 
 		const body = await request.json();
-		const allowed = ['name', 'code', 'color', 'is_active', 'classes_per_week', 'semester_end'];
+		const allowed = [
+			'name',
+			'code',
+			'color',
+			'is_active',
+			'classes_per_week',
+			'semester_end',
+			'schedule',
+		];
 		const updates: Record<string, unknown> = {};
 		for (const key of allowed) {
 			if (key in body) updates[key] = body[key];

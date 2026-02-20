@@ -60,8 +60,8 @@ const NAV_ICON_MAP: Record<string, ReactNode> = {
 const MOBILE_ICON_MAP: Record<string, ReactNode> = {
 	'/dashboard': <LayoutDashboard className={SIZE_MOBILE} />,
 	'/leaderboard': <Trophy className={SIZE_MOBILE} />,
-	'/problems': <Code className={SIZE_MOBILE} />,
-	'/duels': <Swords className={SIZE_MOBILE} />,
+	'/attendance': <CalendarCheck className={SIZE_MOBILE} />,
+	'/flashcards': <Layers className={SIZE_MOBILE} />,
 	'/profile/me': <User className={SIZE_MOBILE} />,
 };
 

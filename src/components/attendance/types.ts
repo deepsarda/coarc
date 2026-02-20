@@ -4,6 +4,7 @@ export interface Course {
 	code: string | null;
 	color: string;
 	classes_per_week?: number;
+	schedule?: Record<string, number>;
 }
 
 export interface AttendanceRecord {

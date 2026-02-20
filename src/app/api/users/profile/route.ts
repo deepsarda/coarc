@@ -44,7 +44,13 @@ export async function PUT(request: Request) {
 		const body = await request.json();
 
 		// Only allow updating specific fields
-		const allowedFields = ['display_name', 'cf_handle', 'lc_handle', 'push_subscription'];
+		const allowedFields = [
+			'display_name',
+			'cf_handle',
+			'lc_handle',
+			'push_subscription',
+			'attendance_reminder',
+		];
 		const updates: Record<string, unknown> = {};
 
 		for (const field of allowedFields) {
