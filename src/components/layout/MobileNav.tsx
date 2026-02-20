@@ -93,7 +93,7 @@ export default function MobileNav() {
 										item.href === '/profile/me' && profile ? `/profile/${profile.id}` : item.href;
 									const isActive =
 										pathname === href ||
-										pathname.startsWith(href + '/') ||
+										pathname.startsWith(`${href}/`) ||
 										(item.href === '/profile/me' && pathname.startsWith('/profile/'));
 									return (
 										<Link

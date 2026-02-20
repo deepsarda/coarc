@@ -1,25 +1,9 @@
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
-import { Filter, Layers, Search, Sparkles } from 'lucide-react';
-import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { Filter, Layers, Search } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-
-interface DeckProgress {
-	got_it: number;
-	needs_review: number;
-	unseen: number;
-}
-
-interface Deck {
-	id: number;
-	title: string;
-	description: string | null;
-	tags: string[];
-	card_count: number;
-	created_at: string;
-	progress: DeckProgress;
-}
+import { type Deck, DeckGrid } from '@/components/flashcards/DeckGrid';
 
 export default function FlashcardsPage() {
 	const [decks, setDecks] = useState<Deck[]>([]);
@@ -50,9 +34,7 @@ export default function FlashcardsPage() {
 				(d) => d.title.toLowerCase().includes(q) || d.tags.some((t) => t.toLowerCase().includes(q)),
 			);
 		}
-		if (tagFilter) {
-			list = list.filter((d) => d.tags.includes(tagFilter));
-		}
+		if (tagFilter) list = list.filter((d) => d.tags.includes(tagFilter));
 		if (sort === 'cards') list = [...list].sort((a, b) => b.card_count - a.card_count);
 		else if (sort === 'progress')
 			list = [...list].sort((a, b) => {
@@ -96,7 +78,6 @@ export default function FlashcardsPage() {
 				transition={{ delay: 0.1 }}
 				className="flex flex-col sm:flex-row gap-3 mb-6"
 			>
-				{/* Search */}
 				<div className="relative flex-1">
 					<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-dim" />
 					<input
@@ -106,8 +87,6 @@ export default function FlashcardsPage() {
 						className="form-input pl-10 py-2.5 text-sm"
 					/>
 				</div>
-
-				{/* Sort */}
 				<select
 					value={sort}
 					onChange={(e) => setSort(e.target.value as typeof sort)}
@@ -165,92 +144,7 @@ export default function FlashcardsPage() {
 					</p>
 				</motion.div>
 			) : (
-				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-					<AnimatePresence mode="popLayout">
-						{filtered.map((deck, i) => {
-							const total = deck.card_count;
-							const mastered = deck.progress.got_it;
-							const pct = total > 0 ? Math.round((mastered / total) * 100) : 0;
-							const isComplete = pct === 100 && total > 0;
-
-							return (
-								<motion.div
-									key={deck.id}
-									initial={{ opacity: 0, y: 20 }}
-									animate={{ opacity: 1, y: 0 }}
-									exit={{ opacity: 0, scale: 0.95 }}
-									transition={{ delay: i * 0.05 }}
-								>
-									<Link href={`/flashcards/${deck.id}`}>
-										<div
-											className={`card-brutal group p-5 h-full flex flex-col transition-all cursor-pointer ${
-												isComplete ? 'border-neon-green/40' : ''
-											}`}
-										>
-											{/* Title */}
-											<div className="flex items-start justify-between gap-2 mb-3">
-												<h3 className="font-heading font-black text-text-primary text-lg leading-tight">
-													{deck.title}
-												</h3>
-												{isComplete && (
-													<Sparkles className="w-4 h-4 text-neon-green shrink-0 mt-0.5" />
-												)}
-											</div>
-
-											{/* Description */}
-											{deck.description && (
-												<p className="text-text-secondary text-sm font-mono mb-3 line-clamp-2">
-													{deck.description}
-												</p>
-											)}
-
-											{/* Tags */}
-											{deck.tags.length > 0 && (
-												<div className="flex flex-wrap gap-1.5 mb-4">
-													{deck.tags.map((t) => (
-														<span
-															key={t}
-															className="px-2 py-0.5 bg-neon-cyan/5 border border-neon-cyan/20 text-neon-cyan font-mono text-micro uppercase tracking-widest"
-														>
-															{t}
-														</span>
-													))}
-												</div>
-											)}
-
-											<div className="mt-auto">
-												{/* Progress Bar */}
-												<div className="h-1.5 bg-void rounded-full overflow-hidden mb-2">
-													<motion.div
-														initial={{ width: 0 }}
-														animate={{ width: `${pct}%` }}
-														transition={{
-															duration: 0.8,
-															delay: i * 0.05 + 0.3,
-														}}
-														className={`h-full ${isComplete ? 'bg-neon-green' : 'bg-neon-cyan'}`}
-													/>
-												</div>
-
-												{/* Stats row */}
-												<div className="flex items-center justify-between">
-													<span className="font-mono text-tiny text-text-dim uppercase tracking-widest font-bold">
-														{mastered}/{total} mastered
-													</span>
-													<span
-														className={`font-mono text-tiny font-bold ${isComplete ? 'text-neon-green' : 'text-text-muted'}`}
-													>
-														{pct}%
-													</span>
-												</div>
-											</div>
-										</div>
-									</Link>
-								</motion.div>
-							);
-						})}
-					</AnimatePresence>
-				</div>
+				<DeckGrid decks={filtered} />
 			)}
 		</div>
 	);

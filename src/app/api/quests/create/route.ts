@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
-import { notifyAllUsers } from '@/lib/notifications/send';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 
 /**
- * POST /api/announcements/create
- * Create a new announcement (admin only).
+ * POST /api/quests/active
+ * Create a new quest (admin only).
+ * Body: { title, description, quest_type, condition, xp_reward, week_start }
  */
 export async function POST(request: Request) {
 	try {
@@ -28,19 +28,29 @@ export async function POST(request: Request) {
 			return NextResponse.json({ error: 'Admin only' }, { status: 403 });
 		}
 
-		const { title, body, priority } = await request.json();
+		const { title, description, quest_type, condition, xp_reward, week_start } =
+			await request.json();
 
-		if (!title || !body) {
-			return NextResponse.json({ error: 'title and body required' }, { status: 400 });
+		if (!title || !description || !quest_type || !condition || !xp_reward || !week_start) {
+			return NextResponse.json(
+				{
+					error:
+						'All fields required: title, description, quest_type, condition, xp_reward, week_start',
+				},
+				{ status: 400 },
+			);
 		}
 
-		const { data: announcement, error } = await admin
-			.from('announcements')
+		const { data: quest, error } = await admin
+			.from('quests')
 			.insert({
 				title,
-				body,
-				priority: priority ?? 'normal',
-				created_by: user.id,
+				description,
+				quest_type,
+				condition,
+				xp_reward,
+				week_start,
+				is_admin_curated: true,
 			})
 			.select()
 			.single();
@@ -49,16 +59,7 @@ export async function POST(request: Request) {
 			return NextResponse.json({ error: error.message }, { status: 500 });
 		}
 
-		// Notify all users
-		await notifyAllUsers(
-			admin,
-			'announcement',
-			`📢 ${title}`,
-			body.length > 100 ? `${body.slice(0, 100)}...` : body,
-			{ announcement_id: announcement.id, url: '/announcements' },
-		);
-
-		return NextResponse.json({ success: true, announcement });
+		return NextResponse.json({ success: true, quest });
 	} catch {
 		return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 	}
