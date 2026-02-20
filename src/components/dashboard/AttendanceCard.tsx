@@ -32,8 +32,8 @@ export default function AttendanceCard() {
 			if (!res.ok) return;
 			const data = await res.json();
 			if (data.insights) setInsights(data.insights);
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[AttendanceCard] Failed to fetch attendance insights:', err);
 		}
 	}, []);
 

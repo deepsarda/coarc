@@ -17,8 +17,8 @@ export function RecommendTab() {
 				if (!res.ok) return;
 				const data = await res.json();
 				setRecs(data.recommendations ?? []);
-			} catch {
-				/* silent */
+			} catch (err) {
+				console.error('[RecommendTab] Failed to fetch recommendations:', err);
 			} finally {
 				setLoading(false);
 			}

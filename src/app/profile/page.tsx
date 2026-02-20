@@ -34,8 +34,8 @@ export default function ProfileSearchPage() {
 			const data = await res.json();
 			setAllUsers(data.leaderboard ?? []);
 			setResults(data.leaderboard ?? []);
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[Profile] Failed to fetch profile data:', err);
 		} finally {
 			setLoading(false);
 		}

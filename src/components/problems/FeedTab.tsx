@@ -32,8 +32,8 @@ export function FeedTab() {
 				setProblems(data.problems ?? []);
 			}
 			setHasMore(data.has_more ?? false);
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[FeedTab] Failed to fetch problem feed:', err);
 		} finally {
 			setLoading(false);
 		}
@@ -112,8 +112,8 @@ export function FeedTab() {
 			setShareForm({ platform: 'cf', problem_url: '', problem_title: '', note: '' });
 			setShowShare(false);
 			await fetchFeed(1);
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[FeedTab] Failed to toggle bookmark:', err);
 		} finally {
 			setSharing(false);
 		}

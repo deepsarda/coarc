@@ -179,8 +179,8 @@ export default function LeaderboardPage() {
 				const json: LeaderboardResponse = await res.json();
 				setData(json);
 			}
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[Leaderboard] Failed to fetch leaderboard data:', err);
 		} finally {
 			setLoading(false);
 		}

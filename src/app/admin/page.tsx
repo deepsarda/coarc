@@ -100,8 +100,8 @@ export default function AdminDashboardPage() {
 				const res = await fetch('/api/admin/stats');
 				const data = await res.json();
 				setStats(data.stats ?? null);
-			} catch {
-				/* silent */
+			} catch (err) {
+				console.error('[Admin] Failed to fetch admin stats:', err);
 			} finally {
 				setLoading(false);
 			}

@@ -25,8 +25,8 @@ export default function AdminTestNotificationPage() {
 			if (!res.ok) return;
 			const data = await res.json();
 			setUsers(data.leaderboard ?? []);
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[AdminTestNotif] Failed to send test notification:', err);
 		} finally {
 			setLoading(false);
 		}

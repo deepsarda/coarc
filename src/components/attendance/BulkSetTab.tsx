@@ -75,8 +75,8 @@ export function BulkSetTab({
 				console.error('Bulk save error:', err);
 			}
 			await onDone();
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[BulkSetTab] Failed to fetch courses:', err);
 		} finally {
 			setSaving(false);
 		}
@@ -207,8 +207,8 @@ export function BulkSetTab({
 					try {
 						await fetch('/api/attendance/reset', { method: 'DELETE' });
 						await onDone();
-					} catch {
-						/* silent */
+					} catch (err) {
+						console.error('[BulkSetTab] Failed to submit bulk attendance:', err);
 					} finally {
 						setSaving(false);
 					}

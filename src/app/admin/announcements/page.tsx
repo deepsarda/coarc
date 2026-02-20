@@ -47,8 +47,8 @@ export default function AdminAnnouncementsPage() {
 			const res = await fetch('/api/announcements/list');
 			const data = await res.json();
 			setAnnouncements(data.announcements ?? []);
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[AdminAnnouncements] Failed to fetch announcements:', err);
 		} finally {
 			setLoading(false);
 		}

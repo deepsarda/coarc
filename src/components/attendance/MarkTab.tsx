@@ -148,8 +148,8 @@ export function MarkTab({ courses, records, selectedDate, onDateChange, onRefres
 					}),
 			);
 			await onRefresh();
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[MarkTab] Failed to submit attendance:', err);
 		} finally {
 			setSaving(null);
 		}

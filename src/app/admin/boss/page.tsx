@@ -52,8 +52,8 @@ export default function AdminBossPage() {
 			const archiveData = await archiveRes.json();
 			setActiveBoss(activeData.boss ?? null);
 			setArchive(archiveData.battles ?? []);
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[AdminBoss] Failed to fetch boss data:', err);
 		} finally {
 			setLoading(false);
 		}

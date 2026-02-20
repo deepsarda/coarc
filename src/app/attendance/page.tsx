@@ -44,8 +44,8 @@ export default function AttendancePage() {
 				body: JSON.stringify({ attendance_reminder: newValue }),
 			});
 			if (res.ok) setReminderOn(newValue);
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[Attendance] Failed to toggle reminder:', err);
 		} finally {
 			setTogglingReminder(false);
 		}
@@ -61,8 +61,8 @@ export default function AttendancePage() {
 			const res = await fetch(`/api/attendance/records?from=${from}&to=${to}`);
 			const data = await res.json();
 			setRecords(data.records ?? []);
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[Attendance] Failed to fetch attendance records:', err);
 		}
 	}, []);
 
@@ -83,8 +83,8 @@ export default function AttendancePage() {
 			setCourses(cData.courses ?? []);
 			setRecords(rData.records ?? []);
 			setInsights(iData.insights ?? []);
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[Attendance] Failed to fetch attendance data:', err);
 		} finally {
 			setLoading(false);
 		}

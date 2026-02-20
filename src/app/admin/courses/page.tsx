@@ -90,8 +90,8 @@ export default function AdminCoursesPage() {
 			if (!res.ok) return;
 			const data = await res.json();
 			setCourses(data.courses ?? []);
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[AdminCourses] Failed to fetch courses:', err);
 		} finally {
 			setLoading(false);
 		}
@@ -141,8 +141,8 @@ export default function AdminCoursesPage() {
 		try {
 			await fetch(`/api/attendance/courses/${courseId}`, { method: 'DELETE' });
 			await fetchCourses();
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[AdminCourses] Failed to save course:', err);
 		}
 	};
 
@@ -178,8 +178,8 @@ export default function AdminCoursesPage() {
 				setEditingId(null);
 				await fetchCourses();
 			}
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[AdminCourses] Failed to delete course:', err);
 		} finally {
 			setSaving(false);
 		}

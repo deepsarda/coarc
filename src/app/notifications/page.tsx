@@ -100,8 +100,8 @@ export default function NotificationsPage() {
 				setUnreadCount(data.unread_count);
 				setHasMore(data.has_more);
 				setTotal(data.total);
-			} catch {
-				/* silent */
+			} catch (err) {
+				console.error('[Notifications] Failed to mark notification as read:', err);
 			} finally {
 				setLoading(false);
 				setLoadingMore(false);
@@ -147,8 +147,8 @@ export default function NotificationsPage() {
 			});
 			setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
 			setUnreadCount(0);
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[Notifications] Failed to fetch notifications:', err);
 		} finally {
 			setMarkingAll(false);
 		}

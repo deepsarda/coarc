@@ -40,8 +40,8 @@ export default function AdminFlashcardsPage() {
 			const res = await fetch('/api/flashcards/decks');
 			const data = await res.json();
 			setDecks(data.decks ?? []);
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[AdminFlashcards] Failed to fetch decks:', err);
 		} finally {
 			setLoading(false);
 		}
@@ -129,8 +129,8 @@ export default function AdminFlashcardsPage() {
 		try {
 			await fetch(`/api/flashcards/decks/${deckId}`, { method: 'DELETE' });
 			loadDecks();
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[AdminFlashcards] Failed to save deck:', err);
 		}
 	}
 
@@ -156,8 +156,8 @@ export default function AdminFlashcardsPage() {
 			});
 			setEditDeck(null);
 			loadDecks();
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[AdminFlashcards] Failed to delete deck:', err);
 		} finally {
 			setSaving(false);
 		}

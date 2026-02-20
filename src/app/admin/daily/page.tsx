@@ -41,8 +41,8 @@ export default function AdminDailyPage() {
 			const res = await fetch('/api/admin/daily');
 			const data = await res.json();
 			setDailies(data.dailies ?? []);
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[AdminDaily] Failed to fetch daily problems:', err);
 		} finally {
 			setLoading(false);
 		}

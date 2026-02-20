@@ -168,8 +168,8 @@ export default function ProfilePage() {
 			if (!res.ok) return;
 			const data = await res.json();
 			setAllBadges(data.badges ?? []);
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[Profile] Failed to fetch user profile:', err);
 		}
 	}, []);
 

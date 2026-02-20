@@ -48,8 +48,8 @@ export default function FlashcardStudyPage() {
 				const review = needsStudy.filter((c) => c.user_status === 'needs_review');
 				setQueue([...unseen, ...review]);
 				setSessionStats((s) => ({ ...s, startTime: Date.now() }));
-			} catch {
-				/* silent */
+			} catch (err) {
+				console.error('[Flashcards] Failed to fetch flashcard deck:', err);
 			} finally {
 				setLoading(false);
 			}

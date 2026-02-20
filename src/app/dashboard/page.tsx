@@ -159,8 +159,8 @@ export default function DashboardPage() {
 			if (!res.ok) return;
 			const data = await res.json();
 			if (data.daily) setDaily({ ...data.daily, solved: data.solved ?? false });
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[Dashboard] Failed to fetch daily problem:', err);
 		}
 	}, []);
 
@@ -171,20 +171,22 @@ export default function DashboardPage() {
 			const data = await res.json();
 			if (data.quests) {
 				setQuests(
-					data.quests.map((q: Record<string, unknown>) => ({
-						id: q.id,
-						title: q.title,
-						description: q.description,
-						xp_reward: q.xp_reward,
-						progress: (q as Record<string, unknown>).user_progress ?? 0,
-						target:
-							((q as Record<string, unknown>).condition as Record<string, number>)?.count ?? 1,
-						completed: (q as Record<string, unknown>).user_completed ?? false,
-					})),
+					data.quests.map((q: Record<string, unknown>) => {
+						const up = (q.user_progress as Record<string, unknown>) ?? {};
+						return {
+							id: q.id,
+							title: q.title,
+							description: q.description,
+							xp_reward: q.xp_reward,
+							progress: (up.progress as number) ?? 0,
+							target: (q.condition as Record<string, number>)?.count ?? 1,
+							completed: (up.completed as boolean) ?? false,
+						};
+					}),
 				);
 			}
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[Dashboard] Failed to fetch quests:', err);
 		}
 	}, []);
 
@@ -194,8 +196,8 @@ export default function DashboardPage() {
 			if (!res.ok) return;
 			const data = await res.json();
 			setNotifCount(data.unread_count ?? 0);
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[Dashboard] Failed to fetch notification count:', err);
 		}
 	}, []);
 
@@ -209,8 +211,8 @@ export default function DashboardPage() {
 				total: badges.length,
 				earned: badges.filter((b: { earned: boolean }) => b.earned).length,
 			});
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[Dashboard] Failed to fetch badges:', err);
 		}
 	}, []);
 

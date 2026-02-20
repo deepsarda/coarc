@@ -24,8 +24,8 @@ export function BookmarksTab() {
 			if (!res.ok) return;
 			const data = await res.json();
 			setBookmarks(data.bookmarks ?? []);
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[BookmarksTab] Failed to fetch bookmarks:', err);
 		} finally {
 			setLoading(false);
 		}

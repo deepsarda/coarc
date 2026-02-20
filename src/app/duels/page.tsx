@@ -52,8 +52,8 @@ export default function DuelsPage() {
 			const res = await fetch('/api/users/leaderboard?board=xp&limit=70');
 			const data = await res.json();
 			setUsers((data.leaderboard ?? []).filter((u: Profile) => u.id !== user?.id && u.cf_handle));
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[Duels] Failed to fetch users:', err);
 		}
 	}
 
@@ -87,8 +87,8 @@ export default function DuelsPage() {
 		try {
 			await fetch(`/api/duels/${duelId}/accept`, { method: 'POST' });
 			fetchDuels();
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[Duels] Failed to accept duel:', err);
 		} finally {
 			setActionLoading(null);
 		}
@@ -99,8 +99,8 @@ export default function DuelsPage() {
 		try {
 			await fetch(`/api/duels/${duelId}/decline`, { method: 'POST' });
 			fetchDuels();
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[Duels] Failed to decline duel:', err);
 		} finally {
 			setActionLoading(null);
 		}

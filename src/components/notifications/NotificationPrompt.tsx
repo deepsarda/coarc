@@ -42,8 +42,8 @@ async function setStoredEndpoint(endpoint: string): Promise<void> {
 		const db = await openIDB();
 		const tx = db.transaction(IDB_STORE, 'readwrite');
 		tx.objectStore(IDB_STORE).put(endpoint, 'endpoint');
-	} catch {
-		/* silent */
+	} catch (err) {
+		console.error('[NotificationPrompt] Failed to store push endpoint:', err);
 	}
 }
 

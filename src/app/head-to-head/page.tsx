@@ -135,8 +135,8 @@ export default function HeadToHeadPage() {
 				if (!res.ok) return;
 				const d = await res.json();
 				setAllUsers(d.leaderboard ?? []);
-			} catch {
-				/* silent */
+			} catch (err) {
+				console.error('[HeadToHead] Failed to fetch head-to-head data:', err);
 			}
 		})();
 	}, []);
@@ -156,8 +156,8 @@ export default function HeadToHeadPage() {
 			const res = await fetch(`/api/users/compare?id1=${user1Id}&id2=${user2Id}`);
 			if (!res.ok) return;
 			setData(await res.json());
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[HeadToHead] Failed to submit answer:', err);
 		} finally {
 			setLoading(false);
 		}

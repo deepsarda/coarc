@@ -33,8 +33,8 @@ export default function AdminResourcesPage() {
 			const approvedData = await approvedRes.json();
 			setPending(pendingData.resources ?? []);
 			setApproved(approvedData.resources ?? []);
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[AdminResources] Failed to fetch resources:', err);
 		} finally {
 			setLoading(false);
 		}

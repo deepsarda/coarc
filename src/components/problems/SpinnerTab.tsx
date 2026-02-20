@@ -35,8 +35,8 @@ export function SpinnerTab() {
 			const data = await res.json();
 			await new Promise((r) => setTimeout(r, 800));
 			setProblem(data.problem ?? null);
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[SpinnerTab] Failed to spin random problem:', err);
 		} finally {
 			setSpinning(false);
 		}

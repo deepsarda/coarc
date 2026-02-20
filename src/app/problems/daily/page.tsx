@@ -35,8 +35,8 @@ export default function DailyProblemPage() {
 			setSolvesCount(data.solves_count ?? 0);
 			setUserSolved(data.user_solved ?? false);
 			return data;
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[DailyProblem] Failed to fetch daily problem:', err);
 		}
 	}, []);
 
@@ -63,8 +63,8 @@ export default function DailyProblemPage() {
 							}
 						}
 					}
-				} catch {
-					/* silent */
+				} catch (err) {
+					console.error('[DailyProblem] Failed to mark problem as solved:', err);
 				} finally {
 					setChecking(false);
 				}

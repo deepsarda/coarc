@@ -47,8 +47,8 @@ export default function AdminQuestsPage() {
 			const res = await fetch('/api/quests/active');
 			const data = await res.json();
 			setQuests(data.quests ?? []);
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[AdminQuests] Failed to fetch quests:', err);
 		} finally {
 			setLoading(false);
 		}

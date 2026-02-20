@@ -39,8 +39,8 @@ export function AttendanceHeatmap() {
 					days.push({ date: ds, ...(map.get(ds) ?? { attended: 0, bunked: 0 }) });
 				}
 				setData(days);
-			} catch {
-				/* silent */
+			} catch (err) {
+				console.error('[AttendanceHeatmap] Failed to fetch attendance data:', err);
 			} finally {
 				setLoading(false);
 			}

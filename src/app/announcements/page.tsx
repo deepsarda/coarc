@@ -146,8 +146,8 @@ export default function AnnouncementsPage() {
 				setAnnouncements(data.announcements ?? []);
 			}
 			setHasMore(data.has_more ?? false);
-		} catch {
-			/* silent */
+		} catch (err) {
+			console.error('[Announcements] Failed to fetch announcements:', err);
 		} finally {
 			setLoading(false);
 			setLoadingMore(false);
