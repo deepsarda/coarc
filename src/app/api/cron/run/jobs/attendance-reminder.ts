@@ -44,10 +44,9 @@ export async function runAttendanceReminder(admin: SupabaseClient) {
 		return { sent: 0, reason: 'No opted-in users' };
 	}
 
-	let sent = 0;
-	for (const user of users) {
-		try {
-			await createNotification(
+	const results = await Promise.allSettled(
+		users.map((user) =>
+			createNotification(
 				admin,
 				user.id,
 				'attendance_reminder',
@@ -55,12 +54,10 @@ export async function runAttendanceReminder(admin: SupabaseClient) {
 				"Don't forget to mark your attendance for today!",
 				{ url: '/attendance' },
 				!!user.push_subscription,
-			);
-			sent++;
-		} catch {
-			// Continue with other users
-		}
-	}
+			),
+		),
+	);
+	const sent = results.filter((r) => r.status === 'fulfilled').length;
 
 	// Record the run
 	await admin.from('cron_runs').upsert(

@@ -41,7 +41,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
 		const { data: existing } = await admin
 			.from('boss_battle_solves')
 			.select('id')
-			.eq('boss_battle_id', bossId)
+			.eq('boss_id', bossId)
 			.eq('user_id', user.id)
 			.single();
 
@@ -49,20 +49,85 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
 			return NextResponse.json({ error: 'Already solved' }, { status: 409 });
 		}
 
+		// Verify on codeforces
+		const { data: profile } = await admin
+			.from('profiles')
+			.select('cf_handle')
+			.eq('id', user.id)
+			.single();
+
+		if (!profile?.cf_handle) {
+			return NextResponse.json(
+				{ error: 'Please connect your Codeforces account first' },
+				{ status: 400 },
+			);
+		}
+
+		// Extract contestId and index from URL
+		// e.g. https://codeforces.com/problemset/problem/1234/A
+		// e.g. https://codeforces.com/contest/1234/problem/A
+		const urlMatch =
+			boss.problem_url.match(/problemset\/problem\/(\d+)\/([^/]+)/) ||
+			boss.problem_url.match(/contest\/(\d+)\/problem\/([^/]+)/);
+
+		if (urlMatch) {
+			const contestId = urlMatch[1];
+			const index = urlMatch[2];
+
+			// Check Codeforces API
+			try {
+				const cfRes = await fetch(
+					`https://codeforces.com/api/user.status?handle=${profile.cf_handle}&from=1&count=50`,
+				);
+				const cfData = await cfRes.json();
+
+				if (cfData.status !== 'OK') {
+					throw new Error('Codeforces API error');
+				}
+
+				const hasSolved = cfData.result.some(
+					(sub: { verdict: string; problem: { contestId?: number; index: string } }) =>
+						sub.verdict === 'OK' &&
+						sub.problem.contestId?.toString() === contestId &&
+						sub.problem.index === index,
+				);
+
+				if (!hasSolved) {
+					return NextResponse.json(
+						{ error: 'No accepted submission found on Codeforces for this problem.' },
+						{ status: 400 },
+					);
+				}
+			} catch (_) {
+				return NextResponse.json(
+					{ error: 'Failed to verify with Codeforces. Please try again later.' },
+					{ status: 500 },
+				);
+			}
+		}
+
 		// Get current solve count to determine rank
 		const { count: solveCount } = await admin
 			.from('boss_battle_solves')
 			.select('id', { count: 'exact', head: true })
-			.eq('boss_battle_id', bossId);
+			.eq('boss_id', bossId);
 
 		const solveRank = (solveCount ?? 0) + 1;
 
 		// Insert solve
-		await admin.from('boss_battle_solves').insert({
-			boss_battle_id: bossId,
+		const { error: insertError } = await admin.from('boss_battle_solves').insert({
+			boss_id: bossId,
 			user_id: user.id,
 			solve_rank: solveRank,
 		});
+
+		if (insertError) {
+			// UNIQUE constraint violation = already solved
+			if (insertError.code === '23505') {
+				return NextResponse.json({ error: 'Already solved' }, { status: 409 });
+			}
+			return NextResponse.json({ error: insertError.message }, { status: 500 });
+		}
 
 		// Determine XP based on rank
 		let xpAmount: number;

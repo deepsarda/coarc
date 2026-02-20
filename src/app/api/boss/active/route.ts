@@ -27,8 +27,17 @@ export async function GET() {
 			.single();
 
 		if (!boss) {
+			// No active boss — check for upcoming battles
+			const { data: upcoming } = await supabase
+				.from('boss_battles')
+				.select('id, title, difficulty_label, starts_at, ends_at, problem_url')
+				.gt('starts_at', now)
+				.order('starts_at', { ascending: true })
+				.limit(5);
+
 			return NextResponse.json({
 				boss: null,
+				upcoming: upcoming ?? [],
 				message: 'No active boss battle',
 			});
 		}
@@ -37,14 +46,20 @@ export async function GET() {
 		const { data: solves, count: solvesCount } = await supabase
 			.from('boss_battle_solves')
 			.select('*, profiles:user_id(display_name)', { count: 'exact' })
-			.eq('boss_battle_id', boss.id)
+			.eq('boss_id', boss.id)
 			.order('solved_at', { ascending: true });
 
 		// Check if current user solved
 		const userSolve = (solves ?? []).find((s) => s.user_id === user.id);
 
-		// HP bar: total HP = 70 (class size), current = 70 - solves
-		const totalHP = 70;
+		// Get total CF profiles
+		const { count: cfUserCount } = await supabase
+			.from('profiles')
+			.select('id', { count: 'exact', head: true })
+			.not('cf_handle', 'is', null);
+
+		// HP bar: total HP = ceil(CF profiles / 2)
+		const totalHP = Math.max(1, Math.ceil((cfUserCount ?? 0) / 2));
 		const currentHP = Math.max(0, totalHP - (solvesCount ?? 0));
 
 		return NextResponse.json({

@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { CalendarCheck, Check, ChevronLeft, ChevronRight, Minus, Plus, X } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { DateInput } from '@/components/ui/DatePicker';
 import type { AttendanceRecord, Course } from './types';
 import { DAYS, dateStr, todayStr } from './types';
 
@@ -180,12 +181,11 @@ export function MarkTab({ courses, records, selectedDate, onDateChange, onRefres
 				>
 					<ChevronLeft className="w-4 h-4" />
 				</button>
-				<input
-					type="date"
+				<DateInput
 					value={selectedDate}
-					onChange={(e) => onDateChange(e.target.value)}
-					max={todayStr()}
-					className="form-input text-sm font-mono flex-1"
+					onChange={(v) => onDateChange(v)}
+					pastOnly
+					className="text-sm font-mono flex-1"
 				/>
 				<button
 					type="button"

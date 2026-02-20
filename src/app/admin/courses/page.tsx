@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { Check, ChevronUp, Palette, Pencil, Plus, Settings, Trash2, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
+import { DateInput } from '@/components/ui/DatePicker';
 
 /* Types */
 interface Course {
@@ -413,11 +414,11 @@ function CourseFormFields({
 					<span className="font-mono text-tiny text-text-muted uppercase tracking-widest font-bold mb-1 block">
 						Semester End Date
 					</span>
-					<input
-						type="date"
+					<DateInput
 						value={form.semester_end}
-						onChange={(e) => setForm({ ...form, semester_end: e.target.value })}
-						className="form-input w-full text-sm font-mono"
+						onChange={(v) => setForm({ ...form, semester_end: v })}
+						futureOnly
+						className="w-full text-sm font-mono"
 					/>
 				</div>
 			</div>

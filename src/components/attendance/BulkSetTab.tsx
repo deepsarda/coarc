@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useCallback, useEffect, useState } from 'react';
+import { DateInput } from '@/components/ui/DatePicker';
 import type { Course } from './types';
 
 export function BulkSetTab({
@@ -109,16 +110,14 @@ export function BulkSetTab({
 				{mode === 'predict' && (
 					<div className="flex items-center gap-2 mb-4">
 						<span className="font-mono text-tiny text-text-muted shrink-0">Semester started:</span>
-						<input
-							type="date"
+						<DateInput
 							value={semStart}
 							min="2026-01-01"
-							onChange={(e) => {
-								const v = e.target.value;
+							onChange={(v) => {
 								if (v && v < '2026-01-01') return;
 								setSemStart(v);
 							}}
-							className="form-input text-sm font-mono flex-1"
+							className="text-sm font-mono flex-1"
 						/>
 						<button
 							type="button"

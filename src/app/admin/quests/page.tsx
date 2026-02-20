@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Plus, ScrollText, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useAuthContext } from '@/components/providers/AuthProvider';
+import { DateInput } from '@/components/ui/DatePicker';
 
 interface Quest {
 	id: number;
@@ -122,8 +123,8 @@ export default function AdminQuestsPage() {
 	}
 
 	return (
-		<div className="px-4 sm:px-8 py-6 sm:py-10 pb-24 sm:pb-10 max-w-[800px] mx-auto relative">
-			<div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[300px] bg-neon-orange/3 rounded-full blur-[150px] pointer-events-none" />
+		<div className="px-4 sm:px-8 py-6 sm:py-10 pb-24 sm:pb-10 max-w-200 mx-auto relative">
+			<div className="absolute top-0 left-1/2 -translate-x-1/2 w-200 h-75 bg-neon-orange/3 rounded-full blur-[150px] pointer-events-none" />
 
 			{/* HEADER */}
 			<motion.header
@@ -149,12 +150,12 @@ export default function AdminQuestsPage() {
 				<label htmlFor="week-select" className="form-label">
 					Week Starting
 				</label>
-				<input
+				<DateInput
 					id="week-select"
-					type="date"
 					value={weekStart}
-					onChange={(e) => setWeekStart(e.target.value)}
-					className="form-input py-2 text-sm w-48"
+					onChange={(v) => setWeekStart(v)}
+					futureOnly
+					className="py-2 text-sm w-48"
 				/>
 				<span className="dash-sub">{weekQuests.length} quests this week</span>
 			</motion.div>

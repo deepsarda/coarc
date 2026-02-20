@@ -33,12 +33,12 @@ export async function GET() {
 				const { count } = await supabase
 					.from('boss_battle_solves')
 					.select('id', { count: 'exact', head: true })
-					.eq('boss_battle_id', boss.id);
+					.eq('boss_id', boss.id);
 
 				const { data: userSolve } = await supabase
 					.from('boss_battle_solves')
 					.select('solve_rank, solved_at')
-					.eq('boss_battle_id', boss.id)
+					.eq('boss_id', boss.id)
 					.eq('user_id', user.id)
 					.single();
 

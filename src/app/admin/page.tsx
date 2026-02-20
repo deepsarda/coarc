@@ -161,8 +161,8 @@ export default function AdminDashboardPage() {
 		: [];
 
 	return (
-		<div className="px-4 sm:px-8 py-6 sm:py-10 pb-24 sm:pb-10 max-w-[900px] mx-auto relative">
-			<div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[300px] bg-neon-cyan/3 rounded-full blur-[150px] pointer-events-none" />
+		<div className="px-4 sm:px-8 py-6 sm:py-10 pb-24 sm:pb-10 max-w-225 mx-auto relative">
+			<div className="absolute top-0 left-1/2 -translate-x-1/2 w-100 h-75 bg-neon-cyan/3 rounded-full blur-[150px] pointer-events-none" />
 
 			{/* HEADER */}
 			<motion.header

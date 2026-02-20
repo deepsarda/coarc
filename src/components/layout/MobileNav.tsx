@@ -26,7 +26,7 @@ export default function MobileNav() {
 							<Link
 								key={item.href}
 								href={href}
-								className={`flex flex-col items-center gap-0.5 px-3 py-1 min-w-[3.5rem] transition-colors ${
+								className={`flex flex-col items-center gap-0.5 px-3 py-1 min-w-14 transition-colors ${
 									isActive ? 'text-neon-cyan' : 'text-text-muted'
 								}`}
 							>
@@ -40,7 +40,7 @@ export default function MobileNav() {
 					<button
 						type="button"
 						onClick={() => setDrawerOpen(true)}
-						className="flex flex-col items-center gap-0.5 px-3 py-1 min-w-[3.5rem] text-text-muted transition-colors"
+						className="flex flex-col items-center gap-0.5 px-3 py-1 min-w-14 text-text-muted transition-colors"
 					>
 						<MoreHorizontal className="w-5 h-5" />
 						<span className="text-[10px] font-mono">More</span>

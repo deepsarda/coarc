@@ -50,21 +50,25 @@ export async function runComputeRankings(admin: SupabaseClient) {
 
 	const darkHorses: string[] = [];
 
+	// Collect dark horse notifications (each notifyAllUsers is already parallel internally)
+	const darkHorsePromises: Promise<void>[] = [];
 	for (const entry of currentRanking) {
 		// Dark horse: earned 3x the average this week and is in top 20
 		if (entry.weekly_xp > avgWeeklyXP * 3 && entry.weekly_xp > 50 && entry.rank <= 20) {
 			darkHorses.push(entry.user_id);
 
-			// Notify all users about the dark horse
-			await notifyAllUsers(
-				admin,
-				'dark_horse',
-				'🐴 Dark Horse Alert!',
-				`${entry.display_name} surged to #${entry.rank} this week with ${entry.weekly_xp} XP!`,
-				{ user_id: entry.user_id, url: '/leaderboard' },
+			darkHorsePromises.push(
+				notifyAllUsers(
+					admin,
+					'dark_horse',
+					'🐴 Dark Horse Alert!',
+					`${entry.display_name} surged to #${entry.rank} this week with ${entry.weekly_xp} XP!`,
+					{ user_id: entry.user_id, url: '/leaderboard' },
+				),
 			);
 		}
 	}
+	await Promise.allSettled(darkHorsePromises);
 
 	// Overtake detection (simplified): compare current weekly rank position
 	// In a production setup, you'd store the previous ranking and diff
@@ -83,6 +87,9 @@ export async function runComputeRankings(admin: SupabaseClient) {
 	if (previousRanking) {
 		const prevRankMap = new Map(previousRanking.map((p) => [p.user_id, p.rank]));
 
+		// Collect all overtake notifications
+		const overtakePromises: Promise<void>[] = [];
+
 		for (const entry of currentRanking) {
 			const prevRank = prevRankMap.get(entry.user_id);
 			if (prevRank && prevRank > entry.rank) {
@@ -98,17 +105,21 @@ export async function runComputeRankings(admin: SupabaseClient) {
 				});
 
 				for (const victim of overtaken) {
-					await createNotification(
-						admin,
-						victim.user_id,
-						'overtake',
-						"📈 You've Been Overtaken!",
-						`${entry.display_name} just passed you on the leaderboard. You're now #${victim.rank}.`,
-						{ url: '/leaderboard' },
+					overtakePromises.push(
+						createNotification(
+							admin,
+							victim.user_id,
+							'overtake',
+							"📈 You've Been Overtaken!",
+							`${entry.display_name} just passed you on the leaderboard. You're now #${victim.rank}.`,
+							{ url: '/leaderboard' },
+						).catch(() => {}),
 					);
 				}
 			}
 		}
+
+		await Promise.allSettled(overtakePromises);
 	}
 
 	return {

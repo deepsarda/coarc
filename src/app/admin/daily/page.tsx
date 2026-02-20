@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { CalendarDays, ExternalLink, Plus, Sparkles } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useAuthContext } from '@/components/providers/AuthProvider';
+import { DateInput } from '@/components/ui/DatePicker';
 
 interface DailyProblem {
 	id: number;
@@ -198,12 +199,12 @@ export default function AdminDailyPage() {
 							<label htmlFor="daily-date" className="form-label mb-1.5 block">
 								Date *
 							</label>
-							<input
+							<DateInput
 								id="daily-date"
-								type="date"
 								value={date}
-								onChange={(e) => setDate(e.target.value)}
-								className="form-input py-2.5 text-sm"
+								onChange={(v) => setDate(v)}
+								futureOnly
+								className="py-2.5 text-sm"
 							/>
 						</div>
 						<div>

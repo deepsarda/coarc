@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Clock, ExternalLink, Plus, Skull, Trophy } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useAuthContext } from '@/components/providers/AuthProvider';
+import { DateTimeInput } from '@/components/ui/DatePicker';
 
 interface BossBattle {
 	id: number;
@@ -65,6 +66,11 @@ export default function AdminBossPage() {
 
 	async function handleCreate() {
 		if (!title.trim() || !problemUrl.trim() || !startsAt || !endsAt) return;
+		if (!problemUrl.includes('codeforces.com/')) {
+			setMsg('❌ Please enter a valid Codeforces problem URL');
+			return;
+		}
+
 		setCreating(true);
 		setMsg('');
 
@@ -276,24 +282,24 @@ export default function AdminBossPage() {
 							<label htmlFor="boss-start" className="form-label mb-1.5 block">
 								Starts At *
 							</label>
-							<input
+							<DateTimeInput
 								id="boss-start"
-								type="datetime-local"
 								value={startsAt}
-								onChange={(e) => setStartsAt(e.target.value)}
-								className="form-input py-2.5 text-sm"
+								onChange={(v) => setStartsAt(v)}
+								futureOnly
+								className="py-2.5 text-sm"
 							/>
 						</div>
 						<div>
 							<label htmlFor="boss-end" className="form-label mb-1.5 block">
 								Ends At *
 							</label>
-							<input
+							<DateTimeInput
 								id="boss-end"
-								type="datetime-local"
 								value={endsAt}
-								onChange={(e) => setEndsAt(e.target.value)}
-								className="form-input py-2.5 text-sm"
+								onChange={(v) => setEndsAt(v)}
+								futureOnly
+								className="py-2.5 text-sm"
 							/>
 						</div>
 					</div>

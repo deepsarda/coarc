@@ -14,9 +14,13 @@ import { awardXP } from './xp';
  * - Sends "streak at risk" warnings
  */
 export async function processAllStreaks(admin: SupabaseClient) {
+	const todayStr = todayIST();
+
 	const { data: profiles } = await admin
 		.from('profiles')
-		.select('id, current_streak, longest_streak, streak_shields, last_solve_date');
+		.select(
+			'id, current_streak, longest_streak, streak_shields, last_solve_date, last_streak_processed',
+		);
 
 	if (!profiles) return;
 
@@ -24,7 +28,14 @@ export async function processAllStreaks(admin: SupabaseClient) {
 	const dayBeforeStr = daysAgoIST(2);
 
 	for (const profile of profiles) {
-		if (!profile.last_solve_date) continue;
+		// Skip if already processed today (prevents duplicate runs)
+		if (profile.last_streak_processed === todayStr) continue;
+
+		if (!profile.last_solve_date) {
+			// Mark as processed even if no solve history
+			await admin.from('profiles').update({ last_streak_processed: todayStr }).eq('id', profile.id);
+			continue;
+		}
 
 		const lastSolve = profile.last_solve_date;
 
@@ -88,6 +99,9 @@ export async function processAllStreaks(admin: SupabaseClient) {
 			}
 		}
 
+		// Mark this user as processed for today
+		await admin.from('profiles').update({ last_streak_processed: todayStr }).eq('id', profile.id);
+
 		// Run badge checks for streak-related badges
 		await checkAndAwardBadges(admin, profile.id);
 	}
@@ -95,7 +109,7 @@ export async function processAllStreaks(admin: SupabaseClient) {
 
 /**
  * Send "streak at risk" warnings. Called at 6 PM IST for users
- * who haven't solved today and have streak >= 3.
+ * who haven't solved today and have streak >= 2.
  */
 export async function sendStreakWarnings(admin: SupabaseClient) {
 	const todayStr = todayIST();
@@ -103,23 +117,24 @@ export async function sendStreakWarnings(admin: SupabaseClient) {
 	const { data: atRiskUsers } = await admin
 		.from('profiles')
 		.select('id, current_streak, last_solve_date')
-		.gte('current_streak', 3);
+		.gte('current_streak', 2);
 
 	if (!atRiskUsers) return;
 
-	for (const user of atRiskUsers) {
-		// If they haven't solved today
-		if (user.last_solve_date !== todayStr) {
-			await createNotification(
+	const warnings = atRiskUsers
+		.filter((user) => user.last_solve_date !== todayStr)
+		.map((user) =>
+			createNotification(
 				admin,
 				user.id,
 				'streak_warning',
 				'🔥 Streak at Risk!',
 				`Your ${user.current_streak}-day streak expires at midnight! Solve a problem now.`,
 				{ url: '/problems/daily' },
-			);
-		}
-	}
+			).catch(() => {}),
+		);
+
+	await Promise.allSettled(warnings);
 }
 
 /**
