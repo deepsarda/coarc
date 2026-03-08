@@ -1,7 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion, useMotionValue, useTransform } from 'framer-motion';
-import { Check, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, Undo2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export interface StudyCard {
@@ -16,9 +16,11 @@ interface FlashcardStudyProps {
 	queue: StudyCard[];
 	currentIndex: number;
 	onMark: (status: 'got_it' | 'needs_review') => void;
+	onPrev?: () => void;
+	canGoPrev?: boolean;
 }
 
-export function FlashcardStudy({ queue, currentIndex, onMark }: FlashcardStudyProps) {
+export function FlashcardStudy({ queue, currentIndex, onMark, onPrev, canGoPrev }: FlashcardStudyProps) {
 	const [flipped, setFlipped] = useState(false);
 	const cardRef = useRef<HTMLDivElement>(null);
 
@@ -71,16 +73,37 @@ export function FlashcardStudy({ queue, currentIndex, onMark }: FlashcardStudyPr
 				if (flipped) handleMark('got_it');
 			} else if (e.key === 'ArrowLeft' || e.key === 'h') {
 				if (flipped) handleMark('needs_review');
+			} else if ((e.key === 'Backspace' || e.key === 'b') && canGoPrev && onPrev) {
+				e.preventDefault();
+				onPrev();
 			}
 		}
 		window.addEventListener('keydown', handleKey);
 		return () => window.removeEventListener('keydown', handleKey);
-	}, [flipped, handleMark]);
+	}, [flipped, handleMark, canGoPrev, onPrev]);
 
 	if (!currentCard) return null;
 
 	return (
 		<>
+			{/* PREVIOUS BUTTON */}
+			{onPrev && (
+				<motion.div
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					className="mb-3 flex"
+				>
+					<button
+						type="button"
+						onClick={onPrev}
+						disabled={!canGoPrev}
+						className="flex items-center gap-2 min-h-[44px] px-4 py-2 font-mono text-tiny font-bold uppercase tracking-widest border border-border-hard text-text-muted transition-colors enabled:hover:border-neon-cyan/50 enabled:hover:text-neon-cyan disabled:opacity-30 disabled:cursor-not-allowed"
+					>
+						<Undo2 className="w-3.5 h-3.5" /> Previous
+					</button>
+				</motion.div>
+			)}
+
 			{/* CARD */}
 			<div className="relative min-h-[320px] sm:min-h-[360px] mb-6 select-none">
 				{/* Swipe indicators */}

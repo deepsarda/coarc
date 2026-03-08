@@ -31,6 +31,9 @@ export default function FlashcardStudyPage() {
 		xpEarned: 0,
 	});
 	const [queue, setQueue] = useState<StudyCard[]>([]);
+	const [history, setHistory] = useState<
+		{ card: StudyCard; status: 'got_it' | 'needs_review'; prevIndex: number; prevQueue: StudyCard[] }[]
+	>([]);
 
 	useEffect(() => {
 		async function load() {
@@ -70,6 +73,9 @@ export default function FlashcardStudyPage() {
 			const currentCard = queue[currentIndex];
 			if (!currentCard) return;
 
+			// Save undo history (snapshot queue before mutation)
+			setHistory((h) => [...h, { card: currentCard, status, prevIndex: currentIndex, prevQueue: [...queue] }]);
+
 			// Update server
 			fetch('/api/flashcards/progress', {
 				method: 'POST',
@@ -107,12 +113,43 @@ export default function FlashcardStudyPage() {
 		[currentIndex, queue],
 	);
 
+	const handlePrev = useCallback(() => {
+		if (history.length === 0) return;
+		const last = history[history.length - 1];
+
+		// Restore queue and index from snapshot
+		setQueue(last.prevQueue);
+		setCurrentIndex(last.prevIndex);
+
+		// If we came back from 'complete', re-enter studying
+		if (phase === 'complete') setPhase('studying');
+
+		// Reverse stats
+		setSessionStats((s) => ({
+			...s,
+			cardsReviewed: Math.max(0, s.cardsReviewed - 1),
+			gotIt: last.status === 'got_it' ? Math.max(0, s.gotIt - 1) : s.gotIt,
+			needsReview: last.status === 'needs_review' ? Math.max(0, s.needsReview - 1) : s.needsReview,
+		}));
+
+		// Revert the server status
+		fetch('/api/flashcards/progress', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ card_id: last.card.id, status: last.card.user_status }),
+		}).catch(() => {});
+
+		// Pop history
+		setHistory((h) => h.slice(0, -1));
+	}, [history, phase]);
+
 	const handleReviewAgain = useCallback(() => {
 		const reviewCards = cards.filter((c) => c.user_status === 'needs_review');
 		if (reviewCards.length > 0) {
 			setQueue(reviewCards);
 			setCurrentIndex(0);
 			setPhase('studying');
+			setHistory([]);
 			setSessionStats({
 				cardsReviewed: 0,
 				gotIt: 0,
@@ -203,7 +240,7 @@ export default function FlashcardStudyPage() {
 			</motion.div>
 
 			{/* FLASHCARD STUDY */}
-			<FlashcardStudy queue={queue} currentIndex={currentIndex} onMark={handleMark} />
+			<FlashcardStudy queue={queue} currentIndex={currentIndex} onMark={handleMark} onPrev={handlePrev} canGoPrev={history.length > 0} />
 
 			{/* CARD COUNTER */}
 			<motion.div
