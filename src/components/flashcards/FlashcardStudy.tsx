@@ -1,7 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion, useMotionValue, useTransform } from 'framer-motion';
-import { Check, ChevronLeft, ChevronRight, Undo2 } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, RotateCcw, Undo2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export interface StudyCard {
@@ -18,9 +18,10 @@ interface FlashcardStudyProps {
 	onMark: (status: 'got_it' | 'needs_review') => void;
 	onPrev?: () => void;
 	canGoPrev?: boolean;
+	onRestart?: () => void;
 }
 
-export function FlashcardStudy({ queue, currentIndex, onMark, onPrev, canGoPrev }: FlashcardStudyProps) {
+export function FlashcardStudy({ queue, currentIndex, onMark, onPrev, canGoPrev, onRestart }: FlashcardStudyProps) {
 	const [flipped, setFlipped] = useState(false);
 	const cardRef = useRef<HTMLDivElement>(null);
 
@@ -86,21 +87,32 @@ export function FlashcardStudy({ queue, currentIndex, onMark, onPrev, canGoPrev 
 
 	return (
 		<>
-			{/* PREVIOUS BUTTON */}
-			{onPrev && (
+			{/* TOP CONTROLS */}
+			{(onPrev || onRestart) && (
 				<motion.div
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
-					className="mb-3 flex"
+					className="mb-3 flex gap-2"
 				>
-					<button
-						type="button"
-						onClick={onPrev}
-						disabled={!canGoPrev}
-						className="flex items-center gap-2 min-h-[44px] px-4 py-2 font-mono text-tiny font-bold uppercase tracking-widest border border-border-hard text-text-muted transition-colors enabled:hover:border-neon-cyan/50 enabled:hover:text-neon-cyan disabled:opacity-30 disabled:cursor-not-allowed"
-					>
-						<Undo2 className="w-3.5 h-3.5" /> Previous
-					</button>
+					{onPrev && (
+						<button
+							type="button"
+							onClick={onPrev}
+							disabled={!canGoPrev}
+							className="flex-1 sm:flex-none flex items-center justify-center gap-2 min-h-[44px] px-4 py-2 font-mono text-tiny font-bold uppercase tracking-widest border border-border-hard text-text-muted transition-colors enabled:hover:border-neon-cyan/50 enabled:hover:text-neon-cyan disabled:opacity-30 disabled:cursor-not-allowed"
+						>
+							<Undo2 className="w-3.5 h-3.5" /> Previous
+						</button>
+					)}
+					{onRestart && (
+						<button
+							type="button"
+							onClick={onRestart}
+							className="flex-1 sm:flex-none flex items-center justify-center gap-2 min-h-[44px] px-4 py-2 font-mono text-tiny font-bold uppercase tracking-widest border border-border-hard text-text-muted transition-colors hover:border-neon-red/50 hover:text-neon-red"
+						>
+							<RotateCcw className="w-3.5 h-3.5" /> Restart
+						</button>
+					)}
 				</motion.div>
 			)}
 

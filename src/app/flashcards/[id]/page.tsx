@@ -49,8 +49,14 @@ export default function FlashcardStudyPage() {
 				const needsStudy = loadedCards.filter((c) => c.user_status !== 'got_it');
 				const unseen = needsStudy.filter((c) => c.user_status === 'unseen');
 				const review = needsStudy.filter((c) => c.user_status === 'needs_review');
-				setQueue([...unseen, ...review]);
+				const initialQueue = [...unseen, ...review];
+				setQueue(initialQueue);
 				setSessionStats((s) => ({ ...s, startTime: Date.now() }));
+				
+				// Fix empty deck bug: if we loaded the deck and there are no cards left to study, show complete phase
+				if (initialQueue.length === 0 && loadedCards.length > 0) {
+					setPhase('complete');
+				}
 			} catch (err) {
 				console.error('[Flashcards] Failed to fetch flashcard deck:', err);
 			} finally {
@@ -142,6 +148,23 @@ export default function FlashcardStudyPage() {
 		// Pop history
 		setHistory((h) => h.slice(0, -1));
 	}, [history, phase]);
+
+	const handleRestart = useCallback(() => {
+		// Reset all cards' visual status back to unseen for the current session
+		const resetCards = cards.map((c) => ({ ...c, user_status: 'unseen' as const }));
+		setCards(resetCards);
+		setQueue([...resetCards]);
+		setCurrentIndex(0);
+		setHistory([]);
+		setPhase('studying');
+		setSessionStats({
+			cardsReviewed: 0,
+			gotIt: 0,
+			needsReview: 0,
+			startTime: Date.now(),
+			xpEarned: 0,
+		});
+	}, [cards]);
 
 	const handleReviewAgain = useCallback(() => {
 		const reviewCards = cards.filter((c) => c.user_status === 'needs_review');
@@ -240,7 +263,7 @@ export default function FlashcardStudyPage() {
 			</motion.div>
 
 			{/* FLASHCARD STUDY */}
-			<FlashcardStudy queue={queue} currentIndex={currentIndex} onMark={handleMark} onPrev={handlePrev} canGoPrev={history.length > 0} />
+			<FlashcardStudy queue={queue} currentIndex={currentIndex} onMark={handleMark} onPrev={handlePrev} canGoPrev={history.length > 0} onRestart={handleRestart} />
 
 			{/* CARD COUNTER */}
 			<motion.div
