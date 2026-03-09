@@ -27,6 +27,16 @@ export function FlashcardStudy({ queue, currentIndex, onMark, onPrev, canGoPrev,
 
 	const currentCard = queue[currentIndex] ?? null;
 
+	const triggerHaptic = useCallback((pattern: number | number[] = 50) => {
+		if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+			try {
+				navigator.vibrate(pattern);
+			} catch (e) {
+				// Ignore errors
+			}
+		}
+	}, []);
+
 	// biome-ignore lint/correctness/useExhaustiveDependencies: intentionally re-trigger on card change
 	useEffect(() => {
 		setFlipped(false);
@@ -40,10 +50,11 @@ export function FlashcardStudy({ queue, currentIndex, onMark, onPrev, canGoPrev,
 
 	const handleMark = useCallback(
 		(status: 'got_it' | 'needs_review') => {
+			triggerHaptic(status === 'got_it' ? [30, 50, 30] : [50, 100, 50]);
 			setFlipped(false);
 			onMark(status);
 		},
-		[onMark],
+		[onMark, triggerHaptic],
 	);
 
 	const handleSwipeEnd = useCallback(
@@ -64,24 +75,30 @@ export function FlashcardStudy({ queue, currentIndex, onMark, onPrev, canGoPrev,
 		[flipped, handleMark],
 	);
 
+	const handleFlip = useCallback(() => {
+		triggerHaptic();
+		setFlipped((f) => !f);
+	}, [triggerHaptic]);
+
 	// Keyboard controls
 	useEffect(() => {
 		function handleKey(e: KeyboardEvent) {
 			if (e.key === ' ' || e.key === 'Enter') {
 				e.preventDefault();
-				if (!flipped) setFlipped(true);
+				handleFlip();
 			} else if (e.key === 'ArrowRight' || e.key === 'l') {
 				if (flipped) handleMark('got_it');
 			} else if (e.key === 'ArrowLeft' || e.key === 'h') {
 				if (flipped) handleMark('needs_review');
 			} else if ((e.key === 'Backspace' || e.key === 'b') && canGoPrev && onPrev) {
 				e.preventDefault();
+				triggerHaptic(40);
 				onPrev();
 			}
 		}
 		window.addEventListener('keydown', handleKey);
 		return () => window.removeEventListener('keydown', handleKey);
-	}, [flipped, handleMark, canGoPrev, onPrev]);
+	}, [flipped, handleMark, canGoPrev, onPrev, handleFlip, triggerHaptic]);
 
 	if (!currentCard) return null;
 
@@ -97,7 +114,10 @@ export function FlashcardStudy({ queue, currentIndex, onMark, onPrev, canGoPrev,
 					{onPrev && (
 						<button
 							type="button"
-							onClick={onPrev}
+							onClick={() => {
+								triggerHaptic(40);
+								onPrev();
+							}}
 							disabled={!canGoPrev}
 							className="flex-1 sm:flex-none flex items-center justify-center gap-2 min-h-[44px] px-4 py-2 font-mono text-tiny font-bold uppercase tracking-widest border border-border-hard text-text-muted transition-colors enabled:hover:border-neon-cyan/50 enabled:hover:text-neon-cyan disabled:opacity-30 disabled:cursor-not-allowed"
 						>
@@ -107,7 +127,10 @@ export function FlashcardStudy({ queue, currentIndex, onMark, onPrev, canGoPrev,
 					{onRestart && (
 						<button
 							type="button"
-							onClick={onRestart}
+							onClick={() => {
+								triggerHaptic([40, 60, 40, 60, 40]);
+								onRestart();
+							}}
 							className="flex-1 sm:flex-none flex items-center justify-center gap-2 min-h-[44px] px-4 py-2 font-mono text-tiny font-bold uppercase tracking-widest border border-border-hard text-text-muted transition-colors hover:border-neon-red/50 hover:text-neon-red"
 						>
 							<RotateCcw className="w-3.5 h-3.5" /> Restart
@@ -153,7 +176,7 @@ export function FlashcardStudy({ queue, currentIndex, onMark, onPrev, canGoPrev,
 						animate={{ opacity: 1, y: 0, scale: 1, x: 0 }}
 						exit={{ opacity: 0, y: -20, scale: 0.95 }}
 						transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-						onClick={() => !flipped && setFlipped(true)}
+						onClick={handleFlip}
 						className="cursor-pointer touch-pan-y"
 					>
 						<div
@@ -231,7 +254,7 @@ export function FlashcardStudy({ queue, currentIndex, onMark, onPrev, canGoPrev,
 				<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center">
 					<button
 						type="button"
-						onClick={() => setFlipped(true)}
+						onClick={handleFlip}
 						className="btn-brutal px-6 py-3 flex items-center justify-center gap-2 mx-auto"
 					>
 						<Check className="w-4 h-4" /> Flip Card
